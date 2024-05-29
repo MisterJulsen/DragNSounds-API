@@ -12,7 +12,7 @@ import net.minecraft.commands.CommandSourceStack;
 
 public class SoundLocationArgument implements ArgumentType<SoundLocation> {
 
-    private static final Collection<String> EXAMPLES = Arrays.asList("foo:bar");
+    private static final Collection<String> EXAMPLES = Arrays.asList("namespace:path/to/file");
 
     public static SoundLocationArgument location() {
         return new SoundLocationArgument();

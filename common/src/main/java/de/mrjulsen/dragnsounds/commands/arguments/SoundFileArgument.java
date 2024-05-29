@@ -16,7 +16,7 @@ import net.minecraft.commands.CommandSourceStack;
 
 public class SoundFileArgument implements ArgumentType<SoundFile> {
 
-    private static final Collection<String> EXAMPLES = Arrays.asList("foo:bar");
+    private static final Collection<String> EXAMPLES = Arrays.asList("namespace:path/to/file/filename");
 
     public static SoundFileArgument location() {
         return new SoundFileArgument();
