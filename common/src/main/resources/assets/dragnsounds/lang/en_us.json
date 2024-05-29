@@ -5,5 +5,14 @@
     "gui.dragnsounds.upload.convert": "Converting audio format... (%s%%)",
     "gui.dragnsounds.upload.upload": "Uploading file... (%s%%)",
     "gui.dragnsounds.file_dialog.title": "Select a sudio file",
-    "gui.dragnsounds.file_dialog.filter": "Audio files"
+    "gui.dragnsounds.file_dialog.filter": "Audio files",
+
+    "gui.dragnsounds.upload.failed": "Upload failed.",
+    "gui.dragnsounds.command.sound.modified": "Sound modified.",
+    "gui.dragnsounds.command.sound.deleted": "Sound file deleted.",
+    "gui.dragnsounds.command.sound.stop_all": "All playing custom sounds have been stopped.",
+    "gui.dragnsounds.command.sound.stopped": "Custom sound playback stopped.",
+    "gui.dragnsounds.command.sound.upload_started": "Sound upload request has been sent to player.",
+    "gui.dragnsounds.command.sound.play": "Now playing custom sound %s to %s targets.",
+    "gui.dragnsounds.command.sound.cleanup": "Async sound file cleanup started. Check console for details."
 }

@@ -5,5 +5,14 @@
     "gui.dragnsounds.upload.convert": "Konvertiere Audioformat... (%s%%)",
     "gui.dragnsounds.upload.upload": "Wird hochgeladen... (%s%%)",
     "gui.dragnsounds.file_dialog.title": "Audiodatei wählen",
-    "gui.dragnsounds.file_dialog.filter": "Audiodateien"
+    "gui.dragnsounds.file_dialog.filter": "Audiodateien",
+    
+    "gui.dragnsounds.upload.failed": "Hochladen fehlgeschlagen",
+    "gui.dragnsounds.command.sound.modified": "Sound modifiziert.",
+    "gui.dragnsounds.command.sound.deleted": "Sounddatei gelöscht.",
+    "gui.dragnsounds.command.sound.stop_all": "Alle abgespielten dynamischen Sounds wurden gestoppt.",
+    "gui.dragnsounds.command.sound.stopped": "Dynamischer Sound wurde gestoppt.",
+    "gui.dragnsounds.command.sound.upload_started": "Eine Sound Hochlade-Anfrage wurde an den Client geschickt.",
+    "gui.dragnsounds.command.sound.play": "Dynamischer Sound %s wird für %s Ziele abgespielt.",
+    "gui.dragnsounds.command.sound.cleanup": "Asynchroner Bereinigungsprozess wurde gestartet. Prüfe die Konsole für Details."
 }

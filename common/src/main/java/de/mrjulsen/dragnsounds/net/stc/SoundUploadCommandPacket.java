@@ -15,6 +15,7 @@ import de.mrjulsen.mcdragonlib.util.TextUtils;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -82,7 +83,6 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                             SoundFile.Builder.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()),
                             packet.settings != null ? packet.settings : AudioSettings.getByFile(files.get()[0].toString()),
                             (file) -> {
-                                contextSupplier.get().getPlayer().sendMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.completed"), null);
                                 if (Minecraft.getInstance().screen == screen.get()) {
                                     DLScreen.setScreen(null);
                                 }
@@ -93,7 +93,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                                     screen.get().setBuffer(client.progress());
                                 }
                             }, (e) -> {
-                                contextSupplier.get().getPlayer().sendMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed"), null);
+                                contextSupplier.get().getPlayer().sendMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED), null);
                                 if (Minecraft.getInstance().screen == screen.get()) {
                                     DLScreen.setScreen(null);
                                 }
