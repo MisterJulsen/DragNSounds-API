@@ -1,6 +1,0 @@
-# Data Storage
-## Storage location
-All uploaded sound files are saved in a folder called `dragnsounds` in the `data` folder of the respective world. This folder usually contains several subfolders (depending on how many add-ons you have installed and how many subfolders each of them create). The subfolders on the first level are (when talking about [SoundLocation](../API/sound_location.md)s) the so-called namespaces. The first sound files or further subfolders with files can be found within these namespaces.
-
-## File structure
-In every folder in which sound files have been uploaded, there is usually also an [IndexFile](../API/index_file.md) file. While the sound files all have cryptic names to avoid problems with the length or the characters used in the file name, the [IndexFile](../API/index_file.md) contains an entry for each sound file with the same name as the file, which contains all information about the sound file. This includes file information (playback duration, artist, ...), technical data (file hash, owner, ...) and metadata, including the entered display name.
