@@ -21,7 +21,7 @@ subprojects {
 
     base {
         // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
-        archivesName = "$rootProject.archives_name-$rootProject.release_channel-$rootProject.minecraft_version-$project.name"
+        archivesName = "$rootProject.archives_name-$rootProject.release_channel-$project.name"
     }
 
     repositories {
@@ -53,7 +53,7 @@ subprojects {
 
     javadoc {
         options {
-            title = "DragNSounds API ${rootProject.minecraft_version}-${rootProject.mod_version}"
+            title = "DragNSounds API ${rootProject.release_channel}-${rootProject.mod_version}"
             tags("apiNote:a:API Note:")
             tags("implNote:a:Impl Note:")
             tags("implSpec:a:Impl Spec:")

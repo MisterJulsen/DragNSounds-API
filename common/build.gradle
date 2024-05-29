@@ -14,5 +14,5 @@ dependencies {
 }
 
 javadoc {
-    destinationDir = file("../docs/docs/javadoc")
+    destinationDir = file("../../Documentation/javadoc")
 }
