@@ -1,7 +1,7 @@
 # DragNSounds API
 
 <p align="center">
-  <a><img src="https://raw.githubusercontent.com/MisterJulsen/DragNSounds-API/Documentation/assets/logo.png" alt="Logo"></a>
+  <a href="https://misterjulsen.github.io/DragNSounds-API/"><img src="https://raw.githubusercontent.com/MisterJulsen/DragNSounds-API/Documentation/assets/logo.png" alt="Logo"></a>
   <a></a>
   <a href="https://discord.gg/AeSbNgvc7f"><img src="https://i.imgur.com/YnDoeHs.png" alt="Discord"></a>
   <a href="https://modrinth.com/mod/dragnsounds-api"><img src="https://i.imgur.com/uLIB4gb.png" alt="CurseForge"></a>
