@@ -1,0 +1,9 @@
+{
+    "soundCategory.custom": "Dynamische Sounds",
+
+    "gui.dragnsounds.upload.title": "Upload läuft. Bitte warten...",
+    "gui.dragnsounds.upload.convert": "Konvertiere Audioformat... (%s%%)",
+    "gui.dragnsounds.upload.upload": "Wird hochgeladen... (%s%%)",
+    "gui.dragnsounds.file_dialog.title": "Audiodatei wählen",
+    "gui.dragnsounds.file_dialog.filter": "Audiodateien"
+}

@@ -1,0 +1,9 @@
+{
+    "soundCategory.custom": "Dynamic Sounds",
+
+    "gui.dragnsounds.upload.title": "Upload in progress! Please wait...",
+    "gui.dragnsounds.upload.convert": "Converting audio format... (%s%%)",
+    "gui.dragnsounds.upload.upload": "Uploading file... (%s%%)",
+    "gui.dragnsounds.file_dialog.title": "Select a sudio file",
+    "gui.dragnsounds.file_dialog.filter": "Audio files"
+}

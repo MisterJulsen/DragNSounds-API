@@ -1,0 +1,3 @@
+accessWidener   v2  named
+accessible class com/mojang/blaze3d/audio/Library$ChannelPool
+accessible class com/mojang/blaze3d/audio/Library$CountingChannelPool
