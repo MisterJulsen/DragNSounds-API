@@ -49,7 +49,6 @@ import de.mrjulsen.dragnsounds.net.stc.modify.SoundSeekPacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundVolumePacket;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
 import de.mrjulsen.dragnsounds.registry.ModCommands;
-import de.mrjulsen.dragnsounds.test.ModItems;
 import de.mrjulsen.mcdragonlib.net.NetworkManagerBase;
 import dev.architectury.networking.NetworkChannel;
 import dev.architectury.platform.Platform;
@@ -67,7 +66,6 @@ public final class DragNSounds {
     private static NetworkManagerBase networkManager;
 
     public static void init() {
-        ModItems.register();
         ModCommands.init();
 
         if (Platform.getEnvironment() == Env.CLIENT) {
