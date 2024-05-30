@@ -8,9 +8,9 @@
     "MrJulsen"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod",
-    "issues": "" 
+    "homepage": "https://misterjulsen.github.io/DragNSounds-API",
+    "sources": "https://github.com/MisterJulsen/DragNSounds-API",
+    "issues": "https://github.com/MisterJulsen/DragNSounds-API/issues" 
   },
   "license": "GNU General Public License v3.0",
   "icon": "icon.png",
@@ -37,6 +37,7 @@
     "modmenu": {
       "links": {
         "modmenu.discord": "https://discord.gg/AeSbNgvc7f",
+        "modmenu.dragnsounds.documentation": "https://misterjulsen.github.io/DragNSounds-API/",
         "JAVE2": "https://github.com/a-schild/jave2"
       },
       "badges": [ "library" ]
