@@ -8,11 +8,13 @@
     "gui.dragnsounds.file_dialog.filter": "Audio files",
 
     "gui.dragnsounds.upload.failed": "Upload failed.",
-    "gui.dragnsounds.command.sound.modified": "Sound modified.",
-    "gui.dragnsounds.command.sound.deleted": "Sound file deleted.",
-    "gui.dragnsounds.command.sound.stop_all": "All playing custom sounds have been stopped.",
-    "gui.dragnsounds.command.sound.stopped": "Custom sound playback stopped.",
-    "gui.dragnsounds.command.sound.upload_started": "Sound upload request has been sent to player.",
-    "gui.dragnsounds.command.sound.play": "Now playing custom sound %s to %s targets.",
-    "gui.dragnsounds.command.sound.cleanup": "Async sound file cleanup started. Check console for details."
+    "gui.dragnsounds.commands.sound.modified": "Sound modified.",
+    "gui.dragnsounds.commands.sound.deleted": "Sound file deleted.",
+    "gui.dragnsounds.commands.sound.stop_all": "All playing custom sounds have been stopped.",
+    "gui.dragnsounds.commands.sound.stopped": "Custom sound playback stopped.",
+    "gui.dragnsounds.commands.sound.upload_started": "Sound upload request has been sent to player.",
+    "gui.dragnsounds.commands.sound.play": "Now playing custom sound \"%s\" to %s players.",
+    "gui.dragnsounds.commands.sound.cleanup": "Async sound file cleanup started. Check console for details.",
+    
+    "modmenu.dragnsounds.documentation": "Documentation"
 }
