@@ -26,6 +26,10 @@ public enum CustomSoundSource implements StringRepresentable {
         return Arrays.stream(SoundSource.values()).filter(x -> x.getName().equals(name)).findFirst().orElse(SoundSource.MASTER);
     }
 
+    public static SoundSource getSoundSourceByNameUnsafe(String name) {
+        return Arrays.stream(SoundSource.values()).filter(x -> x.getName().equals(name)).findFirst().get();
+    }
+
     @Override
     public String getSerializedName() {
         return getName();

@@ -28,6 +28,10 @@ public enum EChannels implements StringRepresentable, ITranslatableEnum {
     public static EChannels getByCount(int count) {
         return Arrays.stream(values()).filter(x -> x.getChannels() == count).findFirst().orElse(STEREO);
     }
+
+    public static EChannels getByNameUnsafe(String name) {
+        return Arrays.stream(values()).filter(x -> x.getName().equals(name)).findFirst().get();
+    }
         
     @Override
     public String getSerializedName() {

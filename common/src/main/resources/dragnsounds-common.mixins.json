@@ -4,12 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "SoundSourceMixin",
     "SoundBufferLibraryMixin",    
     "LibraryMixin",
     "ChannelMixin"
   ],
   "mixins": [
+    "SoundSourceMixin"
   ],
   "injectors": {
     "defaultRequire": 1
