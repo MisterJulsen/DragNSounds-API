@@ -62,6 +62,7 @@ public final class DragNSounds {
     public static final UUID ZERO_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public static final ThreadGroup ASYNC_GROUP = new ThreadGroup("Async Tasks");
+    public static final String DOCUMENTATION_UTL = "https://misterjulsen.github.io/DragNSounds-API/Mod/commands/";
 
     private static NetworkManagerBase networkManager;
 
