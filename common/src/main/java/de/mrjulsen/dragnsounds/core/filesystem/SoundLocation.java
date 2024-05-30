@@ -29,7 +29,7 @@ public class SoundLocation implements INBTSerializable {
      */
     public SoundLocation(Level level, String namespace, String relativePath) {
         this(level);
-        if (namespace.chars().anyMatch(x -> !isAllowedInNamespace((char)x))) {
+        if (namespace.isBlank() || namespace.chars().anyMatch(x -> !isAllowedInNamespace((char)x))) {
             throw new IllegalArgumentException(String.format("'%s' is no valid namespace in SoundLocation.", namespace));
         }
         this.namespace = namespace;
@@ -46,13 +46,19 @@ public class SoundLocation implements INBTSerializable {
     public SoundLocation(Level level, String location) {
         this(level);
         String[] parts = location.split(":");
+        
+        if (parts.length < 1) {
+            throw new IllegalArgumentException(String.format("SoundLocation must not be empty: %s", location));
+        }        
+
         String namespace = parts[0];
-        String relativePath = "";        
+        String relativePath = "";
+        
         if (parts.length > 1) {
             relativePath = parts[1];
         }
         
-        if (namespace.chars().anyMatch(x -> !isAllowedInNamespace((char)x))) {
+        if (namespace.isBlank() || namespace.chars().anyMatch(x -> !isAllowedInNamespace((char)x))) {
             throw new IllegalArgumentException(String.format("'%s' is no valid namespace in SoundLocation.", namespace));
         }
         this.namespace = namespace;
@@ -134,7 +140,7 @@ public class SoundLocation implements INBTSerializable {
      * @return The path to the directory inside the world's data folder where the sounds are saved.
      */
     public static final Path getModDirectory(Level level) {
-        return level.getServer().getWorldPath(new LevelResource("data/" + DragNSounds.MOD_ID));
+        return level.getServer().getWorldPath(new LevelResource("data\\" + DragNSounds.MOD_ID));
     }
 
     /**

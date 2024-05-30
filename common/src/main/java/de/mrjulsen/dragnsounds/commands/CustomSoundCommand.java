@@ -1,6 +1,5 @@
 package de.mrjulsen.dragnsounds.commands;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -11,7 +10,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.api.ServerApi;
 import de.mrjulsen.dragnsounds.commands.arguments.SoundSourceArgument;
@@ -28,64 +26,23 @@ import de.mrjulsen.dragnsounds.core.ffmpeg.AudioSettings;
 import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
-import de.mrjulsen.dragnsounds.events.ServerEvents;
 import de.mrjulsen.dragnsounds.net.stc.SoundUploadCommandPacket;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.Commands.CommandSelection;
 import net.minecraft.commands.arguments.AngleArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.RotationArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 public class CustomSoundCommand {
-
-    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_FILES = SuggestionProviders.register(
-        new ResourceLocation(DragNSounds.MOD_ID, "sound_files"),
-        (commandContext, suggestionsBuilder) -> {
-            return SharedSuggestionProvider.suggest(
-                ServerSoundManager.getAllSoundFiles(ServerEvents.getCurrentServer().overworld()).stream().map(x -> x.toString()).toArray(String[]::new),
-                suggestionsBuilder
-            );
-        });
-
-    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_LOCATIONS = SuggestionProviders.register(
-        new ResourceLocation(DragNSounds.MOD_ID, "sound_locations"),
-        (commandContext, suggestionsBuilder) -> {
-            return SharedSuggestionProvider.suggest(
-                ServerSoundManager.getAllUsedLocations(ServerEvents.getCurrentServer().overworld()).stream().map(x -> x.toString()).toArray(String[]::new),
-                suggestionsBuilder
-            );
-        });
-
-    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_SOURCES = SuggestionProviders.register(
-        new ResourceLocation(DragNSounds.MOD_ID, "sound_sources"),
-        (commandContext, suggestionsBuilder) -> {
-            return SharedSuggestionProvider.suggest(
-                Arrays.stream(SoundSource.values()).map(x -> x.getName()).toArray(String[]::new),
-                suggestionsBuilder
-            );
-        });
-          
-    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_CHANNELS = SuggestionProviders.register(
-        new ResourceLocation(DragNSounds.MOD_ID, "sound_channels"),
-        (commandContext, suggestionsBuilder) -> {
-            return SharedSuggestionProvider.suggest(
-                Arrays.stream(EChannels.values()).map(x -> x.getName()).toArray(String[]::new),
-                suggestionsBuilder
-            );
-        });
-
 
     private static final String CMD_NAME = "sound";
     
@@ -130,20 +87,18 @@ public class CustomSoundCommand {
     private static final String ARG_ANGLE_B = "AngleB";
     private static final String ARG_OUTER_GAIN = "outerGain";
     private static final String ARG_DOPPLER = "dopplerFactor";
-
-
     
     @SuppressWarnings("all")
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandSelection selection) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandSelection selection) {        
         
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(CMD_NAME)
             .requires(x -> x.hasPermission(CommonConfig.USE_SOUND_COMMAND_PERMISSION.get()))
             .then(Commands.literal(SUB_PLAY)
-                .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location()).suggests(ALL_SOUND_FILES)
+                .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location())
                     .executes(x -> playSound(x.getSource(), fileArg(x) ))
                     .then(Commands.argument(ARG_PLAYERS, EntityArgument.players())
                         .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x)))
-                        .then(Commands.argument(ARG_SOURCE, SoundSourceArgument.soundSource()).suggests(ALL_SOUND_SOURCES)
+                        .then(Commands.argument(ARG_SOURCE, SoundSourceArgument.soundSource())
                             .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x)))
                             .then(Commands.argument(ARG_VOLUME, FloatArgumentType.floatArg(CustomSoundInstance.VOLUME_MIN, CustomSoundInstance.VOLUME_MAX))
                                 .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x), volumeArg(x)))
@@ -170,13 +125,13 @@ public class CustomSoundCommand {
                 .executes(x -> stopSound(x.getSource()))
                 .then(Commands.argument(ARG_PLAYERS, EntityArgument.players())
                     .executes(x -> stopSound(x.getSource(), playersArg(x)))
-                    .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location()).suggests(ALL_SOUND_FILES)
+                    .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location())
                         .executes(x -> stopSound(x.getSource(), playersArg(x), fileArg(x)))
                     )
                 )
             ).then(Commands.literal(SUB_MODIFY)
                 .then(Commands.argument(ARG_PLAYER, EntityArgument.player())
-                    .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location()).suggests(ALL_SOUND_FILES)
+                    .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location())
                         .then(Commands.literal(SUB_MODIFY_VOL)
                             .then(Commands.argument(ARG_VOLUME, FloatArgumentType.floatArg(CustomSoundInstance.VOLUME_MIN, CustomSoundInstance.VOLUME_MAX))
                                 .executes(x -> volume(x.getSource(), playerArg(x), fileArg(x), volumeArg(x)))
@@ -222,12 +177,12 @@ public class CustomSoundCommand {
                     )
                 )
             ).then(Commands.literal(SUB_UPLOAD).requires(x -> x.hasPermission(CommonConfig.MANAGE_SOUND_COMMAND_PERMISSION.get()))
-                .then(Commands.argument(ARG_LOCATION, SoundLocationArgument.location()).suggests(ALL_SOUND_LOCATIONS)
+                .then(Commands.argument(ARG_LOCATION, SoundLocationArgument.location())
                     .then(Commands.argument(ARG_DISPLAY_NAME, StringArgumentType.string())
                         .executes(x -> uploadSound(x.getSource(), locationArg(x), displayNameArg(x)))
                         .then(Commands.argument(ARG_PLAYER, EntityArgument.player())
                             .executes(x -> uploadSound(x.getSource(), locationArg(x), displayNameArg(x), playerArg(x)))
-                            .then(Commands.argument(ARG_CHANNELS, SoundChannelsArgument.channels()).suggests(ALL_SOUND_CHANNELS)
+                            .then(Commands.argument(ARG_CHANNELS, SoundChannelsArgument.channels())
                                 .then(Commands.argument(ARG_BIT_RATE, IntegerArgumentType.integer(1))
                                     .then(Commands.argument(ARG_SAMPLING_RATE, IntegerArgumentType.integer(1))
                                         .then(Commands.argument(ARG_QUALITY, IntegerArgumentType.integer(1, 10))
@@ -244,7 +199,7 @@ public class CustomSoundCommand {
                 )
             
             ).then(Commands.literal(SUB_DELETE).requires(x -> x.hasPermission(CommonConfig.MANAGE_SOUND_COMMAND_PERMISSION.get()))
-                .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location()).suggests(ALL_SOUND_FILES)
+                .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location())
                     .executes(x -> deleteSound(x.getSource(), fileArg(x)))
                 )
             ).then(Commands.literal(SUB_CLEAN_UP).requires(x -> x.hasPermission(CommonConfig.MANAGE_SOUND_COMMAND_PERMISSION.get()))
