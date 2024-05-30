@@ -404,8 +404,9 @@ public final class ClientSoundManager {
     /* DEBUG AREA */
 
     public static void printDebug(List<String> debugScreen) {
-        debugScreen.add(ServerInstanceManager.debugString());
-
+        if (DragNSounds.hasServer()) {
+            debugScreen.add(ServerInstanceManager.debugString());
+        }
         if (Platform.getEnvironment() == Env.CLIENT) {
             debugScreen.add(ClientInstanceManager.debugString());
         }

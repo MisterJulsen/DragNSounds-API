@@ -11,12 +11,16 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
+import de.mrjulsen.dragnsounds.core.callbacks.server.SoundGetDataCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCheckCallback;
 import de.mrjulsen.dragnsounds.core.data.PlayerboundDataBuffer;
 import de.mrjulsen.dragnsounds.core.data.UploadSoundBuffer;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
+import de.mrjulsen.mcdragonlib.util.TextUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -110,19 +114,33 @@ public final class ServerInstanceManager {
     /* DEBUG AREA */
 
     public static String debugString() {
-        return String.format("DS-API[S] F: %s+%s, U: %s, IdL: %s, C: [%s,%s]",
+        return String.format("DS-API[S] F: %s+%s, U: %s, IdL: %s, C: [%s,%s,%s]",
             activeBuffers.size(),
             activeBuffersBySoundId.size(),
             uploadFileCache.size(),
             uploadIdLocker.size(),
             SoundPlayingCallback.getCount(),
-            SoundPlayingCheckCallback.getCount()
+            SoundPlayingCheckCallback.getCount(),
+            SoundGetDataCallback.getCount()
         );
+    }
+
+    public static MutableComponent debugComponent() {
+        return TextUtils.empty().append(TextUtils.text("DragNSounds API Status (Server):").withStyle(ChatFormatting.GOLD).withStyle(ChatFormatting.BOLD))
+            .append("\n").append(TextUtils.text("ActiveFileStreams").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(activeBuffers.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("ActiveFileStreams (by id)").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(activeBuffersBySoundId.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("UploadFileCache").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(uploadFileCache.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("UploadIdLocker").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(uploadIdLocker.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundPlayingCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundPlayingCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundPlayingCheckCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundPlayingCheckCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundGetDataCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundGetDataCallback.getCount())).withStyle(ChatFormatting.RED))
+        ;
     }
 
     public static void clearCallbacks() {
         SoundPlayingCallback.clear();
         SoundPlayingCheckCallback.clear();
+        SoundGetDataCallback.clear();
         activeBuffers.clear();
         activeBuffersBySoundId.clear();
         uploadFileCache.clear();

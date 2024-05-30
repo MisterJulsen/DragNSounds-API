@@ -28,6 +28,7 @@ import de.mrjulsen.dragnsounds.net.cts.UpdateMetadataPacket;
 import de.mrjulsen.dragnsounds.net.cts.UploadSoundPacket;
 import de.mrjulsen.dragnsounds.net.stc.AllMetadataResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.PlaySoundPacket;
+import de.mrjulsen.dragnsounds.net.stc.PrintDebugPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDeleteResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundFileResponsePacket;
@@ -111,6 +112,7 @@ public final class DragNSounds {
             SoundDeleteResponsePacket.class,
             SoundUploadCommandPacket.class,
             StopAllSoundsPacket.class,
+            PrintDebugPacket.class,
 
             SoundConeDirectionPacket.class,
             SoundDopplerPacket.class,
@@ -127,5 +129,9 @@ public final class DragNSounds {
 
     public static NetworkChannel net() {
         return networkManager.CHANNEL;
+    }
+    
+    public static boolean hasServer() {
+        return ServerEvents.getCurrentServer() != null;
     }
 }

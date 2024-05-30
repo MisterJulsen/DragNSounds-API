@@ -24,6 +24,9 @@ import de.mrjulsen.dragnsounds.core.data.SoundDataStream;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.net.cts.SoundCreatedResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
+import de.mrjulsen.mcdragonlib.util.TextUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
 
 public final class ClientInstanceManager {
 
@@ -165,7 +168,7 @@ public final class ClientInstanceManager {
     /* DEBUG AREA */
 
     public static String debugString() {
-        return String.format("DS-API[C] B: %s, Ch: %s, L: %s, R: %s, RC: %s, C: [%s,%s,%s,%s,%s,%s,%s,%s,%s], IdL: %s, GC: %s",
+        return String.format("DS-API[C] B: %s, Ch: %s, L: %s, R: %s, RC: %s, C: [%s,%s,%s,%s,%s,%s,%s,%s], IdL: %s, GC: %s",
             SoundStreamHolder.getCount(),
             SoundChannelsHolder.getCount(),
             soundCommandListeners.size(),
@@ -177,7 +180,6 @@ public final class ClientInstanceManager {
             SoundListCallback.getCount(),
             SoundMetadataCallback.getCount(),
             SoundUploadCallback.getCount(),
-            SoundUploadProgressCallback.getCount(),            
             SoundUploadProgressCallback.getCount(),
             SoundErrorCallback.getCount(),
             SoundUploadCancelCallback.getCount(),
@@ -185,5 +187,27 @@ public final class ClientInstanceManager {
             blockedSoundIds.size(),
             gcCount
         );
+    }
+
+    
+
+    public static MutableComponent debugComponent() {
+        return TextUtils.empty().append(TextUtils.text("DragNSounds API Status (Client):").withStyle(ChatFormatting.GOLD).withStyle(ChatFormatting.BOLD))
+            .append("\n").append(TextUtils.text("SoundStreamHolder").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundStreamHolder.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundChannelsHolder").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundChannelsHolder.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundCommandListeners").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(soundCommandListeners.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("PendingSoundRequests").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(pendingSoundRequests.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("RunnableCallbacks").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(runnableCallbacks.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundDeleteCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundDeleteCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundFileCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundFileCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundListCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundListCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundMetadataCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundMetadataCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundUploadCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundUploadCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundUploadProgressCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundUploadProgressCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundErrorCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundErrorCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("SoundUploadCancelCallback").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(SoundUploadCancelCallback.getCount())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("blockedSoundIds").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(blockedSoundIds.size())).withStyle(ChatFormatting.RED))
+            .append("\n").append(TextUtils.text("GC Count").append(": ").withStyle(ChatFormatting.YELLOW)).append(TextUtils.text(String.valueOf(gcCount)).withStyle(ChatFormatting.RED))
+        ;
     }
 }
