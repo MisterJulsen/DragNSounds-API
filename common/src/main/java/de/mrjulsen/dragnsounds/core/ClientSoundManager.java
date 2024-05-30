@@ -394,6 +394,12 @@ public final class ClientSoundManager {
         DragNSounds.net().sendToServer(new SoundFileRequestPacket(requestId, id, location));
     }
 
+    @SuppressWarnings("resource")
+    public static SoundFile getClientDummySoundFile(String location, String id) {
+        SoundLocation loc = new SoundLocation(Minecraft.getInstance().level, location);
+        return SoundFile.client(loc, UUID.fromString(id));
+    }
+
 
     /* DEBUG AREA */
 

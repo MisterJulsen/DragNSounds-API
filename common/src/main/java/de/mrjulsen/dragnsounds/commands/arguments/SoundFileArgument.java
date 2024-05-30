@@ -9,9 +9,11 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.events.ServerEvents;
+import dev.architectury.utils.EnvExecutor;
 import net.minecraft.commands.CommandSourceStack;
 
 public class SoundFileArgument implements ArgumentType<SoundFile> {
@@ -36,8 +38,13 @@ public class SoundFileArgument implements ArgumentType<SoundFile> {
         }
         String string = reader.getString().substring(i, reader.getCursor());
         int lastSlashIndex = string.lastIndexOf('/');
-        SoundLocation loc = new SoundLocation(ServerEvents.getCurrentServer().overworld(), string.substring(0, lastSlashIndex));
-        return SoundFile.of(loc, UUID.fromString(string.substring(lastSlashIndex + 1))).get();
+        
+        return EnvExecutor.getEnvSpecific(() -> () -> {
+            return ClientSoundManager.getClientDummySoundFile(string.substring(0, lastSlashIndex), string.substring(lastSlashIndex + 1));
+        }, () -> () -> {
+            SoundLocation loc = new SoundLocation(ServerEvents.getCurrentServer().overworld(), string.substring(0, lastSlashIndex));
+            return SoundFile.of(loc, UUID.fromString(string.substring(lastSlashIndex + 1))).get();
+        });
     }
 
     @Override

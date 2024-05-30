@@ -248,6 +248,13 @@ public class SoundFile {
         return Optional.empty();
     }
 
+    public static SoundFile client(SoundLocation location, UUID id) {
+        SoundFile file = new SoundFile();
+        file.location = location;
+        file.id = id;
+        return file;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(hash(), getId(), getLocation());
