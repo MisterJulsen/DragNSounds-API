@@ -1,5 +1,6 @@
 package de.mrjulsen.dragnsounds.commands;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -13,6 +14,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.api.ServerApi;
+import de.mrjulsen.dragnsounds.commands.arguments.SoundSourceArgument;
+import de.mrjulsen.dragnsounds.commands.arguments.SoundChannelsArgument;
 import de.mrjulsen.dragnsounds.commands.arguments.SoundFileArgument;
 import de.mrjulsen.dragnsounds.commands.arguments.SoundLocationArgument;
 import de.mrjulsen.dragnsounds.config.CommonConfig;
@@ -44,7 +47,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.server.command.EnumArgument;
 
 public class CustomSoundCommand {
 
@@ -66,7 +68,24 @@ public class CustomSoundCommand {
             );
         });
 
-    private static final String HELP_URL = "https://misterjulsen.github.io/DragNSounds-API/Mod/commands/";
+    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_SOURCES = SuggestionProviders.register(
+        new ResourceLocation(DragNSounds.MOD_ID, "sound_sources"),
+        (commandContext, suggestionsBuilder) -> {
+            return SharedSuggestionProvider.suggest(
+                Arrays.stream(SoundSource.values()).map(x -> x.getName()).toArray(String[]::new),
+                suggestionsBuilder
+            );
+        });
+          
+    public static final SuggestionProvider<CommandSourceStack> ALL_SOUND_CHANNELS = SuggestionProviders.register(
+        new ResourceLocation(DragNSounds.MOD_ID, "sound_channels"),
+        (commandContext, suggestionsBuilder) -> {
+            return SharedSuggestionProvider.suggest(
+                Arrays.stream(EChannels.values()).map(x -> x.getName()).toArray(String[]::new),
+                suggestionsBuilder
+            );
+        });
+
 
     private static final String CMD_NAME = "sound";
     
@@ -124,7 +143,7 @@ public class CustomSoundCommand {
                     .executes(x -> playSound(x.getSource(), fileArg(x) ))
                     .then(Commands.argument(ARG_PLAYERS, EntityArgument.players())
                         .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x)))
-                        .then(Commands.argument(ARG_SOURCE, EnumArgument.enumArgument(SoundSource.class))
+                        .then(Commands.argument(ARG_SOURCE, SoundSourceArgument.soundSource()).suggests(ALL_SOUND_SOURCES)
                             .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x)))
                             .then(Commands.argument(ARG_VOLUME, FloatArgumentType.floatArg(CustomSoundInstance.VOLUME_MIN, CustomSoundInstance.VOLUME_MAX))
                                 .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x), volumeArg(x)))
@@ -208,7 +227,7 @@ public class CustomSoundCommand {
                         .executes(x -> uploadSound(x.getSource(), locationArg(x), displayNameArg(x)))
                         .then(Commands.argument(ARG_PLAYER, EntityArgument.player())
                             .executes(x -> uploadSound(x.getSource(), locationArg(x), displayNameArg(x), playerArg(x)))
-                            .then(Commands.argument(ARG_CHANNELS, EnumArgument.enumArgument(EChannels.class))
+                            .then(Commands.argument(ARG_CHANNELS, SoundChannelsArgument.channels()).suggests(ALL_SOUND_CHANNELS)
                                 .then(Commands.argument(ARG_BIT_RATE, IntegerArgumentType.integer(1))
                                     .then(Commands.argument(ARG_SAMPLING_RATE, IntegerArgumentType.integer(1))
                                         .then(Commands.argument(ARG_QUALITY, IntegerArgumentType.integer(1, 10))
@@ -236,7 +255,7 @@ public class CustomSoundCommand {
                 })
             ).then(Commands.literal(SUB_HELP)
                 .executes(x -> {
-                    Util.getPlatform().openUri(HELP_URL);
+                    Util.getPlatform().openUri(DragNSounds.DOCUMENTATION_UTL);
                     return 1;
                 })
             )
