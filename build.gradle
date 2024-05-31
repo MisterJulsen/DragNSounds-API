@@ -19,6 +19,8 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: "java"
 
+    def includeDependencies = rootProject.hasProperty('includeDependencies') && rootProject.includeDependencies.toBoolean()
+
     base {
         // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
         archivesName = "$rootProject.archives_name-$rootProject.release_channel-$project.name"
@@ -30,6 +32,10 @@ subprojects {
         maven { url = "https://maven.parchmentmc.org" } // ParchmentMC
         maven { url = "https://mvnrepository.com/artifact/ws.schild/jave-all-deps"} // jave
         maven { url = "https://maven.terraformersmc.com/" } // ModMenu
+    }
+        
+    gradle.startParameter.taskNames.each { taskName ->
+        rootProject.includeDependencies = !taskName.contains("publish".toLowerCase())
     }
 
     dependencies {
@@ -49,7 +55,7 @@ subprojects {
 
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }    
+    }
 
     javadoc {
         options {
@@ -84,4 +90,5 @@ subprojects {
             }
         }
     }
+    
 }

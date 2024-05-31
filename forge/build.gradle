@@ -43,15 +43,17 @@ dependencies {
     modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-forge:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
     modImplementation("net.minecraftforge:forgeconfigapiport-fabric:${rootProject.forge_config_api_port_version}")
     
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-core:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux32:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux64:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux-arm32:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux-arm64:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-win32:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-win64:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-osxm1:3.5.0")))
-    modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-osx64:3.5.0")))
+    if (rootProject.includeDependencies.toBoolean()) {
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-core:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux32:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux64:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux-arm32:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-linux-arm64:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-win32:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-win64:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-osxm1:3.5.0")))
+        modImplementation(forgeRuntimeLibrary(include("ws.schild:jave-nativebin-osx64:3.5.0")))
+    }
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')

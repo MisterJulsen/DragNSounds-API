@@ -29,22 +29,22 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
-
-    // Architectury API. This is optional, and you can comment it out if you don't need it.
-    //modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
     
     modCompileOnly("com.electronwill.night-config:toml:3.6.0")
     modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
-    modImplementation(include("ws.schild:jave-core:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-linux32:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-linux64:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-linux-arm32:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-linux-arm64:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-win32:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-win64:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-osxm1:3.5.0"))
-    modImplementation(include("ws.schild:jave-nativebin-osx64:3.5.0"))
     
+    if (rootProject.includeDependencies.toBoolean()) {        
+        modImplementation(include("ws.schild:jave-core:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-linux32:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-linux64:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-linux-arm32:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-linux-arm64:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-win32:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-win64:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-osxm1:3.5.0"))
+        modImplementation(include("ws.schild:jave-nativebin-osx64:3.5.0"))
+    }    
+
     modImplementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
