@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.mojang.blaze3d.audio.Channel;
 
@@ -37,12 +36,19 @@ public class ChannelMixin implements ISelfCast<Channel> {
     @Shadow
     private void pumpBuffers(int amount) {}
 
+
     @Inject(method = "attachBufferStream", at = @At(value = "TAIL"))
     private void onAttachBufferStream(AudioStream stream, CallbackInfo ci) { 
         if (stream instanceof CustomOggAudioStream customStream) {
             isCustom = true;
             soundId = customStream.getSoundId();
-            SoundChannelsHolder.create(soundId, new ChannelContext(self(), source, soundId, streamingBufferSize, this::pumpBuffers));
+            SoundChannelsHolder.create(soundId, new ChannelContext(self(), source, soundId, streamingBufferSize, (i) -> {
+                try {
+                    pumpBuffers(i);
+                } catch (NoSuchMethodError err) {
+                    DragNSounds.LOGGER.error("Unable to provide pumpBuffers() method.", err);
+                }
+            }));
             ClientInstanceManager.runRunnableCallback(soundId);
         }
     }
@@ -50,7 +56,7 @@ public class ChannelMixin implements ISelfCast<Channel> {
     /**
      * Max of 4 buffered samples!
      */
-    @Inject(method = "updateStream()V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/audio/Channel;pumpBuffers(I)V", ordinal = 0), cancellable = true)
+    @Inject(method = "updateStream", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/audio/Channel;pumpBuffers(I)V", ordinal = 0), cancellable = true)
     private void onUpdateStream(CallbackInfo ci) {
         int i = AL10.alGetSourcei(this.source, AL10.AL_BUFFERS_QUEUED);
         if (i >= 4) {
@@ -66,13 +72,6 @@ public class ChannelMixin implements ISelfCast<Channel> {
             ClientInstanceManager.delayedSoundGC(soundId, 60000);
             DragNSounds.net().sendToServer(new StopSoundNotificationPacket(soundId));
             DragNSounds.LOGGER.info("Audio Channel of sound " + soundId + " removed.");
-        }
-    }
-
-    @Inject(method = "pumpBuffers", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/AudioStream;read(I)Ljava/nio/ByteBuffer;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void onPumpBuffers(int readCount, CallbackInfo ci, int i2) {
-        if (readCount > 4) {
-            // DO STUFF
         }
     }
 }
