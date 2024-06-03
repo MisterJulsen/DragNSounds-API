@@ -41,8 +41,3 @@ mandatory = true
 versionRange = "[1.18.2-2.1.8,)"
 ordering = "AFTER"
 side = "BOTH"
-
-[[mixins]]
-config="dragnsounds.mixins.json"
-[[mixins]]
-config="dragnsounds-common.mixins.json"

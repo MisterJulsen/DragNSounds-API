@@ -7,10 +7,11 @@ loom {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"    
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+   
     modCompileOnly("com.electronwill.night-config:toml:3.6.0")
     modImplementation("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}")
-    implementation("ws.schild:jave-all-deps:3.5.0")
+    implementation("ws.schild:jave-all-deps:${rootProject.jave_version}")
 }
 
 javadoc {

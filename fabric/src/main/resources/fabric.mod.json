@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "dragnsounds-common.mixins.json"
+    "dragnsounds.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.11",

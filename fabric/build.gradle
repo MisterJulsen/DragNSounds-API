@@ -16,8 +16,6 @@ configurations {
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
 
-    // Files in this configuration will be bundled into your mod using the Shadow plugin.
-    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
     shadowBundle {
         canBeResolved = true
         canBeConsumed = false
@@ -29,23 +27,22 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
-    
-    modCompileOnly("com.electronwill.night-config:toml:3.6.0")
-    modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
-    
-    if (rootProject.includeDependencies.toBoolean()) {        
-        modImplementation(include("ws.schild:jave-core:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-linux32:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-linux64:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-linux-arm32:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-linux-arm64:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-win32:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-win64:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-osxm1:3.5.0"))
-        modImplementation(include("ws.schild:jave-nativebin-osx64:3.5.0"))
-    }    
 
-    modImplementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
+    modCompileOnly("com.electronwill.night-config:toml:3.6.0")
+    modRuntimeOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
+    modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
+     
+    if (rootProject.includeDependencies.toBoolean()) {        
+        modImplementation(include("ws.schild:jave-core:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-linux32:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-linux64:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-linux-arm32:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-linux-arm64:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-win32:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-win64:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-osxm1:${rootProject.jave_version}"))
+        modImplementation(include("ws.schild:jave-nativebin-osx64:${rootProject.jave_version}"))
+    }
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
