@@ -15,6 +15,12 @@
     "gui.dragnsounds.commands.sound.upload_started": "Sound upload request has been sent to player.",
     "gui.dragnsounds.commands.sound.play": "Now playing custom sound \"%s\" to %s players.",
     "gui.dragnsounds.commands.sound.cleanup": "Async sound file cleanup started. Check console for details.",
+
+    "enum.dragnsounds.audio_channels.mono": "Mono",
+    "enum.dragnsounds.audio_channels.stereo": "Stereo",
+    "enum.dragnsounds.audio_channels.info.mono": "The sound uses only one channel, and can rely on a specific position. Most realistic for sounds effects.",
+    "enum.dragnsounds.audio_channels.info.stereo": "The sound uses two channels, but cannot rely to a specific position. Recommended for background music.",
+    "enum.dragnsounds.audio_channels.description": "The amount of channels used in the sound.",
     
     "modmenu.dragnsounds.documentation": "Documentation"
 }
