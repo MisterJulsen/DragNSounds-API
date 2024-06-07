@@ -28,8 +28,10 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
+    modCompileOnly("dev.architectury:architectury-fabric:${rootProject.architectury_api_version}")
     modCompileOnly("com.electronwill.night-config:toml:3.6.0")
     modRuntimeOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
+    modImplementation("net.minecraftforge:forgeconfigapiport-fabric:${rootProject.forge_config_api_port_version}")
     modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
      
     if (rootProject.includeDependencies.toBoolean()) {        

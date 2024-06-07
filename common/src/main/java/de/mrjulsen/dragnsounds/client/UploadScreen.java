@@ -6,6 +6,7 @@ import de.mrjulsen.dragnsounds.api.ClientApi.UploadState;
 import de.mrjulsen.mcdragonlib.DragonLib;
 import de.mrjulsen.mcdragonlib.client.gui.DLScreen;
 import de.mrjulsen.mcdragonlib.client.gui.widgets.DLButton;
+import de.mrjulsen.mcdragonlib.client.gui.widgets.DLProgressBar;
 import de.mrjulsen.mcdragonlib.client.render.DynamicGuiRenderer;
 import de.mrjulsen.mcdragonlib.client.util.Graphics;
 import de.mrjulsen.mcdragonlib.client.util.GuiAreaDefinition;
@@ -16,7 +17,7 @@ import net.minecraft.network.chat.CommonComponents;
 
 public class UploadScreen extends DLScreen {
 
-    protected ProgressBarWidget progressBar;
+    protected DLProgressBar progressBar;
     protected final long uploadId;
     protected DLButton cancelButton;
 
@@ -33,7 +34,7 @@ public class UploadScreen extends DLScreen {
     @Override
     protected void init() {
         super.init();
-        this.progressBar = addRenderableOnly(new ProgressBarWidget(width / 2 - 80, height / 2, 160, 0, 100, 0));
+        this.progressBar = addRenderableOnly(new DLProgressBar(width / 2 - 80, height / 2, 160, 0, 100, 0));
         this.progressBar.setBackColor(0xFF000000);
         this.progressBar.setBorderColor(DragonLib.NATIVE_BUTTON_FONT_COLOR_DISABLED);
         this.progressBar.setBarColor(0xFFA4EB34);
