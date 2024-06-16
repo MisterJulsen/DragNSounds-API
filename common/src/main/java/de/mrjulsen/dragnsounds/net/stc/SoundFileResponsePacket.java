@@ -53,7 +53,7 @@ public class SoundFileResponsePacket implements IPacketBase<SoundFileResponsePac
     public void handle(SoundFileResponsePacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.of(SoundFile.fromNbt(nbt, contextSupplier.get().getPlayer().getLevel()));
+                Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.of(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()));
                 SoundFileCallback.run(packet.requestId, file);
             });
         });
