@@ -107,7 +107,7 @@ public final class ClientSoundManager {
 
             switch (playback.type()) {
                 case WORLD:
-                    playWorldSound(soundId, file, SoundSource.MASTER, playback.volume(), playback.pitch(), playback.pos(), playback.relative(), playback.attenuationDistance());
+                    playWorldSound(soundId, file, CustomSoundSource.getSoundSourceByName(playback.soundSourceName()), playback.volume(), playback.pitch(), playback.pos(), playback.relative(), playback.attenuationDistance());
                     break;
                 default:
                     playUiSound(soundId, file, playback.volume(), playback.pitch());
