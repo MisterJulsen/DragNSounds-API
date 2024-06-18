@@ -60,6 +60,16 @@ public class CustomSoundInstance extends AbstractSoundInstance {
     }
 
     @Override
+    public float getVolume() {
+        return volume;
+    }
+
+    @Override
+    public float getPitch() {
+        return pitch;
+    }
+
+    @Override
     public WeighedSoundEvents resolve(SoundManager manager) {   
         WeighedSoundEvents event = new WeighedSoundEvents(new ResourceLocation(DragNSounds.MOD_ID, CUSTOM_SOUND_FILENAME_ROOT), file.getDisplayName());
         Sound sound = new Sound(DragNSounds.MOD_ID + ":" + CUSTOM_SOUND_FILENAME_ROOT + "/" + String.valueOf(soundId), volume, pitch, 1, Type.FILE, true, false, getAttenuationDistance());
