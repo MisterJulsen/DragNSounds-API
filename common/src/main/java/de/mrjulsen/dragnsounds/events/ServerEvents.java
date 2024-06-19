@@ -39,7 +39,7 @@ public class ServerEvents {
             ServerSoundManager.closeOnDisconnect(player);
         });
 
-        CommandRegistrationEvent.EVENT.register((dispatcher, selection) -> {
+        CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {
             CustomSoundCommand.register(dispatcher, selection);
             StatusCommand.register(dispatcher, selection);
             DragNSounds.LOGGER.info("Custom commands registered.");

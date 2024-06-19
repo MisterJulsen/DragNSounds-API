@@ -93,7 +93,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                                     screen.get().setBuffer(client.progress());
                                 }
                             }, (e) -> {
-                                contextSupplier.get().getPlayer().sendMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED), null);
+                                contextSupplier.get().getPlayer().sendSystemMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED));
                                 if (Minecraft.getInstance().screen == screen.get()) {
                                     DLScreen.setScreen(null);
                                 }

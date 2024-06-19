@@ -36,7 +36,7 @@ public abstract class LibraryMixin {
     
 
     @Inject(method = "init", at = @At("TAIL"))
-    private void onInit(@Nullable String deviceSpecifier, CallbackInfo ci) {
+    private void onInit(@Nullable String deviceSpecifier, boolean allowHrtf, CallbackInfo ci) {
         streamingChannels = new CountingChannelPool(ClientConfig.MAX_STREAMING_CHANNELS.get());
         staticChannels = new CountingChannelPool(247);
     }

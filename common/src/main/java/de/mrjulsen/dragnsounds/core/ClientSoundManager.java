@@ -50,10 +50,10 @@ import de.mrjulsen.dragnsounds.net.cts.UploadSoundPacket;
 import de.mrjulsen.mcdragonlib.DragonLib;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
 import de.mrjulsen.mcdragonlib.util.MathUtils;
+import de.mrjulsen.mcdragonlib.util.TextUtils;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import ws.schild.jave.EncoderException;
@@ -93,7 +93,7 @@ public final class ClientSoundManager {
                 }
     
                 if (playback.showNowPlayingText()) {
-                    Minecraft.getInstance().gui.setNowPlaying(new TextComponent(file.getDisplayName()));
+                    Minecraft.getInstance().gui.setNowPlaying(TextUtils.text(file.getDisplayName()));
                 }
     
                 if (clientCallbackRequestId > 0) {

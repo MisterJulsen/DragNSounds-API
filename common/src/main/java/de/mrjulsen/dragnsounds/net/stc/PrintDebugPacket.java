@@ -23,7 +23,7 @@ public class PrintDebugPacket implements IPacketBase<PrintDebugPacket> {
     public void handle(PrintDebugPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                contextSupplier.get().getPlayer().sendMessage(ClientInstanceManager.debugComponent(), null);
+                contextSupplier.get().getPlayer().sendSystemMessage(ClientInstanceManager.debugComponent());
             });
         });
     }

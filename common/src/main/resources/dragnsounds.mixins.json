@@ -9,7 +9,8 @@
     "ChannelMixin"
   ],
   "mixins": [
-    "SoundSourceMixin"
+    "SoundSourceMixin",
+    "ArgumentTypesAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

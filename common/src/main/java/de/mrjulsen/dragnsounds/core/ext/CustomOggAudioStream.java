@@ -64,7 +64,7 @@ public class CustomOggAudioStream implements AudioStream {
                 throw new IOException("Failed to read Ogg file " + j);
             }
             this.buffer.position(this.buffer.position() + intBuffer.get(0));
-            STBVorbisInfo sTBVorbisInfo = STBVorbisInfo.mallocStack(memoryStack);
+            STBVorbisInfo sTBVorbisInfo = STBVorbisInfo.malloc(memoryStack);
             STBVorbis.stb_vorbis_get_info(this.handle, sTBVorbisInfo);
             this.audioFormat = new AudioFormat(sTBVorbisInfo.sample_rate(), 16, sTBVorbisInfo.channels(), true, false);
         }

@@ -14,11 +14,11 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
+import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public class SoundChannelsArgument implements ArgumentType<EChannels> {
-    private static final Dynamic2CommandExceptionType INVALID_ENUM = new Dynamic2CommandExceptionType((found, constants) -> new TranslatableComponent("commands.forge.arguments.enum.invalid", constants, found));
+    private static final Dynamic2CommandExceptionType INVALID_ENUM = new Dynamic2CommandExceptionType((found, constants) -> TextUtils.translate("commands.forge.arguments.enum.invalid", constants, found));
 
     public static SoundChannelsArgument channels() {
         return new SoundChannelsArgument();
@@ -34,6 +34,7 @@ public class SoundChannelsArgument implements ArgumentType<EChannels> {
             }
             return source;
         } catch (IllegalArgumentException e) {
+            System.out.println("SALZ");
             throw INVALID_ENUM.createWithContext(reader, name, Arrays.toString(Arrays.stream(EChannels.values()).map(x -> x.getName()).toArray()));
         }
     }

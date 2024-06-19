@@ -14,12 +14,12 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import de.mrjulsen.dragnsounds.core.ext.CustomSoundSource;
+import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundSource;
 
 public class SoundSourceArgument implements ArgumentType<SoundSource> {
-    private static final Dynamic2CommandExceptionType INVALID_ENUM = new Dynamic2CommandExceptionType((found, constants) -> new TranslatableComponent("commands.forge.arguments.enum.invalid", constants, found));
+    private static final Dynamic2CommandExceptionType INVALID_ENUM = new Dynamic2CommandExceptionType((found, constants) -> TextUtils.translate("commands.forge.arguments.enum.invalid", constants, found));
 
     public static SoundSourceArgument soundSource() {
         return new SoundSourceArgument();

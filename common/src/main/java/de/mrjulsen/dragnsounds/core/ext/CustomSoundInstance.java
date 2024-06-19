@@ -10,6 +10,8 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.world.phys.Vec3;
 
 public class CustomSoundInstance extends AbstractSoundInstance {
@@ -31,7 +33,7 @@ public class CustomSoundInstance extends AbstractSoundInstance {
     private int attenuationDistance;
 
     public CustomSoundInstance(long soundId, SoundFile file, SoundSource source, float volume, float pitch, boolean looping, int delay, SoundInstance.Attenuation attenuation, double x, double y, double z, boolean relative, int attenuationDistance) {
-        super(new ResourceLocation(DragNSounds.MOD_ID, CUSTOM_SOUND_FILENAME_ROOT + "/" + file.getId()), source);
+        super(new ResourceLocation(DragNSounds.MOD_ID, CUSTOM_SOUND_FILENAME_ROOT + "/" + file.getId()), source, RandomSource.create());
         this.volume = volume;
         this.pitch = pitch;
         this.x = x;
@@ -72,7 +74,7 @@ public class CustomSoundInstance extends AbstractSoundInstance {
     @Override
     public WeighedSoundEvents resolve(SoundManager manager) {   
         WeighedSoundEvents event = new WeighedSoundEvents(new ResourceLocation(DragNSounds.MOD_ID, CUSTOM_SOUND_FILENAME_ROOT), file.getDisplayName());
-        Sound sound = new Sound(DragNSounds.MOD_ID + ":" + CUSTOM_SOUND_FILENAME_ROOT + "/" + String.valueOf(soundId), volume, pitch, 1, Type.FILE, true, false, getAttenuationDistance());
+        Sound sound = new Sound(DragNSounds.MOD_ID + ":" + CUSTOM_SOUND_FILENAME_ROOT + "/" + String.valueOf(soundId), ConstantFloat.of(volume), ConstantFloat.of(pitch), 1, Type.FILE, true, false, getAttenuationDistance());
         event.addSound(sound);
         this.sound = sound;
         return event;
