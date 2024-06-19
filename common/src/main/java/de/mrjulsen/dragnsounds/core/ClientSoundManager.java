@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -389,7 +388,7 @@ public final class ClientSoundManager {
     }
 
     
-    public static void getSoundFile(SoundLocation location, UUID id, Consumer<Optional<SoundFile>> callback) {
+    public static void getSoundFile(SoundLocation location, String id, Consumer<Optional<SoundFile>> callback) {
         final long requestId = SoundFileCallback.create(callback);
         DragNSounds.net().sendToServer(new SoundFileRequestPacket(requestId, id, location));
     }
@@ -397,7 +396,7 @@ public final class ClientSoundManager {
     @SuppressWarnings("resource")
     public static SoundFile getClientDummySoundFile(String location, String id) {
         SoundLocation loc = new SoundLocation(Minecraft.getInstance().level, location);
-        return SoundFile.client(loc, UUID.fromString(id));
+        return SoundFile.client(loc, id);
     }
 
 

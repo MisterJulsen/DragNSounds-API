@@ -29,7 +29,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
     private final SoundLocation location;
     private final Path path;
     private final boolean readOnly;
-    private Map<UUID, SoundFile> files = new HashMap<>();
+    private Map<String, SoundFile> files = new HashMap<>();
 
     /**
      * Get the index file of the given location.
@@ -78,7 +78,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
      * @param soundId The id of the custom sound file you want to check.
      * @return {@code true} if the file exists, {@code false} otherwise.
      */
-    public boolean has(UUID soundId) {
+    public boolean has(String soundId) {
         return files.containsKey(soundId);
     }
 
@@ -89,7 +89,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
      */
     public boolean has(File file) {
         try {
-            return files.containsKey(UUID.fromString(IOUtils.getFileNameWithoutExtension(file.toPath().toString())));
+            return files.containsKey(IOUtils.getFileNameWithoutExtension(file.toPath().toString()));
         } catch (Exception e) {
             return false;
         }
@@ -101,7 +101,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
      * @return Whether the action was successfull.
      * @apiNote Cannot be used in read-only mode!
      */
-    public boolean delete(UUID soundId) {
+    public boolean delete(String soundId) {
         throwIfReadOnly();
         boolean success = false;
         Optional<File> fileObj = getSoundFile(soundId).getAsFile();
@@ -119,7 +119,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
      * @param soundId The id of the cusotm sound file.
      * @return The {@code SoundFile} if available, {@code null} otherwise.
      */
-    public SoundFile getSoundFile(UUID soundId) {
+    public SoundFile getSoundFile(String soundId) {
         return files.get(soundId);
     }
 
@@ -191,10 +191,10 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
      * Generates a new id that doesn't already exist at this location.
      * @return The new id.
      */
-    public UUID generateId() {
-        UUID id;
+    public String generateId() {
+        String id;
         do {
-            id = UUID.randomUUID();
+            id = UUID.randomUUID().toString().substring(0, 8);
         } while (files.containsKey(id) && files.get(id).getAsFile().isPresent() && files.get(id).getAsFile().get().exists());
         return id;
     }
@@ -221,7 +221,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
 
     private CompoundTag saveMapToNBT() {
         CompoundTag compound = new CompoundTag();
-        for (Map.Entry<UUID, SoundFile> entry : files.entrySet()) {
+        for (Map.Entry<String, SoundFile> entry : files.entrySet()) {
             compound.put(entry.getKey().toString(), entry.getValue().serializeNbt());
         }
 
@@ -230,7 +230,8 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
 
     private void loadMapFromNBT(CompoundTag compound, Level level) {
         for (String key : compound.getAllKeys()) {
-            files.put(UUID.fromString(key), SoundFile.fromNbt(compound.getCompound(key), level));
+            SoundFile file = SoundFile.fromNbt(compound.getCompound(key), level);
+            files.put(file.getId(), file);
         }
     }
 

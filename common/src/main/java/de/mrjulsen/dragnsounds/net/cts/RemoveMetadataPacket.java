@@ -3,7 +3,6 @@ package de.mrjulsen.dragnsounds.net.cts;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
@@ -16,7 +15,7 @@ import net.minecraft.network.FriendlyByteBuf;
 
 public class RemoveMetadataPacket implements IPacketBase<RemoveMetadataPacket> {
 
-    private UUID id;
+    private String id;
     private SoundLocation location;
     private Set<String> metadata;
 
@@ -24,13 +23,13 @@ public class RemoveMetadataPacket implements IPacketBase<RemoveMetadataPacket> {
 
     public RemoveMetadataPacket() {}
 
-    public RemoveMetadataPacket(UUID id, SoundLocation location, Set<String> metadata) {
+    public RemoveMetadataPacket(String id, SoundLocation location, Set<String> metadata) {
         this.id = id;
         this.location = location;
         this.metadata = metadata;
     }
 
-    public RemoveMetadataPacket(UUID id, CompoundTag nbt, Set<String> metadata) {
+    public RemoveMetadataPacket(String id, CompoundTag nbt, Set<String> metadata) {
         this.id = id;
         this.nbt = nbt;
         this.metadata = metadata;
@@ -38,7 +37,7 @@ public class RemoveMetadataPacket implements IPacketBase<RemoveMetadataPacket> {
 
     @Override
     public void encode(RemoveMetadataPacket packet, FriendlyByteBuf buf) {
-        buf.writeUUID(packet.id);
+        buf.writeUtf(packet.id);
         buf.writeNbt(packet.location.serializeNbt());
         buf.writeCollection(packet.metadata, (b, v) -> b.writeUtf(v));
     }
@@ -46,7 +45,7 @@ public class RemoveMetadataPacket implements IPacketBase<RemoveMetadataPacket> {
     @Override
     public RemoveMetadataPacket decode(FriendlyByteBuf buf) {
         return new RemoveMetadataPacket(
-            buf.readUUID(), 
+            buf.readUtf(), 
             buf.readNbt(), 
             buf.readCollection(LinkedHashSet::new, b -> b.readUtf())
         );

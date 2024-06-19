@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.api.Api;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundGetDataCallback;
@@ -35,7 +34,7 @@ public class ServerSoundManager {
     public static final int BUFFER_BLOCK_SIZE = 8;
 
     public static long playSound(SoundFile file, PlaybackConfig playback, ServerPlayer[] players, long clientCallbackRequestId) {
-        final long soundId = (int)Api.id();
+        final long soundId = Api.id();
         new Thread(() -> {
             // Open File
             PlayerboundDataBuffer buffer = ServerInstanceManager.loadFile(file, soundId);
@@ -117,13 +116,13 @@ public class ServerSoundManager {
         return getAllSoundFiles(level).stream().filter(x -> filters.length <= 0 || Arrays.stream(filters).allMatch(y -> y == null || y.isValid(x))).toArray(SoundFile[]::new);
     }
 
-    public static SoundFile getSoundFile(SoundLocation location, UUID id) throws IOException {
+    public static SoundFile getSoundFile(SoundLocation location, String id) throws IOException {
         try (IndexFile index = IndexFile.open(location, true)) {
             return index.getSoundFile(id);
         }
     }
 
-    public static StatusResult deleteSound(SoundLocation loc, UUID id) throws IOException {
+    public static StatusResult deleteSound(SoundLocation loc, String id) throws IOException {
         try (IndexFile index = IndexFile.open(loc, false)) {
             if (!index.has(id)) {
                 return new StatusResult(false, -1, "File not found.");
@@ -133,7 +132,7 @@ public class ServerSoundManager {
         }
     }
 
-    public static Map<String, String> getAllSoundFileMetadata(SoundLocation loc, UUID id) {
+    public static Map<String, String> getAllSoundFileMetadata(SoundLocation loc, String id) {
         Optional<SoundFile> fileObj = SoundFile.of(loc, id);
         if (fileObj.isPresent() && fileObj.get().getAsFile().isPresent() && fileObj.get().getAsFile().get().exists()) {
             return SoundUtils.getAudioMetadata(fileObj.get().getAsFile().get());

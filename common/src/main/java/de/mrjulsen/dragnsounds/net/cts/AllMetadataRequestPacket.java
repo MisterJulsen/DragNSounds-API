@@ -1,7 +1,6 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
@@ -19,7 +18,7 @@ public class AllMetadataRequestPacket implements IPacketBase<AllMetadataRequestP
 
     private long requestId;
     private SoundLocation location;
-    private UUID id;
+    private String id;
 
     private CompoundTag nbt;
 
@@ -31,7 +30,7 @@ public class AllMetadataRequestPacket implements IPacketBase<AllMetadataRequestP
         this.id = file.getId();
     }
 
-    private AllMetadataRequestPacket(long requestId, CompoundTag nbt, UUID id) {
+    private AllMetadataRequestPacket(long requestId, CompoundTag nbt, String id) {
         this.requestId = requestId;
         this.nbt = nbt;
         this.id = id;
@@ -41,7 +40,7 @@ public class AllMetadataRequestPacket implements IPacketBase<AllMetadataRequestP
     public void encode(AllMetadataRequestPacket packet, FriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeNbt(packet.location.serializeNbt());
-        buf.writeUUID(packet.id);
+        buf.writeUtf(packet.id);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class AllMetadataRequestPacket implements IPacketBase<AllMetadataRequestP
         return new AllMetadataRequestPacket(
             buf.readLong(),
             buf.readNbt(),
-            buf.readUUID()
+            buf.readUtf()
         );
     }
 

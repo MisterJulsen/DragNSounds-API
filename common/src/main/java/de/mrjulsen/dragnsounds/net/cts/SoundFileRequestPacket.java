@@ -1,7 +1,6 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
@@ -18,20 +17,20 @@ import net.minecraft.server.level.ServerPlayer;
 public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacket> {
 
     private long requestId;
-    private UUID id;
+    private String id;
     private SoundLocation location;
 
     private CompoundTag nbt;
 
     public SoundFileRequestPacket() {}
 
-    public SoundFileRequestPacket(long requestId, UUID id, SoundLocation location) {
+    public SoundFileRequestPacket(long requestId, String id, SoundLocation location) {
         this.requestId = requestId;
         this.id = id;
         this.location = location;
     }
 
-    public SoundFileRequestPacket(long requestId, UUID id, CompoundTag nbt) {
+    public SoundFileRequestPacket(long requestId, String id, CompoundTag nbt) {
         this.requestId = requestId;
         this.id = id;
         this.nbt = nbt;
@@ -40,7 +39,7 @@ public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacke
     @Override
     public void encode(SoundFileRequestPacket packet, FriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
-        buf.writeUUID(packet.id);
+        buf.writeUtf(packet.id);
         buf.writeNbt(packet.location.serializeNbt());
     }
 
@@ -48,7 +47,7 @@ public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacke
     public SoundFileRequestPacket decode(FriendlyByteBuf buf) {
         return new SoundFileRequestPacket(
             buf.readLong(), 
-            buf.readUUID(), 
+            buf.readUtf(), 
             buf.readNbt()
         );
     }

@@ -2,7 +2,6 @@ package de.mrjulsen.dragnsounds.net.cts;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
@@ -14,7 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 
 public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
 
-    private UUID id;
+    private String id;
     private SoundLocation location;
     private Map<String, String> metadata;
 
@@ -22,13 +21,13 @@ public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
 
     public UpdateMetadataPacket() {}
 
-    public UpdateMetadataPacket(UUID id, SoundLocation location, Map<String, String> metadata) {
+    public UpdateMetadataPacket(String id, SoundLocation location, Map<String, String> metadata) {
         this.id = id;
         this.location = location;
         this.metadata = metadata;
     }
 
-    public UpdateMetadataPacket(UUID id, CompoundTag nbt, Map<String, String> metadata) {
+    public UpdateMetadataPacket(String id, CompoundTag nbt, Map<String, String> metadata) {
         this.id = id;
         this.nbt = nbt;
         this.metadata = metadata;
@@ -36,7 +35,7 @@ public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
 
     @Override
     public void encode(UpdateMetadataPacket packet, FriendlyByteBuf buf) {
-        buf.writeUUID(packet.id);
+        buf.writeUtf(packet.id);
         buf.writeNbt(packet.location.serializeNbt());
         buf.writeMap(packet.metadata, (b, k) -> b.writeUtf(k), (b, v) -> b.writeUtf(v));
     }
@@ -44,7 +43,7 @@ public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
     @Override
     public UpdateMetadataPacket decode(FriendlyByteBuf buf) {
         return new UpdateMetadataPacket(
-            buf.readUUID(), 
+            buf.readUtf(), 
             buf.readNbt(), 
             buf.readMap(b -> b.readUtf(), b -> b.readUtf())
         );

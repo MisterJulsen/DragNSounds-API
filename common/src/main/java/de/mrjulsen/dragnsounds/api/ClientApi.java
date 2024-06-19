@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -247,7 +246,7 @@ public final class ClientApi {
      * @param id The id of the custom sound.
      * @param callback Contains the response of the server.
      */
-    public static void getSoundFile(SoundLocation location, UUID id, Consumer<Optional<SoundFile>> callback) {
+    public static void getSoundFile(SoundLocation location, String id, Consumer<Optional<SoundFile>> callback) {
         ClientSoundManager.getSoundFile(location, id, callback);
     }
 
@@ -257,7 +256,7 @@ public final class ClientApi {
      * @param id The id of the custom sound.
      * @param callback Called after the server has responded.
      */
-    public static void deleteSound(SoundLocation location, UUID id, Consumer<StatusResult> callback) {
+    public static void deleteSound(SoundLocation location, String id, Consumer<StatusResult> callback) {
         final long requestId = SoundDeleteCallback.create(callback);
         DragNSounds.net().sendToServer(new SoundDeleteRequestPacket(requestId, location, id));
     }

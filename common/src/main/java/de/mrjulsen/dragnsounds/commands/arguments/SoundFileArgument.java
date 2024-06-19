@@ -2,7 +2,6 @@ package de.mrjulsen.dragnsounds.commands.arguments;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.StringReader;
@@ -46,7 +45,7 @@ public class SoundFileArgument implements ArgumentType<SoundFile> {
 
         if (DragNSounds.hasServer()) {
             SoundLocation loc = new SoundLocation(ServerEvents.getCurrentServer().overworld(), string.substring(0, lastSlashIndex));
-            return SoundFile.of(loc, UUID.fromString(string.substring(lastSlashIndex + 1))).get();
+            return SoundFile.of(loc, string.substring(lastSlashIndex + 1)).get();
         } else {
             return ClientSoundManager.getClientDummySoundFile(string.substring(0, lastSlashIndex), string.substring(lastSlashIndex + 1));
         }

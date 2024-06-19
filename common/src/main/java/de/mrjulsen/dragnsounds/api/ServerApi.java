@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
@@ -307,7 +306,7 @@ public final class ServerApi {
      * @param id The id of the custom sound.
      * @return The sound file.
      */
-    public static Optional<SoundFile> getSoundFile(SoundLocation location, UUID id) {
+    public static Optional<SoundFile> getSoundFile(SoundLocation location, String id) {
         try {
             return Optional.of(ServerSoundManager.getSoundFile(location, id));
         } catch (IOException e) {
@@ -322,7 +321,7 @@ public final class ServerApi {
      * @param id The id of the custom sound.
      * @return A status notification.
      */
-    public static StatusResult deleteSound(SoundLocation location, UUID id) {
+    public static StatusResult deleteSound(SoundLocation location, String id) {
         try {
             return ServerSoundManager.deleteSound(location, id);
         } catch (IOException e) {

@@ -1,7 +1,6 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
@@ -19,19 +18,19 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
 
     private long requestId;
     private SoundLocation location;
-    private UUID id;
+    private String id;
 
     private CompoundTag nbt;
 
     public SoundDeleteRequestPacket() {}
 
-    public SoundDeleteRequestPacket(long requestId, SoundLocation location, UUID id) {
+    public SoundDeleteRequestPacket(long requestId, SoundLocation location, String id) {
         this.requestId = requestId;
         this.location = location;
         this.id = id;
     }
 
-    public SoundDeleteRequestPacket(long requestId, CompoundTag nbt, UUID id) {
+    public SoundDeleteRequestPacket(long requestId, CompoundTag nbt, String id) {
         this.requestId = requestId;
         this.nbt = nbt;
         this.id = id;
@@ -41,7 +40,7 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
     public void encode(SoundDeleteRequestPacket packet, FriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeNbt(packet.location.serializeNbt());
-        buf.writeUUID(packet.id);
+        buf.writeUtf(packet.id);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
         return new SoundDeleteRequestPacket(
             buf.readLong(), 
             buf.readNbt(), 
-            buf.readUUID()
+            buf.readUtf()
         );        
     }
 

@@ -36,6 +36,7 @@ public class SoundFile {
     /** Default metadata key to get the display name of the file which is stored in the metadata. (because it is not read-only) */
     public static final String META_DISPLAY_NAME = "DisplayName";
     public static final String[] META_DEFAULT_KEYS = {META_DISPLAY_NAME};
+    protected static final int CURRENT_VERSION = 2;
 
     public static final String DEFAULT_AUDIO_FILE_EXTENSION = "ogg";
 
@@ -44,17 +45,24 @@ public class SoundFile {
     private static final String NBT_HASH = "Hash";
     private static final String NBT_INFO = "Info";
     private static final String NBT_METADATA = "Metadata";
+    private static final String NBT_VERSION = "Version";
 
     // FileSystem
     private SoundLocation location = SoundLocation.empty();
-    private UUID id = DragNSounds.ZERO_UUID;
+    private String id = "00000000";
     private String hash = "";
+
+    private int version = CURRENT_VERSION;
 
     // Info
     private SoundFileInfo info = SoundFileInfo.empty();
     protected Map<String, String> metadata = new HashMap<>();
 
     private SoundFile() {
+    }
+
+    public int currentVersion() {
+        return version;
     }
 
     /**
@@ -124,7 +132,7 @@ public class SoundFile {
     /**
      * @return The id of the sound and the name of the sound file on disk.
      */
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -149,10 +157,10 @@ public class SoundFile {
         return getPath(getLocation(), getId());
     }
 
-    protected static Optional<Path> getPath(SoundLocation location, UUID soundId) {
+    protected static Optional<Path> getPath(SoundLocation location, String soundFileId) {
         Optional<Path> path = location.resolve();
         if (path.isPresent()) {
-            return Optional.of(Paths.get(path.get().toString() + "\\" + soundId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
+            return Optional.of(Paths.get(path.get().toString() + "\\" + soundFileId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
         }
         return path;
     }
@@ -190,16 +198,17 @@ public class SoundFile {
     public CompoundTag serializeNbt() {
         CompoundTag nbt = new CompoundTag();
         nbt.put(NBT_LOCATION, getLocation().serializeNbt());
-        nbt.putUUID(NBT_ID, getId());
+        nbt.putString(NBT_ID, getId());
         nbt.putString(NBT_HASH, hash());
         nbt.put(NBT_INFO, getInfo().serializeNbt());
         nbt.put(NBT_METADATA, ExtendedNBTUtils.saveMapToNBT(metadata));
+        nbt.putInt(NBT_VERSION, CURRENT_VERSION);
         return nbt;
     }
 
     public void deserializeNbt(CompoundTag nbt, Level level) {
         location = SoundLocation.fromNbt(nbt.getCompound(NBT_LOCATION), level);
-        id = nbt.getUUID(NBT_ID);
+        id = nbt.contains(NBT_VERSION) ? nbt.getString(NBT_ID) : nbt.getUUID(NBT_ID).toString();
         hash = nbt.getString(NBT_HASH);
         info = SoundFileInfo.fromNbt(nbt.getCompound(NBT_INFO));
         metadata = ExtendedNBTUtils.loadMapFromNBT(nbt.getCompound(NBT_METADATA));
@@ -235,7 +244,7 @@ public class SoundFile {
      * @return The {@code SoundFile}, if available.
      * @side Server
      */
-    public static Optional<SoundFile> of(SoundLocation location, UUID id) {
+    public static Optional<SoundFile> of(SoundLocation location, String id) {
         try {
             try (IndexFile index = IndexFile.open(location, true)) {
                 if (index.has(id)) {
@@ -248,7 +257,7 @@ public class SoundFile {
         return Optional.empty();
     }
 
-    public static SoundFile client(SoundLocation location, UUID id) {
+    public static SoundFile client(SoundLocation location, String id) {
         SoundFile file = new SoundFile();
         file.location = location;
         file.id = id;
@@ -270,7 +279,7 @@ public class SoundFile {
         return String.format("%s/%s", getLocation(), getId());
     }
 
-    public static void updateMetadataInternal(SoundLocation location, UUID id, Map<String, String> meta) throws IOException {
+    public static void updateMetadataInternal(SoundLocation location, String id, Map<String, String> meta) throws IOException {
         try (IndexFile index = IndexFile.open(location, false)) {
             if (index.has(id)) {
                 SoundFile file = index.getSoundFile(id);
@@ -279,7 +288,7 @@ public class SoundFile {
         }
     }
 
-    public static void removeMetadataInternal(SoundLocation location, UUID id, Set<String> keys) throws IOException {
+    public static void removeMetadataInternal(SoundLocation location, String id, Set<String> keys) throws IOException {
         try (IndexFile index = IndexFile.open(location, false)) {
             if (index.has(id)) {
                 SoundFile file = index.getSoundFile(id);
@@ -329,7 +338,7 @@ public class SoundFile {
          */
         public synchronized SoundFile save(UUID owner, ByteArrayOutputStream dataStream, int initialChannels, long initialDuration) throws IOException, InputFormatException, EncoderException {
             try (IndexFile registry = IndexFile.open(location, false)) {
-                UUID fileId = registry.generateId();
+                String fileId = registry.generateId();
                 Path path = getPath(location, fileId).get();
                 File file = path.toFile();
                 file.getParentFile().mkdirs();

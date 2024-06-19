@@ -39,7 +39,7 @@ public class FileInfoFilter extends AbstractFilter<SoundFile> {
                 case KEY_SIZE:
                     return compareOperation().compare(file.getInfo().getSize(), Long.parseLong(value()));
                 case KEY_ID:
-                    return compareOperation().compare(file.getId().toString(), value());
+                    return compareOperation().compare(file.getId(), value());
                 case KEY_CHANNELS:
                     return compareOperation().compare(file.getInfo().getChannels(), Integer.parseInt(value()));
                 default:
