@@ -80,7 +80,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                         AtomicReference<UploadScreen> screen = new AtomicReference<>(null);
                         long uploadId = ClientSoundManager.uploadSound(
                             files.get()[0].toString(),
-                            SoundFile.Builder.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()),
+                            SoundFile.Builder.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()),
                             packet.settings != null ? packet.settings : AudioSettings.getByFile(files.get()[0].toString()),
                             (file) -> {
                                 if (Minecraft.getInstance().screen == screen.get()) {

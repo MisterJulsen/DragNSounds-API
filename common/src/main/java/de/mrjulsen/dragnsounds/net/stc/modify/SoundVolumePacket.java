@@ -71,7 +71,7 @@ public class SoundVolumePacket implements IPacketBase<SoundVolumePacket> {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
                     Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> apply(x, packet.volume, packet.pitch, packet.attenuationDistance));
                 } else {
                     apply(packet.requestId, packet.volume, packet.pitch, packet.attenuationDistance);

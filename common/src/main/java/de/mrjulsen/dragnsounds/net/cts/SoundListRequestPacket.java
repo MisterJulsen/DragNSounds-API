@@ -52,7 +52,7 @@ public class SoundListRequestPacket implements IPacketBase<SoundListRequestPacke
     @Override
     public void handle(SoundListRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            ServerSoundManager.sendFileListToPlayer(contextSupplier.get().getPlayer(), packet.requestId, contextSupplier.get().getPlayer().getLevel(), packet.filter);
+            ServerSoundManager.sendFileListToPlayer(contextSupplier.get().getPlayer(), packet.requestId, contextSupplier.get().getPlayer().level(), packet.filter);
         });
     }
     

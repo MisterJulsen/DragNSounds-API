@@ -55,7 +55,7 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
     @Override
     public void handle(SoundDeleteRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
             StatusResult result;
             try {
                 result = ServerSoundManager.deleteSound(loc, packet.id);

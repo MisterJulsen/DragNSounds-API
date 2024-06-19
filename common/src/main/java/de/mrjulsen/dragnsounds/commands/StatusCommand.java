@@ -29,7 +29,7 @@ public class StatusCommand {
 
 
     private static int status(CommandSourceStack cmd) throws CommandSyntaxException {
-        cmd.sendSuccess(ServerInstanceManager.debugComponent(), false);
+        cmd.sendSuccess(() -> ServerInstanceManager.debugComponent(), false);
         DragNSounds.net().sendToPlayer(cmd.getPlayerOrException(), new PrintDebugPacket());
         return 1;
     }

@@ -52,7 +52,7 @@ public class PlaySoundRequestPacket implements IPacketBase<PlaySoundRequestPacke
     @Override
     public void handle(PlaySoundRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            ServerSoundManager.playSound(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()), packet.playback, new ServerPlayer[] { (ServerPlayer)contextSupplier.get().getPlayer() }, packet.requestId);
+            ServerSoundManager.playSound(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()), packet.playback, new ServerPlayer[] { (ServerPlayer)contextSupplier.get().getPlayer() }, packet.requestId);
         });
     }
 }

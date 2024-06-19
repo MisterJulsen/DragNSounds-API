@@ -55,7 +55,7 @@ public class AllMetadataRequestPacket implements IPacketBase<AllMetadataRequestP
     @Override
     public void handle(AllMetadataRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
             Map<String, String> metadata = ServerSoundManager.getAllSoundFileMetadata(loc, packet.id);
             DragNSounds.net().sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new AllMetadataResponsePacket(packet.requestId, metadata));
         });

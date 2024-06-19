@@ -50,7 +50,7 @@ public class UploadSuccessPacket implements IPacketBase<UploadSuccessPacket> {
     public void handle(UploadSuccessPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                SoundUploadCallback.run(packet.requestId, Optional.of(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel())));
+                SoundUploadCallback.run(packet.requestId, Optional.of(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level())));
                 ClientInstanceManager.closeUploadCallbacks(packet.requestId);
             });
         });

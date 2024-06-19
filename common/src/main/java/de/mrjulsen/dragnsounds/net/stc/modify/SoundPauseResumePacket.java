@@ -61,7 +61,7 @@ public class SoundPauseResumePacket implements IPacketBase<SoundPauseResumePacke
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
                     Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPaused(x, packet.pause));
                 } else {
                     ClientSoundManager.setPaused(packet.requestId, packet.pause);

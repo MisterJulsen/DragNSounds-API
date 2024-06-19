@@ -54,7 +54,7 @@ public class RemoveMetadataPacket implements IPacketBase<RemoveMetadataPacket> {
     @Override
     public void handle(RemoveMetadataPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            SoundLocation location = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+            SoundLocation location = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
             try {
                 SoundFile.removeMetadataInternal(location, packet.id, packet.metadata);
             } catch (IOException e) {

@@ -52,7 +52,7 @@ public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
     @Override
     public void handle(UpdateMetadataPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
-            SoundLocation location = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+            SoundLocation location = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
             try {
                 SoundFile.updateMetadataInternal(location, packet.id, packet.metadata);
             } catch (IOException e) {

@@ -60,7 +60,7 @@ public class SoundListChunkResponsePacket implements IPacketBase<SoundListChunkR
     public void handle(SoundListChunkResponsePacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                Arrays.stream(packet.nbt).map(x -> SoundFile.fromNbt(x, contextSupplier.get().getPlayer().getLevel())).forEach(x -> SoundListCallback.get(packet.requestId).add(x));
+                Arrays.stream(packet.nbt).map(x -> SoundFile.fromNbt(x, contextSupplier.get().getPlayer().level())).forEach(x -> SoundListCallback.get(packet.requestId).add(x));
 
                 if (!packet.hasMore) {
                     SoundListCallback.runIfPresent(packet.requestId);

@@ -64,7 +64,7 @@ public class SoundPositionPacket implements IPacketBase<SoundPositionPacket> {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
                     Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPosition(x, packet.pos));
                 } else {
                     ClientSoundManager.setPosition(packet.requestId, packet.pos);

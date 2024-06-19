@@ -61,7 +61,7 @@ public class SoundSeekPacket implements IPacketBase<SoundSeekPacket> {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
                     Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.seek(x, packet.ticks));
                 } else {
                     ClientSoundManager.seek(packet.requestId, packet.ticks);

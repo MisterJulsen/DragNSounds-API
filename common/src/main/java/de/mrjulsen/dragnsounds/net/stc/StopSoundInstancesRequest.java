@@ -42,7 +42,7 @@ public class StopSoundInstancesRequest implements IPacketBase<StopSoundInstances
     public void handle(StopSoundInstancesRequest packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()));
+                ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()));
             });
         });
     }

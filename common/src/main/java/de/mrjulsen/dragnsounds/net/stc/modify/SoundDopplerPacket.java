@@ -69,7 +69,7 @@ public class SoundDopplerPacket implements IPacketBase<SoundDopplerPacket> {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel());
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
                     Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setDoppler(x, packet.doppler, packet.velocity));
                 } else {
                     ClientSoundManager.setDoppler(packet.requestId, packet.doppler, packet.velocity);

@@ -56,7 +56,7 @@ public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacke
     public void handle(SoundFileRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             try {
-                SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()), packet.id);                
+                SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()), packet.id);                
                 DragNSounds.net().sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new SoundFileResponsePacket(packet.requestId, file));
             } catch (IOException e) {
                 DragNSounds.LOGGER.warn("Could not find sound file.", e);

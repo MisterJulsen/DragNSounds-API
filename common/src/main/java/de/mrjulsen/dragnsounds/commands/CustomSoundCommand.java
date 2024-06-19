@@ -205,7 +205,7 @@ public class CustomSoundCommand {
             ).then(Commands.literal(SUB_CLEAN_UP).requires(x -> x.hasPermission(CommonConfig.MANAGE_SOUND_COMMAND_PERMISSION.get()))
                 .executes(x -> {
                     ServerSoundManager.cleanUp(x.getSource().getLevel(), true);
-                    x.getSource().sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.cleanup"), false);        
+                    x.getSource().sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.cleanup"), false);        
                     return 1;
                 })
             ).then(Commands.literal(SUB_HELP)
@@ -232,7 +232,7 @@ public class CustomSoundCommand {
 
     private static int playSound(CommandSourceStack cmd, SoundFile file, ServerPlayer[] players, SoundSource source, float volume, float pitch, Vec3 pos, int attenuationDistance, int ticksOffset, boolean showLabel) {
         int id = (int)ServerApi.playSound(file, new PlaybackConfig(pos == null ? ESoundType.UI : ESoundType.WORLD, source.getName(), volume, pitch, pos, attenuationDistance, false, ticksOffset, showLabel), players, (player, i, status) -> {});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.play", file.getDisplayName(), players.length), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.play", file.getDisplayName(), players.length), false);
         return id;
     }
 
@@ -338,7 +338,7 @@ public class CustomSoundCommand {
 
     private static int uploadSound(CommandSourceStack cmd, SoundLocation location, String displayName, ServerPlayer player, AudioSettings settings, boolean showProgressScreen, CompoundTag nbt) throws CommandSyntaxException {
         DragNSounds.net().sendToPlayer(player, new SoundUploadCommandPacket(new SoundFile.Builder(location, displayName, Map.of()), settings, showProgressScreen));
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.upload_started"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.upload_started"), false);
         return 1;
     }
 
@@ -387,13 +387,13 @@ public class CustomSoundCommand {
 
     private static int stopSound(CommandSourceStack cmd, ServerPlayer[] players, SoundFile file) throws CommandSyntaxException {
         ServerApi.stopAllSoundInstances(file, players);
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.stopped"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.stopped"), false);
         return 1;
     }
 
     private static int stopSound(CommandSourceStack cmd, ServerPlayer[] players) throws CommandSyntaxException {
         ServerApi.stopAllCustomSounds(players);
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.stop_all"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.stop_all"), false);
         return 1;
     }
 
@@ -407,7 +407,7 @@ public class CustomSoundCommand {
 
     private static int deleteSound(CommandSourceStack cmd, SoundFile file) throws CommandSyntaxException {
         ServerApi.deleteSound(file);
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.deleted"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.deleted"), false);
         return 1;
     }
 
@@ -416,49 +416,49 @@ public class CustomSoundCommand {
 
     private static int volume(CommandSourceStack cmd, ServerPlayer player, SoundFile file, float volume) throws CommandSyntaxException {
         ServerApi.setVolumeAndPitchAllInstances(file, volume, -1, -1, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }
 
     private static int pitch(CommandSourceStack cmd, ServerPlayer player, SoundFile file, float pitch) throws CommandSyntaxException {
         ServerApi.setVolumeAndPitchAllInstances(file, -1, pitch, -1, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }
 
     private static int attenuationDistance(CommandSourceStack cmd, ServerPlayer player, SoundFile file, int attenuationDistance) throws CommandSyntaxException {
         ServerApi.setVolumeAndPitchAllInstances(file, -1, -1, attenuationDistance, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }
 
     private static int pos(CommandSourceStack cmd, ServerPlayer player, SoundFile file, Vec3 pos) throws CommandSyntaxException {
         ServerApi.setPositionAllInstances(file, pos, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }
 
     private static int cone(CommandSourceStack cmd, ServerPlayer player, SoundFile file, Vec3 direction, float angleA, float angleB, float outerGain) throws CommandSyntaxException {
         ServerApi.setConeAllInstances(file, direction, angleA, angleB, outerGain, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }    
 
     private static int doppler(CommandSourceStack cmd, ServerPlayer player, SoundFile file, Vec3 velocity, float doppler) throws CommandSyntaxException {
         ServerApi.setDopplerAllInstances(file, doppler, velocity, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }     
 
     private static int seek(CommandSourceStack cmd, ServerPlayer player, SoundFile file, int ticks) throws CommandSyntaxException {
         ServerApi.seekAllInstances(file, ticks, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }     
 
     private static int setPaused(CommandSourceStack cmd, ServerPlayer player, SoundFile file, boolean paused) throws CommandSyntaxException {
         ServerApi.setSoundPausedAllInstances(file, paused, new ServerPlayer[] {player});
-        cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
+        cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
     }
 }

@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[47,)"
 #issueTrackerURL = ""
 license = "GNU General Public License v3.0"
 
@@ -17,27 +17,27 @@ logoFile = "icon.png"
 [[dependencies.dragnsounds]]
 modId = "forge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.dragnsounds]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2,)"
+versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.dragnsounds]]
 modId = "architectury"
 mandatory = true
-versionRange = "[6.5.85,)"
+versionRange = "[9.1.12,)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.dragnsounds]]
 modId = "dragonlib"
 mandatory = true
-versionRange = "[1.19.2-2.1.11,)"
+versionRange = "[1.20.1-2.1.11,)"
 ordering = "AFTER"
 side = "BOTH"

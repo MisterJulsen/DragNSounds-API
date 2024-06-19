@@ -64,7 +64,7 @@ public class PlaySoundPacket implements IPacketBase<PlaySoundPacket> {
     public void handle(PlaySoundPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().getLevel()), packet.playback, packet.clientCallbackRequestId);
+                ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()), packet.playback, packet.clientCallbackRequestId);
             });
         });
     }

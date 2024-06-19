@@ -14,12 +14,12 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 
 public class ModCommands {
 
-    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENTS = DeferredRegister.create(DragNSounds.MOD_ID, Registry.COMMAND_ARGUMENT_TYPE_REGISTRY);
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENTS = DeferredRegister.create(DragNSounds.MOD_ID, Registries.COMMAND_ARGUMENT_TYPE);
 
     public static final RegistrySupplier<ArgumentTypeInfo<?, ?>> SOUND_FILES_ARG = register(new ResourceLocation(DragNSounds.MOD_ID, "sound_files"), SoundFileArgument.class, () -> SingletonArgumentInfo.contextFree(SoundFileArgument::location));
     public static final RegistrySupplier<ArgumentTypeInfo<?, ?>> SOUND_LOCATION_ARG = register(new ResourceLocation(DragNSounds.MOD_ID, "sound_location"), SoundLocationArgument.class, () -> SingletonArgumentInfo.contextFree(SoundLocationArgument::location));
