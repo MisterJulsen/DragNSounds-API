@@ -130,7 +130,7 @@ public class SoundLocation implements INBTSerializable {
         Path userPath = validRoot.resolve(buildPath()).normalize();
 
         if (!validRoot.equals(userPath) && userPath.startsWith(validRoot)) {
-            return Optional.of(userPath);
+            return Optional.ofNullable(userPath);
         }
         return Optional.empty();
     }
