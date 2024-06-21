@@ -68,7 +68,7 @@ public class SoundUtils {
 
         String s = TinyFileDialogs.tinyfd_openFileDialog(title.getString(), (CharSequence)null, filterPatterns, filter.getString(), multiselect);
         if (s != null) {
-            callback.accept(Optional.of(Arrays.stream(s.split("|")).map(x -> Paths.get(s)).toArray(Path[]::new)));
+            callback.accept(Optional.ofNullable(Arrays.stream(s.split("|")).map(x -> Paths.get(s)).toArray(Path[]::new)));
         } else {
             callback.accept(Optional.empty());
         }

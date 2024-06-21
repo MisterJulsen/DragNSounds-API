@@ -272,7 +272,7 @@ public final class ServerApi {
     public static Optional<SoundFile[]> getAllSoundFiles(Level level, Collection<IFilter<SoundFile>> filters) {
         try {
             SoundFile[] files = ServerSoundManager.getSoundFileList(level, filters.toArray(new IFilter[filters.size()]));
-            return Optional.of(files);
+            return Optional.ofNullable(files);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to get sound file list.", e);
         }
@@ -293,7 +293,7 @@ public final class ServerApi {
             Collection<IFilter<SoundFile>> filtersColl = filters;
             filtersColl.add(new FileInfoFilter(FileInfoFilter.KEY_LOCATION, location.toString(), ECompareOperation.EQUALS));
             SoundFile[] files = ServerSoundManager.getSoundFileList(location.getLevel(), filtersColl.toArray(new IFilter[filters.size()]));
-            return Optional.of(files);
+            return Optional.ofNullable(files);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to get sound file list.", e);
         }
@@ -308,7 +308,7 @@ public final class ServerApi {
      */
     public static Optional<SoundFile> getSoundFile(SoundLocation location, String id) {
         try {
-            return Optional.of(ServerSoundManager.getSoundFile(location, id));
+            return Optional.ofNullable(ServerSoundManager.getSoundFile(location, id));
         } catch (IOException e) {
             DragNSounds.LOGGER.warn("Sound file not found.", e);
             return Optional.empty();

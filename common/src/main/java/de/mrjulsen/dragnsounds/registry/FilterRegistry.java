@@ -29,7 +29,7 @@ public class FilterRegistry {
     public static Optional<IFilter<?>> get(ResourceLocation location, String key, String value, ECompareOperation operation) {
         try {
             IFilter<?> filter = registry.get(location).getConstructor(String.class, String.class, ECompareOperation.class).newInstance(key, value, operation);
-            return Optional.of(filter);
+            return Optional.ofNullable(filter);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             DragNSounds.LOGGER.error("Unable to generate filter class instance.", e);
         }
