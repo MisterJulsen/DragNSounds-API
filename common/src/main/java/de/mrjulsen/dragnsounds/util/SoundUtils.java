@@ -28,7 +28,7 @@ public class SoundUtils {
         "m4a", "m4b", "m4p", "mka", "mp2", "mp3", "oga", "ogg", "oma", "opus", "ra",
         "ram", "sln", "tta", "voc", "wav", "wma", "wv"
     };
-
+    
     public static Map<String, String> getAudioMetadata(File file) {
         Map<String, String> metadata = new LinkedHashMap<>();
         try {
@@ -36,14 +36,15 @@ public class SoundUtils {
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.contains("vorbis")) {
-                    String[] fields = line.split("\0");
-                    for (String field : fields) {
-                        if (field.contains("=")) {
-                            String[] keyValue = field.split("=", 2);
-                            metadata.put(keyValue[0], keyValue[1].substring(0, keyValue[1].length() - 1).split("\1")[0].replaceAll("\\p{C}", ""));
-                        }
+                String[] fields = line.split("\0");
+                for (String field : fields) {
+                    if (field.contains("=")) {
+                        String[] keyValue = field.split("=", 2);
+                        metadata.put(keyValue[0], keyValue[1].split("\1")[0].replaceAll("\\p{C}", ""));
                     }
+                }
+                if (line.contains("vorbis)")) {
+                    break;
                 }
             }
             br.close();
