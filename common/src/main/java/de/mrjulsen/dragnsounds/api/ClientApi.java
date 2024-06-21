@@ -58,7 +58,7 @@ public final class ClientApi {
      * @return An optional containing the {@code ChannelContext} if available.
      */
     public static Optional<ChannelContext> getSound(long soundId) {
-        return SoundChannelsHolder.has(soundId) ? Optional.of(SoundChannelsHolder.get(soundId)) : Optional.empty();
+        return SoundChannelsHolder.has(soundId) ? Optional.ofNullable(SoundChannelsHolder.get(soundId)) : Optional.empty();
     }
 
     /**
@@ -161,7 +161,7 @@ public final class ClientApi {
      * @return The playback data if available.
      */
     public static Optional<SoundPlaybackData> getPlaybackData(long soundId) {
-        return Optional.of(ClientSoundManager.getData(soundId));
+        return Optional.ofNullable(ClientSoundManager.getData(soundId));
     }
 
     /**

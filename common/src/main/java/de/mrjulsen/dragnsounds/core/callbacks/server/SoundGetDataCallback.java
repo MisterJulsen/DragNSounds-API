@@ -17,7 +17,7 @@ public class SoundGetDataCallback {
     public static boolean run(long id, Player player, SoundPlaybackData value) {
         boolean b = callbacks.containsKey(id);
         if (b) {
-            callbacks.remove(id).run(player, Optional.of(value));
+            callbacks.remove(id).run(player, Optional.ofNullable(value));
         }
         return b;
     }

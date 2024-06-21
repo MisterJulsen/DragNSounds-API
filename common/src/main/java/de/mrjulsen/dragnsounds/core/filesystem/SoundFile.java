@@ -160,7 +160,7 @@ public class SoundFile {
     protected static Optional<Path> getPath(SoundLocation location, String soundFileId) {
         Optional<Path> path = location.resolve();
         if (path.isPresent()) {
-            return Optional.of(Paths.get(path.get().toString() + "\\" + soundFileId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
+            return Optional.ofNullable(Paths.get(path.get().toString() + "\\" + soundFileId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
         }
         return path;
     }
@@ -173,7 +173,7 @@ public class SoundFile {
     public Optional<File> getAsFile() {
         Optional<Path> path = getPath();
         if (path.isPresent()) {
-            return Optional.of(path.get().toFile());
+            return Optional.ofNullable(path.get().toFile());
         }
         return Optional.empty();
     }
@@ -248,7 +248,7 @@ public class SoundFile {
         try {
             try (IndexFile index = IndexFile.open(location, true)) {
                 if (index.has(id)) {
-                    return Optional.of(index.getSoundFile(id));
+                    return Optional.ofNullable(index.getSoundFile(id));
                 }
             }
         } catch (IOException e) {
