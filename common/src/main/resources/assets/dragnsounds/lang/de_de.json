@@ -16,5 +16,11 @@
     "gui.dragnsounds.commands.sound.play": "Dynamischer Sound \"%s\" wird für %s Spieler abgespielt.",
     "gui.dragnsounds.commands.sound.cleanup": "Asynchroner Bereinigungsprozess wurde gestartet. Prüfe die Konsole für Details.",
 
+    "enum.dragnsounds.audio_channels.mono": "Mono",
+    "enum.dragnsounds.audio_channels.stereo": "Stereo",
+    "enum.dragnsounds.audio_channels.info.mono": "Der Sound verwendet nur einen Kanal und kann sich auf eine bestimmte Position beziehen. Am realistischsten für Soundeffekte.",
+    "enum.dragnsounds.audio_channels.info.stereo": "Der Sound wird auf zwei Kanälen wiedergegeben, kann aber nicht an eine bestimmte Position gebunden sein. Empfohlen für Hintergrundmusik.",
+    "enum.dragnsounds.audio_channels.description": "Die Anzahl der verwendeten Kanäle.",
+    
     "modmenu.dragnsounds.documentation": "Dokumentation"
 }
