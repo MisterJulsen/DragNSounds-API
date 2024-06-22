@@ -8,9 +8,11 @@ You can find all available major versions of this mod on CurseForge or Modrinth.
 
 #### **Latest versions**
 
-| Minecraft | Version |
-| -------- | -------- |
-| 1.18.2 | 0.1.0 |
+| Minecraft | DragNSounds API | DragonLib | JAVE |
+| - | - | - | - |
+| 1.18.2 | 0.1.8 | 2.1.11 | 3.5.0 |
+| 1.19.2 | 0.1.8 | 2.1.11 | 3.5.0 |
+| 1.20.1 | 0.1.8 | 2.1.11 | 3.5.0 |
 
 ## Architectury Loom setup
 1. Create a new [Architectury project](https://docs.architectury.dev/plugin/get_started).
@@ -18,14 +20,10 @@ You can find all available major versions of this mod on CurseForge or Modrinth.
 ```groovy
 subprojects {
     repositories {
-        maven { // DragonLib, DragNSounds API
-            name = "MrJulsen's Mod Resources"
-            url = "https://raw.githubusercontent.com/MisterJulsen/modsrepo/main/maven"
-        }
-        maven { // Forge Config Api (required for fabric version of DragonLib)
-            name = "Fuzs Mod Resources"
-            url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
-        }
+        maven { url = "https://raw.githubusercontent.com/MisterJulsen/modsrepo/main/maven" } // DragonLib, DragNSounds API
+        maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API
+        maven { url = "https://mvnrepository.com/artifact/ws.schild/jave-all-deps"} // JAVE
+        maven { url = "https://maven.terraformersmc.com/" } // ModMenu
     }
 }
 ```
@@ -33,9 +31,24 @@ subprojects {
 Replace `<LOADER>` with the specific loader (e.g. `forge`) and use `fabric` in your common project.
 ```groovy    
 dependencies {
-    modApi("de.mrjulsen.dragnsoundsapi:dragnsounds-<LOADER>:<MINECRAFT_VERSION>-<DRAGNSOUNDS_VERSION>")
+    modCompileOnly("dev.architectury:architectury-<LOADER>:<ARCHITECTURY_VERSION>")
+    modImplementation("de.mrjulsen.mcdragonlib:dragonlib-<LOADER>:<MINECRAFT_VERSION>-<DRAGONLIB_VERSION>")
+    modImplementation("de.mrjulsen.dragnsounds:dragnsounds-<LOADER>:<MINECRAFT_VERSION>-<DRAGNSOUNDS_VERSION>")
+    
+    modImplementation("ws.schild:jave-core:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-linux32:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-linux64:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-linux-arm32:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-linux-arm64:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-win32:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-win64:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-osxm1:<JAVE_VERSION>"))
+    modImplementation("ws.schild:jave-nativebin-osx64:<JAVE_VERSION>"))
 }
 ```
+!!! note
+    To use JAVE in Forge mods, `forgeRuntimeLibrary` must be added: `modImplementation(forgeRuntimeLibrary (...))`
+
 4. Add the dependencies to your mod.
 In the `forge` project, add this to your `mods.toml` file:
 ```toml
