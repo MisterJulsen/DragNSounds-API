@@ -118,7 +118,11 @@ public class ServerSoundManager {
 
     public static SoundFile getSoundFile(SoundLocation location, String id) throws IOException {
         try (IndexFile index = IndexFile.open(location, true)) {
-            return index.getSoundFile(id);
+            SoundFile file = index.getSoundFile(id);
+            if (file == null) {
+                DragNSounds.LOGGER.warn("Could not find sound file for: " + location + "/" + id);
+            }
+            return file;
         }
     }
 

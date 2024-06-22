@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/MisterJulsen/DragNSounds-API/issues"
 license = "GNU General Public License v3.0"
 
 [[mods]]
@@ -9,6 +9,7 @@ version = "${version}"
 displayName = "DragNSounds API"
 authors = "MrJulsen"
 credits="JAVE2 by a-schild https://github.com/a-schild/jave2"
+displayURL="https://misterjulsen.github.io/DragNSounds-API/"
 description = '''
 A simple API to upload custom sounds or music to the server and let them play in realtime to any player at any position without the need for a resourcepack. This project uses DragonLib, Architectury and JAVE2.
 '''
