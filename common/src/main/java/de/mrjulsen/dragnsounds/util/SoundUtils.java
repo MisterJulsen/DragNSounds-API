@@ -40,7 +40,7 @@ public class SoundUtils {
                 for (String field : fields) {
                     if (field.contains("=")) {
                         String[] keyValue = field.split("=", 2);
-                        metadata.put(keyValue[0], keyValue[1].split("\1")[0].replaceAll("\\p{C}", ""));
+                        metadata.put(keyValue[0], keyValue[1].substring(0, keyValue[1].length() - 1).split("\1")[0].replaceAll("\\p{C}", ""));
                     }
                 }
                 if (line.contains("vorbis)")) {
