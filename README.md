@@ -1,4 +1,4 @@
-# DragNSounds API
+# 💿 DragNSounds API
 
 <p align="center">
   <a href="https://misterjulsen.github.io/DragNSounds-API/"><img src="https://raw.githubusercontent.com/MisterJulsen/DragNSounds-API/Documentation/assets/logo.png" alt="Logo"></a>
@@ -14,14 +14,14 @@ Once added to your own project, the API can be used very easily through a few si
 
 👉 [Getting started as a dev](https://misterjulsen.github.io/DragNSounds-API/)
 
-## Why "DragNSounds"?
+## 🐲 Why "DragNSounds"?
 Well, firstly it fits to the name of my other library [DragonLib](https://github.com/MisterJulsen/MC-DragonLib2) (which this mod is based on), but also because using this API should be as easy as dragging and dropping it into your project or the user's mods folder. And of course ... dragons! 🐉
 
-## Support
+## ✅ Support
 For Support and discussions please join the [Discord server](https://discord.gg/AeSbNgvc7f).
 
-## Dependencies
+## 📚 Dependencies
 This mod is based on [Architectury API](https://docs.architectury.dev/) and [DragonLib 2](https://github.com/MisterJulsen/MC-DragonLib2) (which includes Architectury) and uses [JAVE2](https://github.com/a-schild/jave2) for audio management.
 
-## Supported languages
+## 🗣️ Supported languages
 By default DragNSounds only supports English and German, but you can add translations for other languages in your mod's language file by adding the translation keys of this library.
