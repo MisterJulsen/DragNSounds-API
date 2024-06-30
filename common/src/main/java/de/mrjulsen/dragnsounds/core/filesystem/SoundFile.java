@@ -160,7 +160,7 @@ public class SoundFile {
     protected static Optional<Path> getPath(SoundLocation location, String soundFileId) {
         Optional<Path> path = location.resolve();
         if (path.isPresent()) {
-            return Optional.ofNullable(Paths.get(path.get().toString() + "\\" + soundFileId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
+            return Optional.ofNullable(Paths.get(path.get().toString() + "/" + soundFileId + "." + DEFAULT_AUDIO_FILE_EXTENSION));
         }
         return path;
     }

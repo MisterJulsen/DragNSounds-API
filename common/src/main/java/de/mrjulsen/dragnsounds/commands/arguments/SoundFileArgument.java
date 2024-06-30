@@ -44,10 +44,10 @@ public class SoundFileArgument implements ArgumentType<SoundFile> {
         int lastSlashIndex = string.lastIndexOf('/');
 
         if (DragNSounds.hasServer()) {
-            SoundLocation loc = new SoundLocation(ServerEvents.getCurrentServer().overworld(), string.substring(0, lastSlashIndex));
-            return SoundFile.of(loc, string.substring(lastSlashIndex + 1)).get();
+            SoundLocation loc = new SoundLocation(ServerEvents.getCurrentServer().overworld(), string.substring(0, lastSlashIndex < 0 ? string.length() : lastSlashIndex));
+            return SoundFile.of(loc, string.substring(lastSlashIndex < 0 ? 0 : lastSlashIndex + 1)).get();
         } else {
-            return ClientSoundManager.getClientDummySoundFile(string.substring(0, lastSlashIndex), string.substring(lastSlashIndex + 1));
+            return ClientSoundManager.getClientDummySoundFile(string.substring(0, lastSlashIndex < 0 ? string.length() : lastSlashIndex), string.substring(lastSlashIndex < 0 ? 0 : lastSlashIndex + 1));
         }
     }
 
