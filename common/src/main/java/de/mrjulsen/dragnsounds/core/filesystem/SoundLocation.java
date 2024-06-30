@@ -140,7 +140,7 @@ public class SoundLocation implements INBTSerializable {
      * @return The path to the directory inside the world's data folder where the sounds are saved.
      */
     public static final Path getModDirectory(Level level) {
-        return level.getServer().getWorldPath(new LevelResource("data\\" + DragNSounds.MOD_ID));
+        return level.getServer().getWorldPath(new LevelResource("data/" + DragNSounds.MOD_ID));
     }
 
     /**
