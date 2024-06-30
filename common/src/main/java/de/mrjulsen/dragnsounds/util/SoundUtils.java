@@ -18,6 +18,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
+import de.mrjulsen.mcdragonlib.util.MathUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.network.chat.MutableComponent;;
 
@@ -40,7 +41,7 @@ public class SoundUtils {
                 for (String field : fields) {
                     if (field.contains("=")) {
                         String[] keyValue = field.split("=", 2);
-                        metadata.put(keyValue[0], keyValue[1].substring(0, keyValue[1].length() - 1).split("\1")[0].replaceAll("\\p{C}", ""));
+                        metadata.put(keyValue[0], keyValue[1].substring(0, MathUtils.clamp(keyValue[1].length() - 1, 0, Integer.MAX_VALUE)).split("\1")[0].replaceAll("\\p{C}", ""));
                     }
                 }
                 if (line.contains("vorbis)")) {
