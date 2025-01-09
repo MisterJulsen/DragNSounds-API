@@ -7,7 +7,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'dragnsounds'
+rootProject.name = 'DragNSounds API'
 
 include 'common'
 include 'fabric'

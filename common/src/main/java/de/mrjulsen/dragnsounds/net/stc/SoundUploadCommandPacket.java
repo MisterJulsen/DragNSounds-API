@@ -65,7 +65,6 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
         return new SoundUploadCommandPacket(nbt, settings, showProgress);
     }
 
-    @SuppressWarnings("resource")
     @Override
     public void handle(SoundUploadCommandPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
@@ -74,9 +73,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                     if (!files.isPresent()) {
                         return;
                     }
-                    
-                    try {
-                        
+                    try {                        
                         AtomicReference<UploadScreen> screen = new AtomicReference<>(null);
                         long uploadId = ClientSoundManager.uploadSound(
                             files.get()[0].toString(),
