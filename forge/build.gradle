@@ -85,3 +85,7 @@ components.java {
         skip()
     }
 }
+task releaseAfterMath(type: GradleBuild) {
+    println 'TEST TASK'
+    //tasks = ['build']
+}

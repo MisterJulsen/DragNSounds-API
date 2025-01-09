@@ -23,6 +23,7 @@ import de.mrjulsen.dragnsounds.net.cts.SoundFileRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.SoundGetDataResponsePacket;
 import de.mrjulsen.dragnsounds.net.cts.SoundListRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.SoundPlayingCheckResponsePacket;
+import de.mrjulsen.dragnsounds.net.cts.StartUploadSoundPacket;
 import de.mrjulsen.dragnsounds.net.cts.StopSoundNotificationPacket;
 import de.mrjulsen.dragnsounds.net.cts.UpdateMetadataPacket;
 import de.mrjulsen.dragnsounds.net.cts.UploadSoundPacket;
@@ -35,6 +36,7 @@ import de.mrjulsen.dragnsounds.net.stc.SoundFileResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundListChunkResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundPlayingCheckPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundUploadCommandPacket;
+import de.mrjulsen.dragnsounds.net.stc.StartUploadResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.StopAllSoundsPacket;
 import de.mrjulsen.dragnsounds.net.stc.StopSoundInstancesRequest;
 import de.mrjulsen.dragnsounds.net.stc.StopSoundRequest;
@@ -96,6 +98,7 @@ public final class DragNSounds {
             SoundDeleteRequestPacket.class,
             SoundCreatedResponsePacket.class,
             SoundGetDataResponsePacket.class,
+            StartUploadSoundPacket.class,
 
             // STC
             PlaySoundPacket.class,
@@ -113,6 +116,7 @@ public final class DragNSounds {
             SoundUploadCommandPacket.class,
             StopAllSoundsPacket.class,
             PrintDebugPacket.class,
+            StartUploadResponsePacket.class,
 
             SoundConeDirectionPacket.class,
             SoundDopplerPacket.class,

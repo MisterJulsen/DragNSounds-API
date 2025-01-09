@@ -51,12 +51,17 @@ public class PlaySoundPacket implements IPacketBase<PlaySoundPacket> {
 
     @Override
     public PlaySoundPacket decode(FriendlyByteBuf buf) {
+        long soundId = buf.readLong();
+        int triggerIndex = buf.readInt();
+        CompoundTag nbt = buf.readNbt();
+        PlaybackConfig playback = PlaybackConfig.deserializeNbt(buf.readNbt());
+        long clientCallbackRequestId = buf.readLong();
         return new PlaySoundPacket(
-            buf.readLong(),
-            buf.readInt(),
-            buf.readNbt(),
-            PlaybackConfig.deserializeNbt(buf.readNbt()),
-            buf.readLong()
+            soundId,
+            triggerIndex,
+            nbt,
+            playback,
+            clientCallbackRequestId
         );
     }
 
