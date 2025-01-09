@@ -1,6 +1,7 @@
 package de.mrjulsen.dragnsounds.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -18,6 +19,7 @@ import de.mrjulsen.dragnsounds.core.data.IPlaybackArea;
 import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.data.filter.FileInfoFilter;
 import de.mrjulsen.dragnsounds.core.data.filter.IFilter;
+import de.mrjulsen.dragnsounds.core.ffmpeg.AudioSettings;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundPlayingCheckPacket;
@@ -58,6 +60,70 @@ public final class ServerApi {
      */
     public static long playSound(SoundFile file, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback) {
         long id = ServerSoundManager.playSound(file, playback, player, 0);
+        SoundPlayingCallback.create(id, soundCallback);
+        return id;
+    }
+
+    /**
+     * Converts the given sound file into the {@code ogg} format and saves it on the server.
+     * @param srcFilePath The path to the source audio file.
+     * @param builder A Builder to define how the sound file should look like (contains information such as the location, the name and more)
+     * @param settings Settings for the sound conversion. 
+     * @param callback Called after the creation was successfull.
+     * @param error Called when an error occurs or if the process was cancelled.
+     * @return The id of the process. Use it to cancel the process.
+     */
+    public static long createSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<StatusResult> error) {
+        return ServerSoundManager.createSound(srcFilePath, builder, settings, callback, error);
+    }
+    
+    /**
+     * Converts the given sound file into the {@code ogg} format and saves it on the server.
+     * @param audioData A {@code InputStream} containing all audio data of the source.
+     * @param builder A Builder to define how the sound file should look like (contains information such as the location, the name and more)
+     * @param settings Settings for the sound conversion. 
+     * @param callback Called after the creation was successfull.
+     * @param error Called when an error occurs or if the process was cancelled.
+     * @return The id of the process. Use it to cancel the process.
+     */
+    public static long createSound(InputStream audioData, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<StatusResult> error) {
+        return ServerSoundManager.createSound(audioData, builder, settings, callback, error);
+    }
+
+    /**
+     * Converts the given sound file into the {@code ogg} format and plays it once for the given players without saving the data on the server. After the playback has been finished, the data will be deleted.
+     * @param srcFilePath The path to the source audio file.
+     * @param settings Settings for the sound conversion. 
+     * @param playback The playback settings.
+     * @param player The players that should hear that sound.
+     * @param soundCallback This callback will be called multiple times and once for EVERY single player in the {@code player}-Array.
+     * The callback is called when the client received the first data packet, when the client started playing the sound and when the playback of the client has been stopped.
+     * Since this may be different between all players you have to check for the player too. Also don't rely on a {@code STOP} notification, because the server may not receive one in some edge cases.
+     * Use {@code player.isAlive()} and other methods to check if the player is still online.
+     * @param error Called when an error occurs or if the conversion was cancelled.
+     * @return The id of the process. Use it to cancel the process.
+     */
+    public static long playSoundOnce(String srcFilePath, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<StatusResult> error) {
+        long id = ServerSoundManager.playSoundOnce(srcFilePath, settings, playback, player, afterConversion, error);
+        SoundPlayingCallback.create(id, soundCallback);
+        return id;
+    }
+    
+    /**
+     * Converts the given sound file into the {@code ogg} format and plays it once for the given players without saving the data on the server. After the playback has been finished, the data will be deleted.
+     * @param audioData A {@code InputStream} containing all audio data of the source.
+     * @param settings Settings for the sound conversion. 
+     * @param playback The playback settings.
+     * @param player The players that should hear that sound.
+     * @param soundCallback This callback will be called multiple times and once for EVERY single player in the {@code player}-Array.
+     * The callback is called when the client received the first data packet, when the client started playing the sound and when the playback of the client has been stopped.
+     * Since this may be different between all players you have to check for the player too. Also don't rely on a {@code STOP} notification, because the server may not receive one in some edge cases.
+     * Use {@code player.isAlive()} and other methods to check if the player is still online.
+     * @param error Called when an error occurs or if the conversion was cancelled.
+     * @return The id of the process. Use it to cancel the process.
+     */
+    public static long playSoundOnce(InputStream audioData, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<StatusResult> error) {
+        long id = ServerSoundManager.playSoundOnce(audioData, settings, playback, player, afterConversion, error);
         SoundPlayingCallback.create(id, soundCallback);
         return id;
     }

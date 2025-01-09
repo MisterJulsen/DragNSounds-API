@@ -42,11 +42,11 @@ public class SoundFileInfo implements INBTSerializable {
     private UUID ownerId = DragNSounds.ZERO_UUID;
     private long uploadTimestamp;
     private int channels;
-    private String title;
-    private String artist;
-    private String year;
-    private String album;
-    private String genre;
+    private String title = "Unknown";
+    private String artist = "Unknown";
+    private String year = "";
+    private String album = "";
+    private String genre = "";
 
     public SoundFileInfo(long duration, long fileSize, UUID ownerId, long uploadTimestamp, int channels, String title, String artist, String year, String album, String genre) {
         this.duration = duration;

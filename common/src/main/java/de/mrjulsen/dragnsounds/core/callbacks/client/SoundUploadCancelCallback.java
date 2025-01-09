@@ -33,8 +33,9 @@ public class SoundUploadCancelCallback {
     }
 
     public static void close(long id) {
-        cancelAction.remove(id);
-        cancellable.remove(id);
+        if (cancelAction.containsKey(id)) cancelAction.remove(id);
+        if (cancellable.containsKey(id)) cancellable.remove(id);
+        
     }
 
     public static void clear() {
