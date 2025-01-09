@@ -62,7 +62,7 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
     public void handle(FinishUploadSoundPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             packet.level = contextSupplier.get().getPlayer().getLevel();
-            ServerInstanceManager.getOrCreateUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)contextSupplier.get().getPlayer()).setFinalizerPacket(packet);
+            ServerInstanceManager.getUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)contextSupplier.get().getPlayer()).setFinalizerPacket(packet);
         });
     }
 

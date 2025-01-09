@@ -1,6 +1,8 @@
 package de.mrjulsen.dragnsounds.commands;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -27,6 +29,7 @@ import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundUploadCommandPacket;
+import de.mrjulsen.dragnsounds.util.SoundUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -41,12 +44,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import ws.schild.jave.EncoderException;
 
 public class CustomSoundCommand {
 
     private static final String CMD_NAME = "sound";
     
     private static final String SUB_PLAY = "play";
+    private static final String SUB_PLAY_ONCE = "playOnce";
     private static final String SUB_STOP = "stop";
     private static final String SUB_UPLOAD = "upload";
     private static final String SUB_DELETE = "delete";
@@ -62,8 +67,9 @@ public class CustomSoundCommand {
     private static final String SUB_MODIFY_POSITION = "pos";
     private static final String SUB_MODIFY_PAUSE = "pause";
     private static final String SUB_MODIFY_RESUME = "resume";
-    private static final String SUB_MODIFY_SEEK = "seek"; 
+    private static final String SUB_MODIFY_SEEK = "seek";
 
+    private static final String ARG_FILENAME = "fileName";
     private static final String ARG_SOUND_FILE = "soundFile";
     private static final String ARG_PLAYERS = "targets";
     private static final String ARG_PLAYER = "target";
@@ -112,6 +118,41 @@ public class CustomSoundCommand {
                                                 .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x), attenuationArg(x), ticksArg(x)))
                                                 .then(Commands.argument(ARG_SHOW_LABEL, BoolArgumentType.bool())
                                                     .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x), attenuationArg(x), ticksArg(x), showLabelArg(x)))
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            ).then(Commands.literal(SUB_PLAY_ONCE)
+             .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED))
+                .then(Commands.argument(ARG_FILENAME, StringArgumentType.string())
+                    .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x)))
+                    .then(Commands.argument(ARG_PLAYERS, EntityArgument.players())
+                        .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x)))
+                        .then(Commands.argument(ARG_SOURCE, SoundSourceArgument.soundSource())
+                            .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x)))
+                            .then(Commands.argument(ARG_VOLUME, FloatArgumentType.floatArg(CustomSoundInstance.VOLUME_MIN, CustomSoundInstance.VOLUME_MAX))
+                                .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x)))
+                                .then(Commands.argument(ARG_PITCH, FloatArgumentType.floatArg(CustomSoundInstance.PITCH_MIN, CustomSoundInstance.PITCH_MAX))
+                                    .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x)))
+                                    .then(Commands.argument(ARG_POSITION, Vec3Argument.vec3())
+                                        .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x)))
+                                        .then(Commands.argument(ARG_ATTENUATION_DISTANCE, IntegerArgumentType.integer(0))
+                                            .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x), attenuationArg(x)))
+                                            .then(Commands.argument(ARG_TICKS_OFFSET, IntegerArgumentType.integer(0))
+                                                .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x), attenuationArg(x), ticksArg(x)))
+                                                .then(Commands.argument(ARG_CHANNELS, SoundChannelsArgument.channels())
+                                                    .then(Commands.argument(ARG_BIT_RATE, IntegerArgumentType.integer(1))
+                                                        .then(Commands.argument(ARG_SAMPLING_RATE, IntegerArgumentType.integer(1))
+                                                            .then(Commands.argument(ARG_QUALITY, IntegerArgumentType.integer(1, 10))
+                                                                .executes(x -> playSoundOnce(x.getSource(), selection == CommandSelection.INTEGRATED, filenameArg(x), playersArg(x), sourceArg(x), volumeArg(x), pitchArg(x), posArg(x), attenuationArg(x), ticksArg(x), new AudioSettings(channelsArg(x), bitRateArg(x), samplingRateArg(x), qualityArg(x))))
+                                                            )
+                                                        )
+                                                    )
                                                 )
                                             )
                                         )
@@ -362,6 +403,10 @@ public class CustomSoundCommand {
         return StringArgumentType.getString(stack, ARG_DISPLAY_NAME);
     }
     
+    private static String filenameArg(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
+        return StringArgumentType.getString(stack, ARG_FILENAME);
+    }
+    
     private static EChannels channelsArg(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
         return stack.getArgument(ARG_CHANNELS, EChannels.class);
     }
@@ -460,5 +505,71 @@ public class CustomSoundCommand {
         ServerApi.setSoundPausedAllInstances(file, paused, new ServerPlayer[] {player});
         cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.modified"), false);
         return 1;
+    }
+
+
+
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume, float pitch, Vec3 pos, int attenuationDistance, int ticksOffset, AudioSettings settings) throws CommandSyntaxException {
+        AtomicReference<String> path = new AtomicReference<>(filename);
+        AtomicBoolean success = new AtomicBoolean(filename != null && !filename.isBlank());
+        if (!success.get() && enableClientFeatures) {
+            SoundUtils.showUploadDialog(false, (files) -> {
+                if (!files.isPresent() || files.get().length <= 0) {
+                    return;
+                }
+                path.set(files.get()[0].toString());
+                success.set(true);
+            });
+        }
+
+        if (!success.get()) {
+            cmd.sendFailure(TextUtils.text("Playback failed."));
+            return 0;
+        }
+        try {
+            ServerApi.playSoundOnce(path.get(), settings == null ? AudioSettings.getByFile(path.get()) : settings, new PlaybackConfig(pos == null ? ESoundType.UI : ESoundType.WORLD, source.getName(), volume, pitch, pos, attenuationDistance, false, ticksOffset, false), players, (a, b, c) -> {}, () -> {}, (e) -> {});
+            cmd.sendSuccess(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.play", path.get(), players.length), false);
+            return 1;
+        } catch (EncoderException e) {
+            cmd.sendFailure(TextUtils.text(e.getLocalizedMessage()));
+        }
+        return 0;
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume, float pitch, Vec3 pos, int attenuationDistance, int ticksOffset) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, volume, pitch, pos, attenuationDistance, 0, null);
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume, float pitch, Vec3 pos, int attenuationDistance) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, volume, pitch, pos, attenuationDistance, 0);
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume, float pitch, Vec3 pos) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, volume, pitch, pos, CustomSoundInstance.ATTENUATION_DISTANCE_DEFAULT);
+    }
+    
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume, float pitch) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, volume, pitch, null);
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source, float volume) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, volume, 1);
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players, SoundSource source) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, source, 1);
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename, ServerPlayer[] players) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, players, CustomSoundSource.getSoundSourceByName(CustomSoundSource.CUSTOM.getName()));
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures, String filename) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, filename, new ServerPlayer[] {cmd.getPlayerOrException()});
+    }
+
+    private static int playSoundOnce(CommandSourceStack cmd, boolean enableClientFeatures) throws CommandSyntaxException {
+        return playSoundOnce(cmd, enableClientFeatures, null);
     }
 }

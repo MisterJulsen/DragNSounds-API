@@ -3,8 +3,12 @@ package de.mrjulsen.dragnsounds.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -30,17 +34,28 @@ public class SoundUtils {
     };
 
     public static Map<String, String> getAudioMetadata(File file) {
+        try {
+            return getAudioMetadata(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            DragNSounds.LOGGER.error("Unable to read metadata from audio file.", e);
+        }
+        return new LinkedHashMap<>();
+    }
+
+    public static Map<String, String> getAudioMetadata(InputStream file) {
         Map<String, String> metadata = new LinkedHashMap<>();
         try {
-            FileInputStream fis = new FileInputStream(file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            BufferedReader br = new BufferedReader(new InputStreamReader(file));
             String line;
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split("\0");
                 for (String field : fields) {
                     if (field.contains("=")) {
                         String[] keyValue = field.split("=", 2);
-                        metadata.put(keyValue[0], keyValue[1].substring(0, keyValue[1].length() - 1).split("\1")[0].replaceAll("\\p{C}", ""));
+                        if (keyValue.length < 2) continue;
+                        String key = keyValue[0];
+                        String value = keyValue[1].substring(0, keyValue[1].length() - 1).split("\1")[0].replaceAll("\\p{C}", "");
+                        metadata.put(key, value);
                     }
                 }
                 if (line.contains("vorbis)")) {
@@ -73,5 +88,53 @@ public class SoundUtils {
         } else {
             callback.accept(Optional.empty());
         }
+    }
+
+    /**
+     * Calculates the duration of the OGG audio file.
+     * @param data The OGG audio file data
+     * @return The playback duration in milliseconds
+     */
+    public static long calculateOggDuration(final byte[] data) {
+        int rate = -1;
+        int length = -1;
+
+        for (int i = data.length - 1 - 8 - 2 - 4; i >= 0 && length < 0; i--) {
+            if (isMatch(data, i, "OggS")) {
+                byte[] byteArray = extractByteArray(data, i + 6, 8);
+                length = extractIntLittleEndian(byteArray);
+            }
+        }
+
+        for (int i = 0; i < data.length - 8 - 2 - 4 && rate < 0; i++) {
+            if (isMatch(data, i, "vorbis")) {
+                byte[] byteArray = extractByteArray(data, i + 11, 4);
+                rate = extractIntLittleEndian(byteArray);
+            }
+        }
+
+        double duration = (double) length / (double) rate;
+        return (long)(duration * 1000);
+    }
+
+    private static boolean isMatch(byte[] array, int startIndex, String pattern) {
+        for (int i = 0; i < pattern.length(); i++) {
+            if (array[startIndex + i] != pattern.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static byte[] extractByteArray(byte[] array, int startIndex, int length) {
+        byte[] result = new byte[length];
+        System.arraycopy(array, startIndex, result, 0, length);
+        return result;
+    }
+
+    private static int extractIntLittleEndian(byte[] byteArray) {
+        ByteBuffer bb = ByteBuffer.wrap(byteArray);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getInt();
     }
 }

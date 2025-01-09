@@ -1,6 +1,7 @@
 package de.mrjulsen.dragnsounds.core.filesystem;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -72,8 +73,9 @@ public class SoundLocation implements INBTSerializable {
         this(level);
         Path relativePath = getModDirectory(level).relativize(location);
         String pathStr = relativePath.toString().replace("\\", "/");
-        this.namespace = pathStr.split("/")[0];
-        String path = pathStr.replace(namespace, "");
+        String[] pathComponents = pathStr.split("/", 2);
+        this.namespace = pathComponents.length > 0 ? pathComponents[0] : "";
+        String path = pathComponents.length > 1 ? pathComponents[1] : "";
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
@@ -140,7 +142,7 @@ public class SoundLocation implements INBTSerializable {
      * @return The path to the directory inside the world's data folder where the sounds are saved.
      */
     public static final Path getModDirectory(Level level) {
-        return level.getServer().getWorldPath(new LevelResource("data\\" + DragNSounds.MOD_ID));
+        return level.getServer().getWorldPath(new LevelResource(Paths.get("data", DragNSounds.MOD_ID).toString()));
     }
 
     /**
