@@ -1,35 +1,44 @@
 modLoader = "javafml"
-loaderVersion = "[${forge_loader_version},)"
-issueTrackerURL = "${issues}"
-license = "${license}"
+loaderVersion = "[43,)"
+issueTrackerURL = "https://github.com/MisterJulsen/DragNSounds-API/issues"
+license = "GNU General Public License v3.0"
 
 [[mods]]
-modId = "${modid}"
+modId = "dragnsounds"
 version = "${version}"
-displayName = "${display_name}"
-displayUrl="${homepage}"
-authors = "${authors}"
+displayName = "DragNSounds API"
+authors = "MrJulsen"
 credits="JAVE2 by a-schild https://github.com/a-schild/jave2"
-description = '''${description}'''
-logoFile = "${icon}"
+displayURL="https://misterjulsen.github.io/DragNSounds-API/"
+description = '''
+A simple API to upload custom sounds or music to the server and let them play in realtime to any player at any position without the need for a resourcepack. This project uses DragonLib, Architectury and JAVE2.
+'''
+logoFile = "icon.png"
 
-[[dependencies.${modid}]]
+[[dependencies.dragnsounds]]
 modId = "forge"
 mandatory = true
-versionRange = "[${forge_dependency_version},)"
+versionRange = "[43,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${modid}]]
+[[dependencies.dragnsounds]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[${minecraft_version},${next_unsupported_minecraft_version})"
+versionRange = "[1.19.2,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${modid}]]
+[[dependencies.dragnsounds]]
+modId = "architectury"
+mandatory = true
+versionRange = "[6.5.85,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.dragnsounds]]
 modId = "dragonlib"
 mandatory = true
-versionRange = "[${dragonlib_version},)"
-ordering = "BEFORE"
+versionRange = "[1.19.2-2.1.11,)"
+ordering = "AFTER"
 side = "BOTH"

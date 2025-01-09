@@ -16,12 +16,10 @@ import java.util.UUID;
 import java.util.Arrays;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
-import de.mrjulsen.dragnsounds.config.CommonConfig;
 import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
 import de.mrjulsen.dragnsounds.net.cts.RemoveMetadataPacket;
 import de.mrjulsen.dragnsounds.net.cts.UpdateMetadataPacket;
 import de.mrjulsen.dragnsounds.util.ExtendedNBTUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
@@ -242,7 +240,7 @@ public class SoundFile {
     /**
      * Get a {@code SoundFile} object by location and filename (Id).
      * @param location The location where the sound is saved at.
-     * @param id The id of the sound file (filename on disk without extension)
+     * @param id The if of the sound file (filename on disk without extension)
      * @return The {@code SoundFile}, if available.
      * @side Server
      */
@@ -259,7 +257,7 @@ public class SoundFile {
         return Optional.empty();
     }
 
-    public static SoundFile dummy(SoundLocation location, String id) {
+    public static SoundFile client(SoundLocation location, String id) {
         SoundFile file = new SoundFile();
         file.location = location;
         file.id = id;
@@ -347,7 +345,6 @@ public class SoundFile {
                 try (FileOutputStream out = new FileOutputStream(file)) {
                     dataStream.writeTo(out);
                 }
-
                 SoundFile soundFile = new SoundFile();
                 soundFile.location = location;
                 soundFile.id = fileId;
@@ -360,13 +357,6 @@ public class SoundFile {
                     initialDuration
                 );
                 soundFile.metadata.putAll(metadata);
-
-                StatusResult result = CommonConfig.checkAudioPermissions(soundFile, owner);
-                if (!result.result()) {
-                    file.delete();
-                    throw new IOException(result.message());
-                }
-                
                 registry.add(soundFile);
                 return soundFile;
             }

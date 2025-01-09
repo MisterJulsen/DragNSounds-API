@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.api.Api;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
 
@@ -15,24 +14,15 @@ public class PlayerboundDataBuffer implements AutoCloseable {
     private Map<UUID, Map<Long, Integer>> positions = new HashMap<>();
     private final long id;
 
-    private InputStream dataStream;
-    private final boolean streaming;
-
     public static final int NO_LISTENERS = 1;
     public static final int NO_PLAYER_WITH_UUID = 2;
     public static final int NO_SOUND_WITH_ID = 3;
     public static final int NO_SOUND_AND_PLAYER = 4;
 
-    public PlayerboundDataBuffer(InputStream stream, boolean streaming) throws IOException {
+    public PlayerboundDataBuffer(InputStream stream) throws IOException {
+        this.buffer = stream.readAllBytes();
         this.id = Api.id();
-        this.streaming = streaming;
-        if (streaming) {
-            this.dataStream = stream;
-            this.buffer = new byte[1024000];
-        } else {
-            this.buffer = stream.readAllBytes();
-            stream.close();
-        }
+        stream.close();
     }
 
     public long getId() {
@@ -53,14 +43,6 @@ public class PlayerboundDataBuffer implements AutoCloseable {
         int index = positions.get(player).get(soundId);
         int bufferLength = buffer.length;
         int maxLen = Math.min(bufferLength - index, data.length);
-
-        if (streaming) {
-            try {
-                dataStream.read(buffer, index, maxLen);
-            } catch (Exception e) {
-                DragNSounds.LOGGER.error("Sound data streaming error.", e);
-            }
-        }
 
         System.arraycopy(buffer, index, data, 0, maxLen);
 

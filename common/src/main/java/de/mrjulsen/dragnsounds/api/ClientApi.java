@@ -192,7 +192,7 @@ public final class ClientApi {
      */
     public static long uploadSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> error) {
         return ClientSoundManager.uploadSound(srcFilePath, builder, settings, callback, progress, error);
-    }
+    } 
 
     /**
      * Checks if the upload can be cancelled at this moment.

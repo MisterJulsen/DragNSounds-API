@@ -12,7 +12,6 @@ import de.mrjulsen.mcdragonlib.client.util.Graphics;
 import de.mrjulsen.mcdragonlib.client.util.GuiAreaDefinition;
 import de.mrjulsen.mcdragonlib.client.util.GuiUtils;
 import de.mrjulsen.mcdragonlib.core.EAlignment;
-import de.mrjulsen.mcdragonlib.util.DLUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.network.chat.CommonComponents;
 
@@ -22,7 +21,7 @@ public class UploadScreen extends DLScreen {
     protected final long uploadId;
     protected DLButton cancelButton;
 
-    protected UploadState currentState = UploadState.CONVERT;
+    protected UploadState currentState;
 
     protected final String keyConvert = "gui." + DragNSounds.MOD_ID + ".upload.convert";
     protected final String keyUpload = "gui." + DragNSounds.MOD_ID + ".upload.upload";
@@ -58,15 +57,15 @@ public class UploadScreen extends DLScreen {
         DynamicGuiRenderer.renderWindow(graphics, new GuiAreaDefinition(width / 2 - 100, height / 2 - 50, 200, 100));
         super.renderMainLayer(graphics, mouseX, mouseY, partialTicks);
         GuiUtils.drawString(graphics, font, width / 2, height / 2 - 40, title, DragonLib.NATIVE_UI_FONT_COLOR, EAlignment.CENTER, false);
-        GuiUtils.drawString(graphics, font, width / 2, height / 2 - 20, currentState == UploadState.CONVERT ? TextUtils.translate(keyConvert) : TextUtils.translate(keyUpload, (int)progressBar.getValue()), DragonLib.NATIVE_UI_FONT_COLOR, EAlignment.CENTER, false);
+        GuiUtils.drawString(graphics, font, width / 2, height / 2 - 20, currentState == UploadState.CONVERT ? TextUtils.translate(keyConvert, (int)progressBar.getValue()) : TextUtils.translate(keyUpload, (int)progressBar.getValue()), DragonLib.NATIVE_UI_FONT_COLOR, EAlignment.CENTER, false);
     }
     
     public void setProgress(double d) {
-        DLUtils.doIfNotNull(progressBar, x -> x.setValue(d));
+        this.progressBar.setValue(d);
     }
 
     public void setBuffer(double d) {
-        DLUtils.doIfNotNull(progressBar, x -> x.setBufferValue(d));
+        this.progressBar.setBufferValue(d);
     }
 
     public void setCurrentState(UploadState state) {

@@ -39,7 +39,7 @@ public class UploadSoundBuffer implements AutoCloseable {
         this.requestId = requestId;
         this.player = player;
         this.maxSize = maxSize;
-        this.output = new ByteArrayOutputStream(maxSize);
+        this.output = new ByteArrayOutputStream();
         this.queue = new ConcurrentLinkedQueue<>();
 
         new Thread(this::queueWorker, "Upload Buffer Listener").start();
@@ -59,7 +59,7 @@ public class UploadSoundBuffer implements AutoCloseable {
                         DragNSounds.net().sendToPlayer(player, new UploadProgressPacket(requestId, new UploadProgress(progress, UploadState.UPLOAD)));
                     } catch (IOException e) {
                         DragNSounds.LOGGER.error("Error while writing upload file content.", e);
-                        DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -102, e.getLocalizedMessage())));
+                        DragNSounds.net().sendToPlayer(player, new StatusResult(false, -102, e.getLocalizedMessage()));
                         isWorking = false;
                         break;
                     }

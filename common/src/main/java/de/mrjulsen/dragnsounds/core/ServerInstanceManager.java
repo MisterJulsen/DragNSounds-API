@@ -2,7 +2,6 @@ package de.mrjulsen.dragnsounds.core;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,17 +11,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
-import de.mrjulsen.dragnsounds.config.CommonConfig;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundGetDataCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCheckCallback;
-import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.data.PlayerboundDataBuffer;
 import de.mrjulsen.dragnsounds.core.data.UploadSoundBuffer;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
-import de.mrjulsen.dragnsounds.net.stc.UploadFailedPacket;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.ChatFormatting;
@@ -41,7 +35,7 @@ public final class ServerInstanceManager {
         String hash = IOUtils.getFileHash(file.getPath().get().toString());
         PlayerboundDataBuffer buffer = activeBuffers.computeIfAbsent(hash, x -> {
             try {
-                return new PlayerboundDataBuffer(new FileInputStream(file.getPath().get().toFile()), false);
+                return new PlayerboundDataBuffer(new FileInputStream(file.getPath().get().toFile()));
             } catch (IOException e) {
                 DragNSounds.LOGGER.error("Unable to open sound file.", e);
                 return null;
@@ -50,47 +44,6 @@ public final class ServerInstanceManager {
 
         if (buffer == null) {
             DragNSounds.LOGGER.error("Sound file could not be loaded! " + file.toString());
-            return null;
-        }
-
-        activeBuffersBySoundId.computeIfAbsent(soundId, x -> buffer);
-
-        return buffer;
-    }
-
-    public static PlayerboundDataBuffer loadFromStream(InputStream stream, boolean streaming, long soundId) {
-        PlayerboundDataBuffer buffer = activeBuffers.computeIfAbsent(String.valueOf(stream.hashCode()), x -> {
-            try {
-                return new PlayerboundDataBuffer(stream, streaming);
-            } catch (IOException e) {
-                DragNSounds.LOGGER.error("Unable to stream sound file.", e);
-                return null;
-            }
-        });
-
-        if (buffer == null) {
-            DragNSounds.LOGGER.error("Sound stream could not be processed!");
-            return null;
-        }
-
-        activeBuffersBySoundId.computeIfAbsent(soundId, x -> buffer);
-
-        return buffer;
-    }
-
-    public static PlayerboundDataBuffer loadInputData(InputStream stream, boolean streaming, long soundId) {
-        String hash = String.valueOf(stream.hashCode());
-        PlayerboundDataBuffer buffer = activeBuffers.computeIfAbsent(hash, x -> {
-            try {
-                return new PlayerboundDataBuffer(stream, streaming);
-            } catch (IOException e) {
-                DragNSounds.LOGGER.error("Unable to read sound file.", e);
-                return null;
-            }
-        });
-
-        if (buffer == null) {
-            DragNSounds.LOGGER.error("Sound file could not be loaded!");
             return null;
         }
 
@@ -115,8 +68,7 @@ public final class ServerInstanceManager {
 
     public static void closeAll(Player player) {
         List<PlayerboundDataBuffer> idsToRemove = new LinkedList<>();
-        activeBuffersBySoundId.entrySet().removeIf(x -> {        
-            ClientSoundManager.playSoundQueue(x.getKey(), 0, SoundFile.dummy(SoundLocation.empty(), ""), PlaybackConfig.defaultUI(1, 1, 0), 0);
+        activeBuffersBySoundId.entrySet().removeIf(x -> {
             boolean b = x.getValue().remove(player.getUUID());
             idsToRemove.add(x.getValue());
             return b;
@@ -137,20 +89,8 @@ public final class ServerInstanceManager {
         });
     }
 
-    public static synchronized StatusResult createUploadBuffer(long requestId, int maxSize, ServerPlayer player) {        
-        StatusResult result = CommonConfig.checkFilePermissions(maxSize, player);
-        if (result.result()) { 
-            uploadFileCache.computeIfAbsent(requestId, x -> new UploadSoundBuffer(x, (int)maxSize, player));
-        }
-        return result;
-    }
-
-    public static synchronized UploadSoundBuffer getUploadBuffer(long requestId, int maxSize, ServerPlayer player) {
-        if (!uploadFileCache.containsKey(requestId)) { 
-            DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -201, "The upload task has not been prepared.")));
-            return null;
-        }
-        return uploadFileCache.get(requestId);
+    public static synchronized UploadSoundBuffer getOrCreateUploadBuffer(long requestId, int maxSize, ServerPlayer player) {
+        return uploadFileCache.computeIfAbsent(requestId, x -> new UploadSoundBuffer(x, maxSize, player));
     }
 
     public static void closeUploadBuffer(long requestId) {

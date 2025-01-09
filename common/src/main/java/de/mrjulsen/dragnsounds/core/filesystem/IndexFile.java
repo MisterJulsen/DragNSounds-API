@@ -147,7 +147,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
         CompoundTag nbt = serializeNbt();
         try {
             checkAndRepair();
-            NbtIo.writeCompressed(nbt, path.resolve(INDEX_FILENAME).toFile());
+            NbtIo.writeCompressed(nbt, new File(path.toString() + "/" + INDEX_FILENAME));
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to save index file.", e);
         }
@@ -163,7 +163,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
     public static IndexFile open(SoundLocation location, boolean readOnly) throws IOException {
         Optional<Path> path = location.resolve();
         if (path.isPresent()) {
-            File indexFile = path.get().resolve(INDEX_FILENAME).toFile();
+            File indexFile = new File(path.get().toString() + "/" + INDEX_FILENAME);
             if (indexFile.exists()) {
                 IndexFile file = new IndexFile(location, readOnly);
                 file.deserializeNbt(NbtIo.readCompressed(indexFile));
@@ -181,7 +181,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
     public static boolean existsIn(SoundLocation location) {
         Optional<Path> path = location.resolve();
         if (path.isPresent()) {
-            File indexFile = path.get().resolve(INDEX_FILENAME).toFile();
+            File indexFile = new File(path.get().toString() + "/" + INDEX_FILENAME);
             return indexFile.exists();
         }
         return false;

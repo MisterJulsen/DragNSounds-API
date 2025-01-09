@@ -103,7 +103,7 @@ public class SoundDataStream extends InputStream {
     public int read(byte[] data) {
         int iteration = 0;
         while (hasData && filledSpace() <= data.length) {
-            if (Thread.currentThread().getThreadGroup() != DragNSounds.ASYNC_GROUP || iteration > 100) {
+            if (Thread.currentThread().getThreadGroup() != DragNSounds.ASYNC_GROUP) {
                 DragNSounds.LOGGER.warn("No sound data available. Stream will be stopped.");
                 return -1;
             }            
@@ -178,6 +178,8 @@ public class SoundDataStream extends InputStream {
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
+
+                try { TimeUnit.MILLISECONDS.sleep(10); } catch (InterruptedException e) { }
             }
 
             try { TimeUnit.MILLISECONDS.sleep(10); } catch (InterruptedException e) { }

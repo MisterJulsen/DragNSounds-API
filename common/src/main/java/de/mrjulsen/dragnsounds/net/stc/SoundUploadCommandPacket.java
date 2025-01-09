@@ -65,6 +65,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
         return new SoundUploadCommandPacket(nbt, settings, showProgress);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public void handle(SoundUploadCommandPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
@@ -73,7 +74,9 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                     if (!files.isPresent()) {
                         return;
                     }
-                    try {                        
+                    
+                    try {
+                        
                         AtomicReference<UploadScreen> screen = new AtomicReference<>(null);
                         long uploadId = ClientSoundManager.uploadSound(
                             files.get()[0].toString(),
@@ -90,7 +93,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
                                     screen.get().setBuffer(client.progress());
                                 }
                             }, (e) -> {
-                                contextSupplier.get().getPlayer().sendSystemMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED).append(" ").append(e.message()));
+                                contextSupplier.get().getPlayer().sendSystemMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED));
                                 if (Minecraft.getInstance().screen == screen.get()) {
                                     DLScreen.setScreen(null);
                                 }
