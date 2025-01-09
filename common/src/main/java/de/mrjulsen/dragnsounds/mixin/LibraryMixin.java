@@ -16,10 +16,10 @@ import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.Library.ChannelPool;
 import com.mojang.blaze3d.audio.Library.CountingChannelPool;
 
-import de.mrjulsen.dragnsounds.config.ClientConfig;
-
 @Mixin(Library.class)
 public abstract class LibraryMixin {
+
+    private static final int CHANNELS = 32;
 
     @Shadow
     private ChannelPool streamingChannels;
@@ -37,7 +37,7 @@ public abstract class LibraryMixin {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(@Nullable String deviceSpecifier, boolean allowHrtf, CallbackInfo ci) {
-        streamingChannels = new CountingChannelPool(ClientConfig.MAX_STREAMING_CHANNELS.get());
+        streamingChannels = new CountingChannelPool(CHANNELS);
         staticChannels = new CountingChannelPool(247);
     }
 
@@ -45,9 +45,9 @@ public abstract class LibraryMixin {
     private void onCreateContext(CallbackInfo ci) {;
         IntBuffer b = BufferUtils.createIntBuffer(5);
         b.put(ALC11.ALC_MONO_SOURCES);
-        b.put(247 + ClientConfig.MAX_STREAMING_CHANNELS.get());
+        b.put(247 + CHANNELS);
         b.put(ALC11.ALC_STEREO_SOURCES);
-        b.put(247 + ClientConfig.MAX_STREAMING_CHANNELS.get());
+        b.put(247 + CHANNELS);
         b.put(0);
         b.flip();
         this.context = ALC10.alcCreateContext(this.currentDevice, b);

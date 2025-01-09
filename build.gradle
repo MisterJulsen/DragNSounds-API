@@ -31,6 +31,7 @@ subprojects {
         maven { url = "https://maven.parchmentmc.org" } // ParchmentMC
         maven { url = "https://mvnrepository.com/artifact/ws.schild/jave-all-deps"} // jave
         maven { url = "https://maven.terraformersmc.com/" } // ModMenu
+        maven { url = "https://maven.nucleoid.xyz/" } // Nucleoid
     }
         
     gradle.startParameter.taskNames.each { taskName ->
@@ -61,8 +62,8 @@ subprojects {
             "discord": rootProject.discord,
             "next_unsupported_minecraft_version": rootProject.next_unsupported_minecraft_version,
             "dragonlib_version": "$rootProject.minecraft_version-$rootProject.dragonlib_version",
-            "forge_loader_version": rootProject.forge_loader_version,
-            "forge_dependency_version": rootProject.forge_dependency_version,
+            "neoforge_loader_version": rootProject.neoforge_loader_version,
+            "neoforge_dependency_version": rootProject.neoforge_dependency_version,
             "fabric_loader_version": rootProject.fabric_loader_version,
             "java_version": rootProject.java_version
         ]

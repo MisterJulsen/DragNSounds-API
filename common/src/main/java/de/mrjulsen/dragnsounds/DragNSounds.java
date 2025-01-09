@@ -70,13 +70,13 @@ public final class DragNSounds {
     private static NetworkManagerBase networkManager;
 
     public static void init() {
-        ModCommands.init();
 
         if (Platform.getEnvironment() == Env.CLIENT) {
             ClientSoundManager.init();
             ClientEvents.init();
         }
         ServerEvents.init();
+        ModCommands.init();
 
         FilterRegistry.register(FileInfoFilter.class);
         FilterRegistry.register(FileMetadataFilter.class);

@@ -12,6 +12,7 @@ import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.mcdragonlib.data.INBTSerializable;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.Level;
 
@@ -147,7 +148,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
         CompoundTag nbt = serializeNbt();
         try {
             checkAndRepair();
-            NbtIo.writeCompressed(nbt, path.resolve(INDEX_FILENAME).toFile());
+            NbtIo.writeCompressed(nbt, path.resolve(INDEX_FILENAME));
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to save index file.", e);
         }
@@ -166,7 +167,7 @@ public class IndexFile implements INBTSerializable, AutoCloseable {
             File indexFile = path.get().resolve(INDEX_FILENAME).toFile();
             if (indexFile.exists()) {
                 IndexFile file = new IndexFile(location, readOnly);
-                file.deserializeNbt(NbtIo.readCompressed(indexFile));
+                file.deserializeNbt(NbtIo.readCompressed(indexFile.toPath(), NbtAccounter.unlimitedHeap()));
                 return file;
             }
         }
