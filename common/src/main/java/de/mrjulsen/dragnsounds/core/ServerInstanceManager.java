@@ -16,11 +16,9 @@ import de.mrjulsen.dragnsounds.config.CommonConfig;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundGetDataCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCheckCallback;
-import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.data.PlayerboundDataBuffer;
 import de.mrjulsen.dragnsounds.core.data.UploadSoundBuffer;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.UploadFailedPacket;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
 import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
@@ -117,7 +115,6 @@ public final class ServerInstanceManager {
     public static void closeAll(Player player) {
         List<PlayerboundDataBuffer> idsToRemove = new LinkedList<>();
         activeBuffersBySoundId.entrySet().removeIf(x -> {        
-            ClientSoundManager.playSoundQueue(x.getKey(), 0, SoundFile.dummy(SoundLocation.empty(), ""), PlaybackConfig.defaultUI(1, 1, 0), 0);
             boolean b = x.getValue().remove(player.getUUID());
             idsToRemove.add(x.getValue());
             return b;
