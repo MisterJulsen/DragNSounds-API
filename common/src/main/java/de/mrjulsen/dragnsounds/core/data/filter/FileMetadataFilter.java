@@ -13,7 +13,7 @@ public class FileMetadataFilter extends AbstractFilter<SoundFile> {
 
     @Override
     public ResourceLocation getFilterId() {
-        return new ResourceLocation(DragNSounds.MOD_ID, "soundfile_metadata");
+        return ResourceLocation.fromNamespaceAndPath(DragNSounds.MOD_ID, "soundfile_metadata");
     }
 
     @Override

@@ -10,7 +10,7 @@ import de.mrjulsen.dragnsounds.core.ffmpeg.AudioSettings;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
 import de.mrjulsen.mcdragonlib.client.gui.DLScreen;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
@@ -18,10 +18,10 @@ import dev.architectury.utils.EnvExecutor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import ws.schild.jave.EncoderException;
 
-public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandPacket> {
+public class SoundUploadCommandPacket extends BaseNetworkPacket<SoundUploadCommandPacket> {
 
     private SoundFile.Builder builder;
     private AudioSettings settings;
@@ -44,7 +44,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
     }
 
     @Override
-    public void encode(SoundUploadCommandPacket packet, FriendlyByteBuf buf) {        
+    public void encode(SoundUploadCommandPacket packet, RegistryFriendlyByteBuf buf) {        
         buf.writeBoolean(packet.settings != null);
         buf.writeBoolean(packet.showProgress);
         buf.writeNbt(packet.builder.serializeNbt());
@@ -54,7 +54,7 @@ public class SoundUploadCommandPacket implements IPacketBase<SoundUploadCommandP
     }
 
     @Override
-    public SoundUploadCommandPacket decode(FriendlyByteBuf buf) {
+    public SoundUploadCommandPacket decode(RegistryFriendlyByteBuf buf) {
         boolean hasSettings = buf.readBoolean();
         boolean showProgress = buf.readBoolean();
         CompoundTag nbt = buf.readNbt();

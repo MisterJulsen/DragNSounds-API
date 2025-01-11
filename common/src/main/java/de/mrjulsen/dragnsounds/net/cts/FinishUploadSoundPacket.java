@@ -4,14 +4,14 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ServerInstanceManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPacket> {
+public class FinishUploadSoundPacket extends BaseNetworkPacket<FinishUploadSoundPacket> {
 
     private long requestId;
     private int maxSize;
@@ -39,7 +39,7 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
     }
 
     @Override
-    public void encode(FinishUploadSoundPacket packet, FriendlyByteBuf buf) {
+    public void encode(FinishUploadSoundPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeInt(packet.maxSize);
         buf.writeNbt(packet.file.serializeNbt());
@@ -48,7 +48,7 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
     }
 
     @Override
-    public FinishUploadSoundPacket decode(FriendlyByteBuf buf) {
+    public FinishUploadSoundPacket decode(RegistryFriendlyByteBuf buf) {
         return new FinishUploadSoundPacket(
             buf.readLong(),
             buf.readInt(),

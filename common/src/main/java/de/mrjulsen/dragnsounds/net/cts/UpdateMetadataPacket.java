@@ -6,12 +6,12 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
+public class UpdateMetadataPacket extends BaseNetworkPacket<UpdateMetadataPacket> {
 
     private String id;
     private SoundLocation location;
@@ -34,14 +34,14 @@ public class UpdateMetadataPacket implements IPacketBase<UpdateMetadataPacket> {
     }
 
     @Override
-    public void encode(UpdateMetadataPacket packet, FriendlyByteBuf buf) {
+    public void encode(UpdateMetadataPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeUtf(packet.id);
         buf.writeNbt(packet.location.serializeNbt());
         buf.writeMap(packet.metadata, (b, k) -> b.writeUtf(k), (b, v) -> b.writeUtf(v));
     }
 
     @Override
-    public UpdateMetadataPacket decode(FriendlyByteBuf buf) {
+    public UpdateMetadataPacket decode(RegistryFriendlyByteBuf buf) {
         return new UpdateMetadataPacket(
             buf.readUtf(), 
             buf.readNbt(), 

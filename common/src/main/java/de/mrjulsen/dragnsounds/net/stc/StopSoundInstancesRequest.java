@@ -4,14 +4,14 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class StopSoundInstancesRequest implements IPacketBase<StopSoundInstancesRequest> {
+public class StopSoundInstancesRequest extends BaseNetworkPacket<StopSoundInstancesRequest> {
 
     private SoundFile file;
     private CompoundTag nbt;
@@ -27,12 +27,12 @@ public class StopSoundInstancesRequest implements IPacketBase<StopSoundInstances
     }
 
     @Override
-    public void encode(StopSoundInstancesRequest packet, FriendlyByteBuf buf) {
+    public void encode(StopSoundInstancesRequest packet, RegistryFriendlyByteBuf buf) {
         buf.writeNbt(packet.file.serializeNbt());
     }
 
     @Override
-    public StopSoundInstancesRequest decode(FriendlyByteBuf buf) {
+    public StopSoundInstancesRequest decode(RegistryFriendlyByteBuf buf) {
         return new StopSoundInstancesRequest(
             buf.readNbt()
         );

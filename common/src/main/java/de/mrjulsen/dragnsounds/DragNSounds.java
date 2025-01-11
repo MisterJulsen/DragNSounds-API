@@ -51,9 +51,7 @@ import de.mrjulsen.dragnsounds.net.stc.modify.SoundPositionPacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundSeekPacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundVolumePacket;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
-import de.mrjulsen.dragnsounds.registry.ModCommands;
-import de.mrjulsen.mcdragonlib.net.NetworkManagerBase;
-import dev.architectury.networking.NetworkChannel;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
 
@@ -67,8 +65,6 @@ public final class DragNSounds {
     public static final ThreadGroup ASYNC_GROUP = new ThreadGroup("Async Tasks");
     public static final String DOCUMENTATION_UTL = "https://misterjulsen.github.io/DragNSounds-API/Mod/commands/";
 
-    private static NetworkManagerBase networkManager;
-
     public static void init() {
 
         if (Platform.getEnvironment() == Env.CLIENT) {
@@ -76,12 +72,11 @@ public final class DragNSounds {
             ClientEvents.init();
         }
         ServerEvents.init();
-        ModCommands.init();
 
         FilterRegistry.register(FileInfoFilter.class);
         FilterRegistry.register(FileMetadataFilter.class);
 
-        networkManager = new NetworkManagerBase(MOD_ID, "blockbeats_network", List.of(
+        DLNetworkManager.registerPackets(MOD_ID, List.of(
             // CTS
             CancelUploadSoundPacket.class,
             FinishUploadSoundPacket.class,
@@ -98,8 +93,8 @@ public final class DragNSounds {
             SoundDeleteRequestPacket.class,
             SoundCreatedResponsePacket.class,
             SoundGetDataResponsePacket.class,
-            StartUploadSoundPacket.class,
-
+            StartUploadSoundPacket.class
+        ), List.of(
             // STC
             PlaySoundPacket.class,
             SoundDataPacket.class,
@@ -129,10 +124,6 @@ public final class DragNSounds {
         ));
 
         PlatformSpecific.registerConfig();
-    }
-
-    public static NetworkChannel net() {
-        return networkManager.CHANNEL;
     }
     
     public static boolean hasServer() {

@@ -13,9 +13,10 @@ import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundChannelsHolder;
 import de.mrjulsen.dragnsounds.core.data.ChannelContext;
-import de.mrjulsen.dragnsounds.core.ext.CustomOggAudioStream;
+import de.mrjulsen.dragnsounds.core.ext.DSAudioStreamExt;
 import de.mrjulsen.dragnsounds.net.cts.StopSoundNotificationPacket;
 import de.mrjulsen.dragnsounds.util.ISelfCast;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import net.minecraft.client.sounds.AudioStream;
 
 @Mixin(Channel.class)
@@ -39,7 +40,7 @@ public class ChannelMixin implements ISelfCast<Channel> {
 
     @Inject(method = "attachBufferStream", at = @At(value = "TAIL"))
     private void onAttachBufferStream(AudioStream stream, CallbackInfo ci) { 
-        if (stream instanceof CustomOggAudioStream customStream) {
+        if (stream instanceof DSAudioStreamExt customStream) {
             isCustom = true;
             soundId = customStream.getSoundId();
             SoundChannelsHolder.create(soundId, new ChannelContext(self(), source, soundId, streamingBufferSize, (i) -> {
@@ -70,7 +71,7 @@ public class ChannelMixin implements ISelfCast<Channel> {
             SoundChannelsHolder.close(soundId);
             ClientInstanceManager.removeSoundCommandListener(soundId).stop();
             ClientInstanceManager.delayedSoundGC(soundId, 60000);
-            DragNSounds.net().sendToServer(new StopSoundNotificationPacket(soundId));
+            DLNetworkManager.sendToServer(new StopSoundNotificationPacket(soundId));
             DragNSounds.LOGGER.info("Audio Channel of sound " + soundId + " removed.");
         }
     }

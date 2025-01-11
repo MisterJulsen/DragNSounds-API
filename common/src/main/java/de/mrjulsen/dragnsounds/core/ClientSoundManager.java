@@ -51,6 +51,7 @@ import de.mrjulsen.dragnsounds.net.cts.StartUploadSoundPacket;
 import de.mrjulsen.dragnsounds.net.cts.UploadSoundPacket;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import de.mrjulsen.mcdragonlib.util.MathUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
@@ -101,7 +102,7 @@ public final class ClientSoundManager {
                 }
 
                 ClientInstanceManager.getSoundCommandListener(soundId).start(file);
-                DragNSounds.net().sendToServer(new SoundCreatedResponsePacket(soundId, ESoundPlaybackStatus.PLAY));
+                DLNetworkManager.sendToServer(new SoundCreatedResponsePacket(soundId, ESoundPlaybackStatus.PLAY));
             });
 
             switch (playback.type()) {
@@ -376,7 +377,7 @@ public final class ClientSoundManager {
                     onError.accept(new StatusResult(false, -100, e.getLocalizedMessage()));
                 });
             }
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            DLNetworkManager.sendToServer(new CancelUploadSoundPacket(requestId));
         }
     }
 
@@ -413,7 +414,7 @@ public final class ClientSoundManager {
             SoundStartUploadCallback.create(requestId, (status) -> {
                 start.complete(status);
             });
-            DragNSounds.net().sendToServer(new StartUploadSoundPacket(requestId, size));
+            DLNetworkManager.sendToServer(new StartUploadSoundPacket(requestId, size));
 
             StatusResult result = start.get(10, TimeUnit.SECONDS);
             if (!result.result()) {
@@ -431,7 +432,7 @@ public final class ClientSoundManager {
                     buffer = tmp;
                 }
 
-                DragNSounds.net().sendToServer(new UploadSoundPacket(requestId, index, stream.available() > 0, size, buffer));
+                DLNetworkManager.sendToServer(new UploadSoundPacket(requestId, index, stream.available() > 0, size, buffer));
                 if (progress != null) {
                     progress.accept(new UploadProgress(clientProgress, UploadState.UPLOAD), serverProgress.get());
                 }
@@ -456,12 +457,12 @@ public final class ClientSoundManager {
                 DragNSounds.LOGGER.error("Unable to get audio duration on client. " + e.getLocalizedMessage(), e);
             }
 
-            DragNSounds.net().sendToServer(new FinishUploadSoundPacket(requestId, size, data, channels, duration));
+            DLNetworkManager.sendToServer(new FinishUploadSoundPacket(requestId, size, data, channels, duration));
             finish.get(60, TimeUnit.SECONDS);
 
         } catch (CancelException e) {
             DragNSounds.LOGGER.warn("Upload aborted.", e);
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            DLNetworkManager.sendToServer(new CancelUploadSoundPacket(requestId));
             ClientInstanceManager.closeUploadCallbacks(requestId);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
@@ -475,7 +476,7 @@ public final class ClientSoundManager {
                     onError.accept(new StatusResult(false, -4, e.getLocalizedMessage()));
                 });
             }
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            DLNetworkManager.sendToServer(new CancelUploadSoundPacket(requestId));
             ClientInstanceManager.closeUploadCallbacks(requestId);
         } finally {
             SoundUploadCancelCallback.close(requestId);
@@ -485,13 +486,13 @@ public final class ClientSoundManager {
     @SuppressWarnings("unchecked")
     public static void getAllSoundFiles(Collection<IFilter<SoundFile>> filters, Consumer<SoundFile[]> callback) {
         final long requestId = SoundListCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundListRequestPacket(requestId, filters.toArray(new IFilter[filters.size()])));        
+        DLNetworkManager.sendToServer(new SoundListRequestPacket(requestId, filters.toArray(new IFilter[filters.size()])));        
     }
 
     
     public static void getSoundFile(SoundLocation location, String id, Consumer<Optional<SoundFile>> callback) {
         final long requestId = SoundFileCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundFileRequestPacket(requestId, id, location));
+        DLNetworkManager.sendToServer(new SoundFileRequestPacket(requestId, id, location));
     }
 
     public static SoundFile getClientDummySoundFile(String location, String id) {

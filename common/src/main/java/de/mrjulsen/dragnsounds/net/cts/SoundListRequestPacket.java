@@ -8,11 +8,11 @@ import de.mrjulsen.dragnsounds.core.data.ECompareOperation;
 import de.mrjulsen.dragnsounds.core.data.filter.IFilter;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundListRequestPacket implements IPacketBase<SoundListRequestPacket> {
+public class SoundListRequestPacket extends BaseNetworkPacket<SoundListRequestPacket> {
 
     private long requestId;
     private IFilter<SoundFile>[] filter;
@@ -25,7 +25,7 @@ public class SoundListRequestPacket implements IPacketBase<SoundListRequestPacke
     }
 
     @Override
-    public void encode(SoundListRequestPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundListRequestPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeInt(packet.filter.length);
         for (IFilter<SoundFile> f : packet.filter) {
@@ -38,7 +38,7 @@ public class SoundListRequestPacket implements IPacketBase<SoundListRequestPacke
 
     @Override
     @SuppressWarnings("unchecked")
-    public SoundListRequestPacket decode(FriendlyByteBuf buf) {
+    public SoundListRequestPacket decode(RegistryFriendlyByteBuf buf) {
         long requestId = buf.readLong();
         int size = buf.readInt();
         IFilter<SoundFile>[] filter = new IFilter[size];

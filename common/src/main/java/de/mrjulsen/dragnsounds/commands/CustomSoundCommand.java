@@ -30,6 +30,7 @@ import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundUploadCommandPacket;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -101,7 +102,7 @@ public class CustomSoundCommand {
             .requires(x -> x.hasPermission(CommonConfig.USE_SOUND_COMMAND_PERMISSION.get()))
             .then(Commands.literal(SUB_PLAY)
                 .then(Commands.argument(ARG_SOUND_FILE, SoundFileArgument.location())
-                    .executes(x -> playSound(x.getSource(), fileArg(x) ))
+                    .executes(x -> playSound(x.getSource(), fileArg(x)))
                     .then(Commands.argument(ARG_PLAYERS, EntityArgument.players())
                         .executes(x -> playSound(x.getSource(), fileArg(x), playersArg(x)))
                         .then(Commands.argument(ARG_SOURCE, SoundSourceArgument.soundSource())
@@ -378,7 +379,7 @@ public class CustomSoundCommand {
 
 
     private static int uploadSound(CommandSourceStack cmd, SoundLocation location, String displayName, ServerPlayer player, AudioSettings settings, boolean showProgressScreen, CompoundTag nbt) throws CommandSyntaxException {
-        DragNSounds.net().sendToPlayer(player, new SoundUploadCommandPacket(new SoundFile.Builder(location, displayName, Map.of()), settings, showProgressScreen));
+        DLNetworkManager.sendToPlayer(player, new SoundUploadCommandPacket(new SoundFile.Builder(location, displayName, Map.of()), settings, showProgressScreen));
         cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.upload_started"), false);
         return 1;
     }

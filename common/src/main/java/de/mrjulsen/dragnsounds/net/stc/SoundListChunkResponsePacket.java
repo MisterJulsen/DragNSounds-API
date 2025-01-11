@@ -5,14 +5,14 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundListCallback;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundListChunkResponsePacket implements IPacketBase<SoundListChunkResponsePacket> {
+public class SoundListChunkResponsePacket extends BaseNetworkPacket<SoundListChunkResponsePacket> {
 
     private long requestId;
     private boolean hasMore;
@@ -35,7 +35,7 @@ public class SoundListChunkResponsePacket implements IPacketBase<SoundListChunkR
     }
 
     @Override
-    public void encode(SoundListChunkResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundListChunkResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeBoolean(packet.hasMore);
         buf.writeInt(packet.files.length);
@@ -45,7 +45,7 @@ public class SoundListChunkResponsePacket implements IPacketBase<SoundListChunkR
     }
 
     @Override
-    public SoundListChunkResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundListChunkResponsePacket decode(RegistryFriendlyByteBuf buf) {
         long requestId = buf.readLong();
         boolean hasMore = buf.readBoolean();
         int size = buf.readInt();

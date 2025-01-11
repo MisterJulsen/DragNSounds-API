@@ -3,13 +3,13 @@ package de.mrjulsen.dragnsounds.net.stc;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class StopSoundRequest implements IPacketBase<StopSoundRequest> {
+public class StopSoundRequest extends BaseNetworkPacket<StopSoundRequest> {
 
     private long soundId;
 
@@ -20,12 +20,12 @@ public class StopSoundRequest implements IPacketBase<StopSoundRequest> {
     }
 
     @Override
-    public void encode(StopSoundRequest packet, FriendlyByteBuf buf) {
+    public void encode(StopSoundRequest packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
     }
 
     @Override
-    public StopSoundRequest decode(FriendlyByteBuf buf) {
+    public StopSoundRequest decode(RegistryFriendlyByteBuf buf) {
         return new StopSoundRequest(
             buf.readLong()
         );

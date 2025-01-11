@@ -3,19 +3,19 @@ package de.mrjulsen.dragnsounds.net.stc;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class PrintDebugPacket implements IPacketBase<PrintDebugPacket> {
-
-    @Override
-    public void encode(PrintDebugPacket packet, FriendlyByteBuf buf) {}
+public class PrintDebugPacket extends BaseNetworkPacket<PrintDebugPacket> {
 
     @Override
-    public PrintDebugPacket decode(FriendlyByteBuf buf) {
+    public void encode(PrintDebugPacket packet, RegistryFriendlyByteBuf buf) {}
+
+    @Override
+    public PrintDebugPacket decode(RegistryFriendlyByteBuf buf) {
         return new PrintDebugPacket();
     }
 

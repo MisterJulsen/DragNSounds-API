@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ServerInstanceManager;
 import de.mrjulsen.dragnsounds.net.stc.PrintDebugPacket;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.Commands.CommandSelection;
@@ -30,7 +31,7 @@ public class StatusCommand {
 
     private static int status(CommandSourceStack cmd) throws CommandSyntaxException {
         cmd.sendSuccess(() -> ServerInstanceManager.debugComponent(), false);
-        DragNSounds.net().sendToPlayer(cmd.getPlayerOrException(), new PrintDebugPacket());
+        DLNetworkManager.sendToPlayer(cmd.getPlayerOrException(), new PrintDebugPacket());
         return 1;
     }
 }

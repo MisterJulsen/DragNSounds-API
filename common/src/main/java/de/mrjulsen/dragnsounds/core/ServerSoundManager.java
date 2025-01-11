@@ -36,6 +36,7 @@ import de.mrjulsen.dragnsounds.net.stc.SoundListChunkResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundGetDataRequestPacket;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.DLUtils;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import net.minecraft.client.Minecraft;
@@ -65,10 +66,10 @@ public class ServerSoundManager {
             while (i < BUFFER_BLOCK_SIZE && hasNext) {
                 byte[] data = new byte[buffer.maxSize(player.getUUID(), soundId, DragNSounds.DEFAULT_NET_DATA_SIZE * 2)];
                 hasNext = buffer.read(player.getUUID(), soundId, data);
-                DragNSounds.net().sendToPlayer(player, new SoundDataPacket(soundId, i, INITIAL_SIZE, hasNext, data));
+                DLNetworkManager.sendToPlayer(player, new SoundDataPacket(soundId, i, INITIAL_SIZE, hasNext, data));
                 i++;
             }
-            DragNSounds.net().sendToPlayer(player, new PlaySoundPacket(soundId, i - 1, file, playback, clientCallbackRequestId));
+            DLNetworkManager.sendToPlayer(player, new PlaySoundPacket(soundId, i - 1, file, playback, clientCallbackRequestId));
         }
     }
 
@@ -79,7 +80,7 @@ public class ServerSoundManager {
         if (!hasNext) {
             ServerInstanceManager.closeSound(player, soundId);
         }
-        DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundDataPacket(soundId, index, -1, hasNext, data));
+        DLNetworkManager.sendToPlayer((ServerPlayer)player, new SoundDataPacket(soundId, index, -1, hasNext, data));
     }
 
     public static void closeOnDisconnect(Player player) {
@@ -89,7 +90,7 @@ public class ServerSoundManager {
 
     public static void getSoundPlaybackData(long soundId, ServerPlayer[] players, ISoundPlaybackData callback) {
         SoundGetDataCallback.create(soundId, callback);
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundGetDataRequestPacket(soundId));
+        DLNetworkManager.sendToPlayers(Arrays.stream(players).toList(), new SoundGetDataRequestPacket(soundId));
     }
 
     public static void stopSound(Player player, long soundId) {
@@ -116,7 +117,7 @@ public class ServerSoundManager {
                 files = getSoundFileList(level, filters);
             } catch (IOException e) {
                 DragNSounds.LOGGER.error("Unable to get sound file list.", e);
-                DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, false, new SoundFile[0]));
+                DLNetworkManager.sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, false, new SoundFile[0]));
                 return;
             }
 
@@ -125,7 +126,7 @@ public class ServerSoundManager {
                 System.arraycopy(files, i, chunk, 0, chunk.length);
                 
                 boolean hasMore = i + filesPerPacket < files.length;
-                DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, hasMore, chunk));
+                DLNetworkManager.sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, hasMore, chunk));
             }
         }, "Sound List Loader").start();
     }

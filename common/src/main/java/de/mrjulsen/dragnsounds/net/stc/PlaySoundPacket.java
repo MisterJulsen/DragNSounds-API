@@ -5,14 +5,14 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class PlaySoundPacket implements IPacketBase<PlaySoundPacket> {
+public class PlaySoundPacket extends BaseNetworkPacket<PlaySoundPacket> {
 
     private long soundId;
     private int triggerIndex;
@@ -41,7 +41,7 @@ public class PlaySoundPacket implements IPacketBase<PlaySoundPacket> {
     }
 
     @Override
-    public void encode(PlaySoundPacket packet, FriendlyByteBuf buf) {
+    public void encode(PlaySoundPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
         buf.writeInt(packet.triggerIndex);
         buf.writeNbt(packet.file.serializeNbt());
@@ -50,7 +50,7 @@ public class PlaySoundPacket implements IPacketBase<PlaySoundPacket> {
     }
 
     @Override
-    public PlaySoundPacket decode(FriendlyByteBuf buf) {
+    public PlaySoundPacket decode(RegistryFriendlyByteBuf buf) {
         long soundId = buf.readLong();
         int triggerIndex = buf.readInt();
         CompoundTag nbt = buf.readNbt();

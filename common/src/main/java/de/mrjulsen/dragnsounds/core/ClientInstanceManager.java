@@ -24,6 +24,7 @@ import de.mrjulsen.dragnsounds.core.data.SoundDataStream;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.net.cts.SoundCreatedResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
@@ -51,7 +52,7 @@ public final class ClientInstanceManager {
         SoundDataStream stream = SoundStreamHolder.getOrCreate(packet.getSoundId(), () -> {
             DragNSounds.LOGGER.debug("Local sound buffer with a size of " + packet.getBufferSize() + " bytes has been created. (ID " + packet.getSoundId() + ")");
             createSoundCommandListener(packet.getSoundId());
-            DragNSounds.net().sendToServer(new SoundCreatedResponsePacket(packet.getSoundId(), ESoundPlaybackStatus.PREPARE));
+            DLNetworkManager.sendToServer(new SoundCreatedResponsePacket(packet.getSoundId(), ESoundPlaybackStatus.PREPARE));
             return new SoundDataStream(packet.getBufferSize(), packet.getSoundId());
         });
 

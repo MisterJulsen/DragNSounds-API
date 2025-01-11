@@ -4,13 +4,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundMetadataCallback;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class AllMetadataResponsePacket implements IPacketBase<AllMetadataResponsePacket> {
+public class AllMetadataResponsePacket extends BaseNetworkPacket<AllMetadataResponsePacket> {
 
     private long requestId;
     private Map<String, String> metadata;
@@ -23,13 +23,13 @@ public class AllMetadataResponsePacket implements IPacketBase<AllMetadataRespons
     }
 
     @Override
-    public void encode(AllMetadataResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(AllMetadataResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeMap(packet.metadata, (b, k) -> b.writeUtf(k), (b, v) -> b.writeUtf(v));
     }
 
     @Override
-    public AllMetadataResponsePacket decode(FriendlyByteBuf buf) {
+    public AllMetadataResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new AllMetadataResponsePacket(
             buf.readLong(), 
             buf.readMap(b -> b.readUtf(), b -> b.readUtf())

@@ -4,11 +4,11 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback.ESoundPlaybackStatus;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundCreatedResponsePacket implements IPacketBase<SoundCreatedResponsePacket> {
+public class SoundCreatedResponsePacket extends BaseNetworkPacket<SoundCreatedResponsePacket> {
 
     private long soundId;
     private ESoundPlaybackStatus status;
@@ -22,13 +22,13 @@ public class SoundCreatedResponsePacket implements IPacketBase<SoundCreatedRespo
     }
 
     @Override
-    public void encode(SoundCreatedResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundCreatedResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
         buf.writeInt(packet.status.getId());
     }
 
     @Override
-    public SoundCreatedResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundCreatedResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundCreatedResponsePacket(buf.readLong(), ESoundPlaybackStatus.getById(buf.readInt()));
     }
 

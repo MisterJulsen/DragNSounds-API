@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundStreamHolder;
-import de.mrjulsen.dragnsounds.core.ext.CustomOggAudioStream;
+import de.mrjulsen.dragnsounds.core.ext.CustomJOrbisAudioStream;
 import de.mrjulsen.dragnsounds.core.ext.CustomSoundInstance;
 import net.minecraft.Util;
 import net.minecraft.client.sounds.AudioStream;
@@ -32,7 +32,12 @@ public class SoundBufferLibraryMixin {
                         String relPath = resourceLocation.getPath().replace(pathPrefix, "").replace(".ogg", "");
                         long soundId = Long.parseLong(relPath);
                         InputStream inputStream = SoundStreamHolder.get(soundId);
-                        return loop ? new LoopingAudioStream(input -> new CustomOggAudioStream(soundId, input), inputStream) : new CustomOggAudioStream(soundId, inputStream);
+                        try {
+                            return loop ? new LoopingAudioStream(input -> new CustomJOrbisAudioStream(soundId, input), inputStream) : new CustomJOrbisAudioStream(soundId, inputStream);
+                        } catch (Exception e) {
+                            DragNSounds.LOGGER.error("pathPrefix", e);
+                            return null;
+                        }
                     } catch (Exception iOException) {
                         throw new CompletionException(iOException);
                     }

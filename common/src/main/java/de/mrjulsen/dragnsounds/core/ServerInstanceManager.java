@@ -23,6 +23,7 @@ import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.UploadFailedPacket;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.ChatFormatting;
@@ -147,7 +148,7 @@ public final class ServerInstanceManager {
 
     public static synchronized UploadSoundBuffer getUploadBuffer(long requestId, int maxSize, ServerPlayer player) {
         if (!uploadFileCache.containsKey(requestId)) { 
-            DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -201, "The upload task has not been prepared.")));
+            DLNetworkManager.sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -201, "The upload task has not been prepared.")));
             return null;
         }
         return uploadFileCache.get(requestId);

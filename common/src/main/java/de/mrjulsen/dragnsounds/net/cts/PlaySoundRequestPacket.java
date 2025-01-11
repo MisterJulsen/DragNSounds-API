@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class PlaySoundRequestPacket implements IPacketBase<PlaySoundRequestPacket> {
+public class PlaySoundRequestPacket extends BaseNetworkPacket<PlaySoundRequestPacket> {
 
     private long requestId;
     private SoundFile file;
@@ -34,14 +34,14 @@ public class PlaySoundRequestPacket implements IPacketBase<PlaySoundRequestPacke
     }
 
     @Override
-    public void encode(PlaySoundRequestPacket packet, FriendlyByteBuf buf) {
+    public void encode(PlaySoundRequestPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeNbt(packet.file.serializeNbt());
         buf.writeNbt(packet.playback.serializeNbt());
     }
 
     @Override
-    public PlaySoundRequestPacket decode(FriendlyByteBuf buf) {
+    public PlaySoundRequestPacket decode(RegistryFriendlyByteBuf buf) {
         return new PlaySoundRequestPacket(
             buf.readLong(),
             buf.readNbt(),

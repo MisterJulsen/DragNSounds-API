@@ -17,6 +17,7 @@ import de.mrjulsen.dragnsounds.net.stc.UploadFailedPacket;
 import de.mrjulsen.dragnsounds.net.stc.UploadProgressPacket;
 import de.mrjulsen.dragnsounds.net.stc.UploadSuccessPacket;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -56,10 +57,10 @@ public class UploadSoundBuffer implements AutoCloseable {
                         hasMore = packet.hasMore();
                         indexNeeded++;
                         double progress = 100D / maxSize * output.size();
-                        DragNSounds.net().sendToPlayer(player, new UploadProgressPacket(requestId, new UploadProgress(progress, UploadState.UPLOAD)));
+                        DLNetworkManager.sendToPlayer(player, new UploadProgressPacket(requestId, new UploadProgress(progress, UploadState.UPLOAD)));
                     } catch (IOException e) {
                         DragNSounds.LOGGER.error("Error while writing upload file content.", e);
-                        DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -102, e.getLocalizedMessage())));
+                        DLNetworkManager.sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -102, e.getLocalizedMessage())));
                         isWorking = false;
                         break;
                     }
@@ -82,13 +83,13 @@ public class UploadSoundBuffer implements AutoCloseable {
         if (finalizerPacket != null) {
             try {
                 SoundFile file = finalizerPacket.getFile().save(player.getUUID(), output, finalizerPacket.getInitialChannels(), finalizerPacket.getInitialDuration());
-                DragNSounds.net().sendToPlayer(player, new UploadSuccessPacket(requestId, file));
+                DLNetworkManager.sendToPlayer(player, new UploadSuccessPacket(requestId, file));
             } catch (Throwable e) {
                 DragNSounds.LOGGER.error("Unable to save uploaded file.", e);
-                DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -100, e.getLocalizedMessage())));
+                DLNetworkManager.sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -100, e.getLocalizedMessage())));
             }
         } else {            
-            DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -101, "Upload canceled unexpectedly.")));
+            DLNetworkManager.sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -101, "Upload canceled unexpectedly.")));
         }
 
         ServerSoundManager.closeUpload(requestId);

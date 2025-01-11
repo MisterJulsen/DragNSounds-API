@@ -5,14 +5,14 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundFileCallback;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundFileResponsePacket implements IPacketBase<SoundFileResponsePacket> {
+public class SoundFileResponsePacket extends BaseNetworkPacket<SoundFileResponsePacket> {
 
     private long requestId;
     private SoundFile file;
@@ -32,7 +32,7 @@ public class SoundFileResponsePacket implements IPacketBase<SoundFileResponsePac
     }
 
     @Override
-    public void encode(SoundFileResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundFileResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         boolean b = packet.file != null;
         buf.writeBoolean(b);
@@ -42,7 +42,7 @@ public class SoundFileResponsePacket implements IPacketBase<SoundFileResponsePac
     }
 
     @Override
-    public SoundFileResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundFileResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundFileResponsePacket(
             buf.readLong(),
             buf.readBoolean() ? buf.readNbt() : null

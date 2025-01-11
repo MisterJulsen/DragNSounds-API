@@ -22,6 +22,7 @@ import de.mrjulsen.dragnsounds.net.cts.RemoveMetadataPacket;
 import de.mrjulsen.dragnsounds.net.cts.UpdateMetadataPacket;
 import de.mrjulsen.dragnsounds.util.ExtendedNBTUtils;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
@@ -84,7 +85,7 @@ public class SoundFile {
      */
     public void updateMetadata(Map<String, String> meta) {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            DragNSounds.net().sendToServer(new UpdateMetadataPacket(id, location, meta));
+            DLNetworkManager.sendToServer(new UpdateMetadataPacket(id, location, meta));
         });
         EnvExecutor.runInEnv(Env.SERVER, () -> () -> {
             try {
@@ -104,7 +105,7 @@ public class SoundFile {
      */
     public void removeMetadata(Set<String> keys) {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            DragNSounds.net().sendToServer(new RemoveMetadataPacket(id, location, keys));
+            DLNetworkManager.sendToServer(new RemoveMetadataPacket(id, location, keys));
         });
         EnvExecutor.runInEnv(Env.SERVER, () -> () -> {
             try {

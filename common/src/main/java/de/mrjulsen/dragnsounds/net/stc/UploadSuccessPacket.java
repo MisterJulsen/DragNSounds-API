@@ -6,14 +6,14 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundUploadCallback;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class UploadSuccessPacket implements IPacketBase<UploadSuccessPacket> {
+public class UploadSuccessPacket extends BaseNetworkPacket<UploadSuccessPacket> {
 
     private long requestId;
     private SoundFile file;
@@ -33,13 +33,13 @@ public class UploadSuccessPacket implements IPacketBase<UploadSuccessPacket> {
     }
 
     @Override
-    public void encode(UploadSuccessPacket packet, FriendlyByteBuf buf) {
+    public void encode(UploadSuccessPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeNbt(packet.file.serializeNbt());
     }
 
     @Override
-    public UploadSuccessPacket decode(FriendlyByteBuf buf) {
+    public UploadSuccessPacket decode(RegistryFriendlyByteBuf buf) {
         return new UploadSuccessPacket(
             buf.readLong(),
             buf.readNbt()

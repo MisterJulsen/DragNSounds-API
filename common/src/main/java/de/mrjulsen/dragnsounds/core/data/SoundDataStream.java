@@ -13,6 +13,7 @@ import de.mrjulsen.dragnsounds.core.callbacks.client.SoundStreamHolder;
 import de.mrjulsen.dragnsounds.net.cts.SoundDataRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.StopSoundNotificationPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 
 public class SoundDataStream extends InputStream {
 
@@ -96,13 +97,9 @@ public class SoundDataStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        return super.read(b);
-    }
-
-    public int read(byte[] data) {
+    public int read(byte[] data, int off, int len) throws IOException {
         int iteration = 0;
-        while (hasData && filledSpace() <= data.length) {
+        while (hasData && filledSpace() <= len) {
             if (Thread.currentThread().getThreadGroup() != DragNSounds.ASYNC_GROUP || iteration > 100) {
                 DragNSounds.LOGGER.warn("No sound data available. Stream will be stopped.");
                 return -1;
@@ -114,14 +111,14 @@ public class SoundDataStream extends InputStream {
             iteration++;
         }
 
-        if (!hasData && (filledSpace() <= 0 || data == null || data.length <= 0)) {
+        if (!hasData && (filledSpace() <= 0 || data == null || len <= 0)) {
             return -1;
         }
 
-        int maxLen = Math.min(filledSpace(), data.length);
+        int maxLen = Math.min(filledSpace(), len);
         
         for (int i = 0; i < maxLen; i++) {
-            data[i] = bufferQ.poll();
+            data[off + i] = bufferQ.poll();
         }
         this.pendingBytes -= maxLen;
 
@@ -130,7 +127,7 @@ public class SoundDataStream extends InputStream {
                 packetIndexRequested = packetIndexNeeded;
             }
             pendingBytes += 8192 * 2;
-            DragNSounds.net().sendToServer(new SoundDataRequestPacket(this.getSoundId(), 8192 * 2, packetIndexRequested));
+            DLNetworkManager.sendToServer(new SoundDataRequestPacket(this.getSoundId(), 8192 * 2, packetIndexRequested));
             packetIndexRequested++;
         }
         return maxLen;
@@ -190,7 +187,7 @@ public class SoundDataStream extends InputStream {
         isStreaming = false;
         bufferQ.clear();
         SoundStreamHolder.close(soundId);
-        DragNSounds.net().sendToServer(new StopSoundNotificationPacket(soundId));
+        DLNetworkManager.sendToServer(new StopSoundNotificationPacket(soundId));
         DragNSounds.LOGGER.info("Sound playback has been stopped. (ID " + soundId + ")");
     }
     

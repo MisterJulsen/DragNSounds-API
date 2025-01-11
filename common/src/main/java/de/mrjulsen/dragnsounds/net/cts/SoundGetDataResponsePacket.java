@@ -4,11 +4,11 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundGetDataCallback;
 import de.mrjulsen.dragnsounds.core.data.SoundPlaybackData;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundGetDataResponsePacket implements IPacketBase<SoundGetDataResponsePacket> {
+public class SoundGetDataResponsePacket extends BaseNetworkPacket<SoundGetDataResponsePacket> {
     
     private long soundId;
     private SoundPlaybackData data;
@@ -21,7 +21,7 @@ public class SoundGetDataResponsePacket implements IPacketBase<SoundGetDataRespo
     }
 
     @Override
-    public void encode(SoundGetDataResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundGetDataResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
         buf.writeBoolean(packet.data != null);
         if (packet.data != null) {
@@ -30,7 +30,7 @@ public class SoundGetDataResponsePacket implements IPacketBase<SoundGetDataRespo
     }
 
     @Override
-    public SoundGetDataResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundGetDataResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundGetDataResponsePacket(buf.readLong(), buf.readBoolean() ? SoundPlaybackData.fromNbt(buf.readNbt()) : null);
     }
 

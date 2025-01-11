@@ -6,14 +6,14 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundVolumePacket implements IPacketBase<SoundVolumePacket> {
+public class SoundVolumePacket extends BaseNetworkPacket<SoundVolumePacket> {
 
     private SoundFile file;
     private long requestId;
@@ -42,7 +42,7 @@ public class SoundVolumePacket implements IPacketBase<SoundVolumePacket> {
     }
 
     @Override
-    public void encode(SoundVolumePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundVolumePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(packet.file != null);
         if (packet.file == null) {
             buf.writeLong(packet.requestId);
@@ -55,7 +55,7 @@ public class SoundVolumePacket implements IPacketBase<SoundVolumePacket> {
     }
 
     @Override
-    public SoundVolumePacket decode(FriendlyByteBuf buf) {
+    public SoundVolumePacket decode(RegistryFriendlyByteBuf buf) {
         boolean hasFile = buf.readBoolean();
         return new SoundVolumePacket(
             hasFile ? buf.readNbt() : null,

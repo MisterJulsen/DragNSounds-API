@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundChannelsHolder;
@@ -30,6 +29,7 @@ import de.mrjulsen.dragnsounds.net.cts.SoundDeleteRequestPacket;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
 
@@ -48,7 +48,7 @@ public final class ClientApi {
      */
     public static long playSound(SoundFile file, PlaybackConfig playback, Consumer<Long> responseCallback) {
         long requestId = ClientInstanceManager.addSoundRequestCallback(responseCallback);
-        DragNSounds.net().sendToServer(new PlaySoundRequestPacket(requestId, file, playback));
+        DLNetworkManager.sendToServer(new PlaySoundRequestPacket(requestId, file, playback));
         return requestId;
     }
 
@@ -258,7 +258,7 @@ public final class ClientApi {
      */
     public static void deleteSound(SoundLocation location, String id, Consumer<StatusResult> callback) {
         final long requestId = SoundDeleteCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundDeleteRequestPacket(requestId, location, id));
+        DLNetworkManager.sendToServer(new SoundDeleteRequestPacket(requestId, location, id));
     }
 
     /**
@@ -277,7 +277,7 @@ public final class ClientApi {
      */
     public static void getFileMetadata(SoundFile file, Consumer<Map<String, String>> callback) {
         final long requestId = SoundMetadataCallback.create(callback);
-        DragNSounds.net().sendToServer(new AllMetadataRequestPacket(requestId, file));
+        DLNetworkManager.sendToServer(new AllMetadataRequestPacket(requestId, file));
     }
 
     /**

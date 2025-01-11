@@ -6,14 +6,14 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundPauseResumePacket implements IPacketBase<SoundPauseResumePacket> {
+public class SoundPauseResumePacket extends BaseNetworkPacket<SoundPauseResumePacket> {
 
     private SoundFile file;
     private long requestId;
@@ -36,7 +36,7 @@ public class SoundPauseResumePacket implements IPacketBase<SoundPauseResumePacke
     }
 
     @Override
-    public void encode(SoundPauseResumePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundPauseResumePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(packet.file != null);
         if (packet.file == null) {
             buf.writeLong(packet.requestId);
@@ -47,7 +47,7 @@ public class SoundPauseResumePacket implements IPacketBase<SoundPauseResumePacke
     }
 
     @Override
-    public SoundPauseResumePacket decode(FriendlyByteBuf buf) {
+    public SoundPauseResumePacket decode(RegistryFriendlyByteBuf buf) {
         boolean hasFile = buf.readBoolean();
         return new SoundPauseResumePacket(
             hasFile ? buf.readNbt() : null,

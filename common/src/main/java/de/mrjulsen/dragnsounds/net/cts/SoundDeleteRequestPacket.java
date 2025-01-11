@@ -8,13 +8,14 @@ import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundDeleteResponsePacket;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestPacket> {
+public class SoundDeleteRequestPacket extends BaseNetworkPacket<SoundDeleteRequestPacket> {
 
     private long requestId;
     private SoundLocation location;
@@ -37,14 +38,14 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
     }
 
     @Override
-    public void encode(SoundDeleteRequestPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundDeleteRequestPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeNbt(packet.location.serializeNbt());
         buf.writeUtf(packet.id);
     }
 
     @Override
-    public SoundDeleteRequestPacket decode(FriendlyByteBuf buf) {
+    public SoundDeleteRequestPacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundDeleteRequestPacket(
             buf.readLong(), 
             buf.readNbt(), 
@@ -63,7 +64,7 @@ public class SoundDeleteRequestPacket implements IPacketBase<SoundDeleteRequestP
                 DragNSounds.LOGGER.error("Unable to delete sound file: " + packet.id, e);
                 result = new StatusResult(false, Integer.MIN_VALUE, e.getLocalizedMessage());
             }
-            DragNSounds.net().sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new SoundDeleteResponsePacket(packet.requestId, result));
+            DLNetworkManager.sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new SoundDeleteResponsePacket(packet.requestId, result));
         });
     }
     

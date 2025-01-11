@@ -3,12 +3,12 @@ package de.mrjulsen.dragnsounds.net.cts;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class UploadSoundPacket implements IPacketBase<UploadSoundPacket>, Comparable<UploadSoundPacket> {
+public class UploadSoundPacket extends BaseNetworkPacket<UploadSoundPacket> implements Comparable<UploadSoundPacket> {
 
     private long requestId;
     private int index;
@@ -27,7 +27,7 @@ public class UploadSoundPacket implements IPacketBase<UploadSoundPacket>, Compar
     }
 
     @Override
-    public void encode(UploadSoundPacket packet, FriendlyByteBuf buf) {
+    public void encode(UploadSoundPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeInt(packet.index);
         buf.writeBoolean(packet.hasMore);
@@ -36,7 +36,7 @@ public class UploadSoundPacket implements IPacketBase<UploadSoundPacket>, Compar
     }
 
     @Override
-    public UploadSoundPacket decode(FriendlyByteBuf buf) {
+    public UploadSoundPacket decode(RegistryFriendlyByteBuf buf) {
         return new UploadSoundPacket(
             buf.readLong(),
             buf.readInt(),

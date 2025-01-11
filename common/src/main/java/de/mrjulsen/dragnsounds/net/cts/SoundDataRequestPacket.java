@@ -3,11 +3,11 @@ package de.mrjulsen.dragnsounds.net.cts;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundDataRequestPacket implements IPacketBase<SoundDataRequestPacket> {
+public class SoundDataRequestPacket extends BaseNetworkPacket<SoundDataRequestPacket> {
 
     private long soundId;
     private int size;
@@ -22,14 +22,14 @@ public class SoundDataRequestPacket implements IPacketBase<SoundDataRequestPacke
     }
 
     @Override
-    public void encode(SoundDataRequestPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundDataRequestPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
         buf.writeInt(packet.size);
         buf.writeInt(packet.index);
     }
 
     @Override
-    public SoundDataRequestPacket decode(FriendlyByteBuf buf) {
+    public SoundDataRequestPacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundDataRequestPacket(
             buf.readLong(),
             buf.readInt(),

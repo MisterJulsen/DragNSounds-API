@@ -4,13 +4,13 @@ import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundDeleteCallback;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundDeleteResponsePacket implements IPacketBase<SoundDeleteResponsePacket> {
+public class SoundDeleteResponsePacket extends BaseNetworkPacket<SoundDeleteResponsePacket> {
 
     private long requestId;
     private StatusResult result;
@@ -23,7 +23,7 @@ public class SoundDeleteResponsePacket implements IPacketBase<SoundDeleteRespons
     }
 
     @Override
-    public void encode(SoundDeleteResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundDeleteResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeBoolean(packet.result.result());
         buf.writeInt(packet.result.code());
@@ -31,7 +31,7 @@ public class SoundDeleteResponsePacket implements IPacketBase<SoundDeleteRespons
     }
 
     @Override
-    public SoundDeleteResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundDeleteResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundDeleteResponsePacket(
             buf.readLong(), 
             new StatusResult(buf.readBoolean(), buf.readInt(), buf.readUtf())

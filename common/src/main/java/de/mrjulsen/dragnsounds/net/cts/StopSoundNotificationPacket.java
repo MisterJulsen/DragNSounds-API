@@ -5,11 +5,11 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback.ESoundPlaybackStatus;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class StopSoundNotificationPacket implements IPacketBase<StopSoundNotificationPacket> {
+public class StopSoundNotificationPacket extends BaseNetworkPacket<StopSoundNotificationPacket> {
 
     private long soundId;
 
@@ -20,12 +20,12 @@ public class StopSoundNotificationPacket implements IPacketBase<StopSoundNotific
     }
 
     @Override
-    public void encode(StopSoundNotificationPacket packet, FriendlyByteBuf buf) {
+    public void encode(StopSoundNotificationPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
     }
 
     @Override
-    public StopSoundNotificationPacket decode(FriendlyByteBuf buf) {
+    public StopSoundNotificationPacket decode(RegistryFriendlyByteBuf buf) {
         return new StopSoundNotificationPacket(buf.readLong());
     }
 

@@ -51,7 +51,6 @@ public class SoundLocationArgument implements ArgumentType<SoundLocation> {
             return Suggestions.empty();
         }
     }
-
     @Override
     public Collection<String> getExamples() {
         return EXAMPLES;

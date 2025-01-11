@@ -3,11 +3,11 @@ package de.mrjulsen.dragnsounds.net.cts;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCheckCallback;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundPlayingCheckResponsePacket implements IPacketBase<SoundPlayingCheckResponsePacket> {
+public class SoundPlayingCheckResponsePacket extends BaseNetworkPacket<SoundPlayingCheckResponsePacket> {
 
     private long requestId;
     private boolean value;
@@ -20,13 +20,13 @@ public class SoundPlayingCheckResponsePacket implements IPacketBase<SoundPlaying
     }
 
     @Override
-    public void encode(SoundPlayingCheckResponsePacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundPlayingCheckResponsePacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeBoolean(packet.value);
     }
 
     @Override
-    public SoundPlayingCheckResponsePacket decode(FriendlyByteBuf buf) {
+    public SoundPlayingCheckResponsePacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundPlayingCheckResponsePacket(
             buf.readLong(), 
             buf.readBoolean()

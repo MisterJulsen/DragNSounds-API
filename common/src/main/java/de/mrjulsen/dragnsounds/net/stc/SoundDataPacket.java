@@ -3,13 +3,13 @@ package de.mrjulsen.dragnsounds.net.stc;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundDataPacket implements IPacketBase<SoundDataPacket>, Comparable<SoundDataPacket> {
+public class SoundDataPacket extends BaseNetworkPacket<SoundDataPacket> implements Comparable<SoundDataPacket> {
 
     private long soundId;
     private int index;
@@ -28,7 +28,7 @@ public class SoundDataPacket implements IPacketBase<SoundDataPacket>, Comparable
     }
 
     @Override
-    public void encode(SoundDataPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundDataPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
         buf.writeInt(packet.index);
         buf.writeInt(packet.bufferSize);
@@ -37,7 +37,7 @@ public class SoundDataPacket implements IPacketBase<SoundDataPacket>, Comparable
     }
 
     @Override
-    public SoundDataPacket decode(FriendlyByteBuf buf) {
+    public SoundDataPacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundDataPacket(
             buf.readLong(),
             buf.readInt(),

@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundErrorCallback;
 import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class UploadFailedPacket implements IPacketBase<UploadFailedPacket> {
+public class UploadFailedPacket extends BaseNetworkPacket<UploadFailedPacket> {
 
     private long requestId;
     private StatusResult error;
@@ -24,7 +24,7 @@ public class UploadFailedPacket implements IPacketBase<UploadFailedPacket> {
     }
 
     @Override
-    public void encode(UploadFailedPacket packet, FriendlyByteBuf buf) {
+    public void encode(UploadFailedPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.requestId);
         buf.writeBoolean(packet.error.result());
         buf.writeInt(packet.error.code());
@@ -32,7 +32,7 @@ public class UploadFailedPacket implements IPacketBase<UploadFailedPacket> {
     }
 
     @Override
-    public UploadFailedPacket decode(FriendlyByteBuf buf) {
+    public UploadFailedPacket decode(RegistryFriendlyByteBuf buf) {
         return new UploadFailedPacket(
             buf.readLong(),
             new StatusResult(buf.readBoolean(), buf.readInt(), buf.readUtf())

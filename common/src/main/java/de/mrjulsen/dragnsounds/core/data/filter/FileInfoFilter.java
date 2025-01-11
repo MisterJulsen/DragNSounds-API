@@ -21,7 +21,7 @@ public class FileInfoFilter extends AbstractFilter<SoundFile> {
     
     @Override
     public ResourceLocation getFilterId() {
-        return new ResourceLocation(DragNSounds.MOD_ID, "soundfile_info");
+        return ResourceLocation.fromNamespaceAndPath(DragNSounds.MOD_ID, "soundfile_info");
     }
 
     @Override

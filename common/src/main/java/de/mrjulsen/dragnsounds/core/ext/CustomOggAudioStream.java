@@ -17,7 +17,6 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.audio.OggAudioStream;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,9 +25,11 @@ import net.minecraft.util.Mth;
 
 /**
  * Contains additional data and bugfixes.
- * @see OggAudioStream
+ * @see CustomJOrbisAudioStream
+ * @deprecated Replaced with {@code CustomJOrbisAudioStream}
  */
-public class CustomOggAudioStream implements AudioStream {
+@Deprecated
+public class CustomOggAudioStream implements AudioStream, DSAudioStreamExt {
     private long handle;
     private final AudioFormat audioFormat;
     private final InputStream input;

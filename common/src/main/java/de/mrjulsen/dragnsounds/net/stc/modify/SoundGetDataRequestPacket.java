@@ -2,16 +2,16 @@ package de.mrjulsen.dragnsounds.net.stc.modify;
 
 import java.util.function.Supplier;
 
-import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.net.cts.SoundGetDataResponsePacket;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
+import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundGetDataRequestPacket implements IPacketBase<SoundGetDataRequestPacket> {
+public class SoundGetDataRequestPacket extends BaseNetworkPacket<SoundGetDataRequestPacket> {
     
     private long soundId;
 
@@ -22,12 +22,12 @@ public class SoundGetDataRequestPacket implements IPacketBase<SoundGetDataReques
     }
 
     @Override
-    public void encode(SoundGetDataRequestPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundGetDataRequestPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeLong(packet.soundId);
     }
 
     @Override
-    public SoundGetDataRequestPacket decode(FriendlyByteBuf buf) {
+    public SoundGetDataRequestPacket decode(RegistryFriendlyByteBuf buf) {
         return new SoundGetDataRequestPacket(buf.readLong());
     }
 
@@ -35,7 +35,7 @@ public class SoundGetDataRequestPacket implements IPacketBase<SoundGetDataReques
     public void handle(SoundGetDataRequestPacket packet, Supplier<PacketContext> contextSupplier) {
         contextSupplier.get().queue(() -> {
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                DragNSounds.net().sendToServer(new SoundGetDataResponsePacket(packet.soundId, ClientSoundManager.getData(packet.soundId)));
+                DLNetworkManager.sendToServer(new SoundGetDataResponsePacket(packet.soundId, ClientSoundManager.getData(packet.soundId)));
             });
         });
     }

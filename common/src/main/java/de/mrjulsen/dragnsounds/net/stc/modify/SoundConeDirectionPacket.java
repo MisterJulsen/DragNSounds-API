@@ -6,15 +6,15 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 
-public class SoundConeDirectionPacket implements IPacketBase<SoundConeDirectionPacket> {
+public class SoundConeDirectionPacket extends BaseNetworkPacket<SoundConeDirectionPacket> {
 
     private SoundFile file;
     private long requestId;
@@ -45,7 +45,7 @@ public class SoundConeDirectionPacket implements IPacketBase<SoundConeDirectionP
     }
 
     @Override
-    public void encode(SoundConeDirectionPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundConeDirectionPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(packet.file != null);
         if (packet.file == null) {
             buf.writeLong(packet.requestId);
@@ -61,7 +61,7 @@ public class SoundConeDirectionPacket implements IPacketBase<SoundConeDirectionP
     }
 
     @Override
-    public SoundConeDirectionPacket decode(FriendlyByteBuf buf) {
+    public SoundConeDirectionPacket decode(RegistryFriendlyByteBuf buf) {
         boolean hasFile = buf.readBoolean();
         return new SoundConeDirectionPacket(
             hasFile ? buf.readNbt() : null,

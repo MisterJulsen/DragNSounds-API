@@ -6,15 +6,15 @@ import java.util.function.Supplier;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
+import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 
-public class SoundPositionPacket implements IPacketBase<SoundPositionPacket> {
+public class SoundPositionPacket extends BaseNetworkPacket<SoundPositionPacket> {
 
     private SoundFile file;
     private long requestId;
@@ -37,7 +37,7 @@ public class SoundPositionPacket implements IPacketBase<SoundPositionPacket> {
     }
 
     @Override
-    public void encode(SoundPositionPacket packet, FriendlyByteBuf buf) {
+    public void encode(SoundPositionPacket packet, RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(packet.file != null);
         if (packet.file == null) {
             buf.writeLong(packet.requestId);
@@ -50,7 +50,7 @@ public class SoundPositionPacket implements IPacketBase<SoundPositionPacket> {
     }
 
     @Override
-    public SoundPositionPacket decode(FriendlyByteBuf buf) {
+    public SoundPositionPacket decode(RegistryFriendlyByteBuf buf) {
         boolean hasFile = buf.readBoolean();
         return new SoundPositionPacket(
             hasFile ? buf.readNbt() : null,
