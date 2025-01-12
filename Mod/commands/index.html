@@ -685,6 +685,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#playonce" class="md-nav__link">
+    <span class="md-ellipsis">
+      playOnce
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#stop" class="md-nav__link">
     <span class="md-ellipsis">
       stop
@@ -937,6 +946,15 @@
   <a href="#play" class="md-nav__link">
     <span class="md-ellipsis">
       play
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#playonce" class="md-nav__link">
+    <span class="md-ellipsis">
+      playOnce
     </span>
   </a>
   
@@ -1204,10 +1222,113 @@
 <p>2</p>
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
+<h3 id="playonce"><code>playOnce</code></h3>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">playOnce</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">filepath</span><span class="o">&gt;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;targets&gt;</span><span class="p">]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;source&gt;</span><span class="p">]</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;volume&gt;</span><span class="p">]</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;pitch&gt;</span><span class="p">]</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;position&gt;</span><span class="p">]</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;attenuationDistance&gt;</span><span class="p">]</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;ticksOffset&gt;</span><span class="p">]</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;channels&gt;</span><span class="w"> </span><span class="err">&lt;bitRate&gt;</span><span class="w"> </span><span class="err">&lt;samplingRate&gt;</span><span class="w"> </span><span class="err">&lt;quality&gt;</span><span class="p">]</span>
+</span></code></pre></div>
+<p><strong>Description</strong></p>
+<p>Plays a specific sound for the specified players once without creating a file on the server, given the specified arguments.</p>
+<p><strong>Arguments</strong></p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+<th>Default</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>filepath</code></td>
+<td>Optional on singleplayer: The sound file that should be played. (e.g. <code>"C:\path\to\sound.mp3"</code>)</td>
+<td></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>targets</code></td>
+<td>Optional: Players for whom the sound should be played.</td>
+<td><code>@s</code></td>
+<td><a href="https://minecraft.wiki/w/Target_selectors">EntitySelector</a></td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td>Optional: The sound source in which the sound should be played in.</td>
+<td><code>CUSTOM</code></td>
+<td>Enum</td>
+</tr>
+<tr>
+<td><code>volume</code></td>
+<td>Optional: The volume of the sound. Must be a value between <code>0.0</code> and <code>1.0</code>.</td>
+<td><code>1.0</code></td>
+<td>Float</td>
+</tr>
+<tr>
+<td><code>pitch</code></td>
+<td>Optional: The pitch of the sound. Must be a value between <code>0.5</code> and <code>2.0</code>.</td>
+<td><code>1.0</code></td>
+<td>Float</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td>Optional: The position of the sound in the world. Only works for <code>Mono</code> sounds!</td>
+<td><code>~ ~ ~</code></td>
+<td>Vec3</td>
+</tr>
+<tr>
+<td><code>attenuationDistance</code></td>
+<td>Optional: The attenuation distance of the sound in blocks.</td>
+<td><code>16</code></td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>ticksOffset</code></td>
+<td>Optional: Fast forwards the sound the given number of ticks before playing. Value must be larger than 0.</td>
+<td><code>0</code></td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>channels</code></td>
+<td>Optional: The audio channels the converted sound should have.</td>
+<td>(source)</td>
+<td>Enum</td>
+</tr>
+<tr>
+<td><code>bitRate</code></td>
+<td>Optional: The bit rate the converted sound should have.</td>
+<td>(source)</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>samplingRate</code></td>
+<td>Optional: The sampling rate the converted sound should have.</td>
+<td>(source)</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>quality</code></td>
+<td>Optional: The quality the converted sound should have. Must be a value between 0 and 10.</td>
+<td><code>5</code></td>
+<td>Byte</td>
+</tr>
+</tbody>
+</table>
+<p><strong><a href="https://minecraft.wiki/w/Permission_level">Premission level</a> required</strong></p>
+<p>2</p>
+<p><strong>Environment</strong></p>
+<p>Client, Server</p>
 <h3 id="stop"><code>stop</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">stop</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;targets&gt;</span><span class="p">]</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;file&gt;</span><span class="p">]</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">stop</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;targets&gt;</span><span class="p">]</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;file&gt;</span><span class="p">]</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Stops all playing instances of one or all sounds for the selected players.</p>
@@ -1241,12 +1362,12 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h3 id="upload"><code>upload</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">upload</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">location</span><span class="o">&gt;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">displayName</span><span class="o">&gt;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;target&gt;</span><span class="p">]</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;channels&gt;</span><span class="w"> </span><span class="err">&lt;bitRate&gt;</span><span class="w"> </span><span class="err">&lt;samplingRate&gt;</span><span class="w"> </span><span class="err">&lt;quality&gt;</span><span class="p">]</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;showProgress&gt;</span><span class="p">]</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">upload</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">location</span><span class="o">&gt;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">displayName</span><span class="o">&gt;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;target&gt;</span><span class="p">]</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;channels&gt;</span><span class="w"> </span><span class="err">&lt;bitRate&gt;</span><span class="w"> </span><span class="err">&lt;samplingRate&gt;</span><span class="w"> </span><span class="err">&lt;quality&gt;</span><span class="p">]</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;showProgress&gt;</span><span class="p">]</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Opens a file picker dialog for the selected player where it can choose one sound file it want to upload.</p>
@@ -1316,8 +1437,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h3 id="delete"><code>delete</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">delete</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">delete</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Deletes the selected file from the server. Sound instances of that file that are currently playing will continue playing.</p>
@@ -1345,7 +1466,7 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h3 id="cleanup"><code>cleanUp</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">cleanUp</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">cleanUp</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Runs a clean up which will removed all unused sound files and empty sound locations. This action will be performed every time when the server starts.</p>
@@ -1354,7 +1475,7 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h3 id="showfolder"><code>showFolder</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">showFolder</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">showFolder</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Opens the folder where the sounds are stored.</p>
@@ -1363,7 +1484,7 @@
 <p><strong>Environment</strong></p>
 <p>Client</p>
 <h3 id="help"><code>help</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">help</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">help</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Shows this documentation.</p>
@@ -1372,11 +1493,11 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h3 id="modify"><code>modify</code></h3>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">volume</span><span class="o">|</span><span class="kc">pitch</span><span class="o">|</span><span class="kc">attenuationDistance</span><span class="o">|</span><span class="kc">doppler</span><span class="o">|</span><span class="kc">cone</span><span class="o">|</span><span class="kc">pos</span><span class="o">|</span><span class="kc">pause</span><span class="o">|</span><span class="kc">resume</span><span class="o">|</span><span class="kc">seek</span><span class="o">&gt;</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="l">..</span><span class="o">.</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">volume</span><span class="o">|</span><span class="kc">pitch</span><span class="o">|</span><span class="kc">attenuationDistance</span><span class="o">|</span><span class="kc">doppler</span><span class="o">|</span><span class="kc">cone</span><span class="o">|</span><span class="kc">pos</span><span class="o">|</span><span class="kc">pause</span><span class="o">|</span><span class="kc">resume</span><span class="o">|</span><span class="kc">seek</span><span class="o">&gt;</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="l">..</span><span class="o">.</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Modifies the playback sound for the selected players.</p>
@@ -1410,8 +1531,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-volume"><code>modify volume</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">volume</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">volume</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">volume</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">volume</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Modifies the volume of the sound.</p>
@@ -1439,8 +1560,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-pitch"><code>modify pitch</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pitch</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">pitch</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pitch</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">pitch</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Modifies the pitch of the sound.</p>
@@ -1468,8 +1589,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-attenuationdistance"><code>modify attenuationDistance</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">attenuationDistance</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">distance</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">attenuationDistance</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">distance</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Modifies the attenuation distance.</p>
@@ -1497,9 +1618,9 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-doppler"><code>modify doppler</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">doppler</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">velocity</span><span class="o">&gt;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">dopplerFactor</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">doppler</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">velocity</span><span class="o">&gt;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">dopplerFactor</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Enables the doppler effect for the sound.</p>
@@ -1533,11 +1654,11 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-cone"><code>modify cone</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">cone</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">direction</span><span class="o">&gt;</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">angleA</span><span class="o">&gt;</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">angleB</span><span class="o">&gt;</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;outerGain&gt;</span><span class="p">]</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">cone</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">direction</span><span class="o">&gt;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">angleA</span><span class="o">&gt;</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">angleB</span><span class="o">&gt;</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="p">[</span><span class="err">&lt;outerGain&gt;</span><span class="p">]</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Defines a cone area in which the sound can be heard. Useful to simulate directional speakers.</p>
@@ -1583,8 +1704,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-pos"><code>modify pos</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pos</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">position</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pos</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">position</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Changes the position of the sound source in the world.</p>
@@ -1612,7 +1733,7 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-pause"><code>modify pause</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pause</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">pause</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Pauses the playback of the selected sound for the selected player.</p>
@@ -1621,7 +1742,7 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-resume"><code>modify resume</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">resume</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">resume</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Resumes the playback of the selected sound for the selected player.</p>
@@ -1630,8 +1751,8 @@
 <p><strong>Environment</strong></p>
 <p>Client, Server</p>
 <h4 id="modify-seek"><code>modify seek</code></h4>
-<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">seek</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">ticks</span><span class="o">&gt;</span>
+<div class="language-mcfunction highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="o">/</span><span class="kc">sound</span><span class="w"> </span><span class="kc">modify</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">target</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">file</span><span class="o">&gt;</span><span class="w"> </span><span class="kc">seek</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kc">ticks</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p><strong>Description</strong></p>
 <p>Skips the given amount of ticks in the sound.</p>

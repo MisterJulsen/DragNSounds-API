@@ -43,6 +43,49 @@ Plays a specific sound for the specified amount of players, given the specified 
 
 Client, Server
 
+### `playOnce`
+```mcfunction
+/sound playOnce
+    <filepath>
+    [<targets>]
+    [<source>]
+    [<volume>]
+    [<pitch>]
+    [<position>]
+    [<attenuationDistance>]
+    [<ticksOffset>]
+    [<channels> <bitRate> <samplingRate> <quality>]
+```
+
+**Description**
+
+Plays a specific sound for the specified players once without creating a file on the server, given the specified arguments.
+
+**Arguments**
+
+| Argument | Description | Default | Type |
+| -------- | -------- | -------- | -------- |
+| `filepath` | Optional on singleplayer: The sound file that should be played. (e.g. `"C:\path\to\sound.mp3"`) |  | String |
+| `targets` | Optional: Players for whom the sound should be played. | `@s` | [EntitySelector](https://minecraft.wiki/w/Target_selectors) |
+| `source` | Optional: The sound source in which the sound should be played in. | `CUSTOM` | Enum |
+| `volume` | Optional: The volume of the sound. Must be a value between `0.0` and `1.0`. | `1.0` | Float |
+| `pitch` | Optional: The pitch of the sound. Must be a value between `0.5` and `2.0`.| `1.0` | Float |
+| `position` | Optional: The position of the sound in the world. Only works for `Mono` sounds! | `~ ~ ~` | Vec3 |
+| `attenuationDistance` | Optional: The attenuation distance of the sound in blocks. | `16` | Integer |
+| `ticksOffset` | Optional: Fast forwards the sound the given number of ticks before playing. Value must be larger than 0. | `0` | Integer |
+| `channels` | Optional: The audio channels the converted sound should have. | (source) | Enum |
+| `bitRate` | Optional: The bit rate the converted sound should have. | (source) | Integer |
+| `samplingRate` | Optional: The sampling rate the converted sound should have. | (source) | Integer |
+| `quality` | Optional: The quality the converted sound should have. Must be a value between 0 and 10. | `5` | Byte |
+
+**[Premission level](https://minecraft.wiki/w/Permission_level) required**
+
+2
+
+**Environment**
+
+Client, Server
+
 ### `stop`
 ```mcfunction
 /sound stop
