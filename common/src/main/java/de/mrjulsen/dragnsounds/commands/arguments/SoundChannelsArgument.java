@@ -34,7 +34,6 @@ public class SoundChannelsArgument implements ArgumentType<EChannels> {
             }
             return source;
         } catch (IllegalArgumentException e) {
-            System.out.println("SALZ");
             throw INVALID_ENUM.createWithContext(reader, name, Arrays.toString(Arrays.stream(EChannels.values()).map(x -> x.getName()).toArray()));
         }
     }
