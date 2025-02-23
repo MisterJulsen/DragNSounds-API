@@ -99,7 +99,6 @@ public final class FFmpegUtils {
      * @param requestId The id of the request. If unknown, use {@code System.nanoTime()}.
      * @param audioInputData The input file data.
      * @param settings The settings for the output file.
-     * @param onProgressChanged This method will be called while converting and reports the progress. Pass {@code null}, if you don't want to use this.
      * @param onFinished This method will be called after converting the audio file. Pass {@code null}, if you don't want to use this.
      * @param onError This method will be called when an error occurs. Pass {@code null}, if you don't want to use this.
      */
