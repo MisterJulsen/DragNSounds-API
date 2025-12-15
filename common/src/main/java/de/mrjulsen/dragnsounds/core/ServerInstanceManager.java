@@ -20,7 +20,9 @@ import de.mrjulsen.dragnsounds.core.data.PlayerboundDataBuffer;
 import de.mrjulsen.dragnsounds.core.data.UploadSoundBuffer;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.net.stc.UploadFailedPacket;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.ChatFormatting;
@@ -104,7 +106,7 @@ public final class ServerInstanceManager {
     public static void closeSound(Player player, long soundId) {
         List<PlayerboundDataBuffer> idsToRemove = new LinkedList<>();
         activeBuffersBySoundId.entrySet().removeIf(x -> {
-            boolean b = x.getKey() == soundId && x.getValue().remove(player.getUUID(), soundId, PlayerboundDataBuffer.NO_SOUND_WITH_ID).result();
+            boolean b = x.getKey() == soundId && x.getValue().remove(player.getUUID(), soundId, PlayerboundDataBuffer.NO_SOUND_WITH_ID).flag() == DLStatus.FLAG_OK;
             idsToRemove.add(x.getValue());
             return b;
         });
@@ -134,9 +136,9 @@ public final class ServerInstanceManager {
         });
     }
 
-    public static synchronized StatusResult createUploadBuffer(long requestId, int maxSize, ServerPlayer player) {        
-        StatusResult result = CommonConfig.checkFilePermissions(maxSize, player);
-        if (result.result()) { 
+    public static synchronized DLStatus createUploadBuffer(long requestId, int maxSize, ServerPlayer player) {        
+        DLStatus result = CommonConfig.checkFilePermissions(maxSize, player);
+        if (result.flag() == DLStatus.FLAG_OK) { 
             uploadFileCache.computeIfAbsent(requestId, x -> new UploadSoundBuffer(x, (int)maxSize, player));
         }
         return result;
@@ -144,7 +146,7 @@ public final class ServerInstanceManager {
 
     public static synchronized UploadSoundBuffer getUploadBuffer(long requestId, int maxSize, ServerPlayer player) {
         if (!uploadFileCache.containsKey(requestId)) { 
-            DragNSounds.net().sendToPlayer(player, new UploadFailedPacket(requestId, new StatusResult(false, -201, "The upload task has not been prepared.")));
+            ModNetworkManager.UPLOAD_FAILED.send(NetworkDirection.toPlayer(player), new UploadFailedPacket(requestId, new DLStatus(DLStatus.FLAG_ERROR, -201, "The upload task has not been prepared.")));
             return null;
         }
         return uploadFileCache.get(requestId);

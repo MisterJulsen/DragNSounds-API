@@ -15,7 +15,9 @@ import de.mrjulsen.dragnsounds.core.callbacks.client.SoundChannelsHolder;
 import de.mrjulsen.dragnsounds.core.data.ChannelContext;
 import de.mrjulsen.dragnsounds.core.ext.CustomOggAudioStream;
 import de.mrjulsen.dragnsounds.net.cts.StopSoundNotificationPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.ISelfCast;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import net.minecraft.client.sounds.AudioStream;
 
 @Mixin(Channel.class)
@@ -70,7 +72,7 @@ public class ChannelMixin implements ISelfCast<Channel> {
             SoundChannelsHolder.close(soundId);
             ClientInstanceManager.removeSoundCommandListener(soundId).stop();
             ClientInstanceManager.delayedSoundGC(soundId, 60000);
-            DragNSounds.net().sendToServer(new StopSoundNotificationPacket(soundId));
+            ModNetworkManager.STOP_SOUND_NOTIFICATION.send(NetworkDirection.toServer(), new StopSoundNotificationPacket(soundId));
             DragNSounds.LOGGER.info("Audio Channel of sound " + soundId + " removed.");
         }
     }

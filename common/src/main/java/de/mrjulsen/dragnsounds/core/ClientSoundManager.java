@@ -49,11 +49,13 @@ import de.mrjulsen.dragnsounds.net.cts.SoundFileRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.SoundListRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.StartUploadSoundPacket;
 import de.mrjulsen.dragnsounds.net.cts.UploadSoundPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
-import de.mrjulsen.mcdragonlib.util.MathUtils;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
+import de.mrjulsen.mcdragonlib.util.math.MathUtils;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
 import net.minecraft.client.Minecraft;
@@ -101,7 +103,7 @@ public final class ClientSoundManager {
                 }
 
                 ClientInstanceManager.getSoundCommandListener(soundId).start(file);
-                DragNSounds.net().sendToServer(new SoundCreatedResponsePacket(soundId, ESoundPlaybackStatus.PLAY));
+                ModNetworkManager.SOUND_CREATED_RESPONSE.send(NetworkDirection.toServer(), new SoundCreatedResponsePacket(soundId, ESoundPlaybackStatus.PLAY));
             });
 
             switch (playback.type()) {
@@ -275,21 +277,21 @@ public final class ClientSoundManager {
         }
     }
 
-    public static long uploadSound(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> onError) {
+    public static long uploadSound(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> onError) {
         try {
             return uploadSoundStream(IOUtils.readFile(filePath), targetSettings, settings, afterUpload, progress, onError);
         } catch (IOException e) {            
             DragNSounds.LOGGER.error("Unable to upload custom sound.", e);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                 });
             }
         }
         return 0;
     }
 
-    public static long uploadSoundStream(InputStream audioStream, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> onError) {
+    public static long uploadSoundStream(InputStream audioStream, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> onError) {
         final long requestId = Api.id();
         new Thread(() -> {
             try {
@@ -303,7 +305,7 @@ public final class ClientSoundManager {
                             DragNSounds.LOGGER.error("Unable to upload custom sound. No permission.", e);
                             if (onError != null) {
                                 Minecraft.getInstance().execute(() -> {
-                                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                                 });
                             }
                             SoundUploadCancelCallback.close(requestId);
@@ -316,7 +318,7 @@ public final class ClientSoundManager {
                 DragNSounds.LOGGER.error("Unable to upload custom sound.", e);
                 if (onError != null) {
                     Minecraft.getInstance().execute(() -> {
-                        onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                     });
                 }
                 SoundUploadCancelCallback.close(requestId);
@@ -326,7 +328,7 @@ public final class ClientSoundManager {
     }
 
     @Deprecated
-    public static long uploadSoundFile(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> onError) {
+    public static long uploadSoundFile(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> onError) {
         final long requestId = Api.id();
         new Thread(() -> {
             try {
@@ -342,7 +344,7 @@ public final class ClientSoundManager {
                             DragNSounds.LOGGER.error("Unable to upload custom sound. No permission.", e);
                             if (onError != null) {
                                 Minecraft.getInstance().execute(() -> {
-                                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                                 });
                             }
                             SoundUploadCancelCallback.close(requestId);
@@ -356,7 +358,7 @@ public final class ClientSoundManager {
                 DragNSounds.LOGGER.error("Unable to upload custom sound.", e);
                 if (onError != null) {
                     Minecraft.getInstance().execute(() -> {
-                        onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                     });
                 }
                 SoundUploadCancelCallback.close(requestId);
@@ -366,21 +368,21 @@ public final class ClientSoundManager {
         return requestId;
     }
 
-    private static void uploadFileInternal(long requestId, File file, SoundFile.Builder data, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> onError) {
+    private static void uploadFileInternal(long requestId, File file, SoundFile.Builder data, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> onError) {
         try {
             uploadStreamInternal(requestId, IOUtils.readFile(file.getAbsolutePath()), data, afterUpload, progress, onError);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to upload custom sound from file.", e);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(false, -100, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -100, e.getLocalizedMessage()));
                 });
             }
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            ModNetworkManager.CANCEL_UPLOAD_SOUND.send(NetworkDirection.toServer(), new CancelUploadSoundPacket(requestId));
         }
     }
 
-    private static void uploadStreamInternal(long requestId, InputStream input, SoundFile.Builder data, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> onError) {
+    private static void uploadStreamInternal(long requestId, InputStream input, SoundFile.Builder data, Consumer<Optional<SoundFile>> afterUpload, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> onError) {
         
         try (InputStream stream = input) {
             CompletableFuture<Boolean> finish = new CompletableFuture<>();
@@ -409,14 +411,14 @@ public final class ClientSoundManager {
                 cancelled.set(true);
             });
 
-            CompletableFuture<StatusResult> start = new CompletableFuture<>();
+            CompletableFuture<DLStatus> start = new CompletableFuture<>();
             SoundStartUploadCallback.create(requestId, (status) -> {
                 start.complete(status);
             });
-            DragNSounds.net().sendToServer(new StartUploadSoundPacket(requestId, size));
+            ModNetworkManager.START_UPLOAD_SOUND.send(NetworkDirection.toServer(), new StartUploadSoundPacket(requestId, size));
 
-            StatusResult result = start.get(10, TimeUnit.SECONDS);
-            if (!result.result()) {
+            DLStatus result = start.get(10, TimeUnit.SECONDS);
+            if (result.flag() != DLStatus.FLAG_OK) {
                 throw new CancelException(result.message());
             }
 
@@ -431,7 +433,7 @@ public final class ClientSoundManager {
                     buffer = tmp;
                 }
 
-                DragNSounds.net().sendToServer(new UploadSoundPacket(requestId, index, stream.available() > 0, size, buffer));
+                ModNetworkManager.UPLOAD_SOUND.send(NetworkDirection.toServer(), new UploadSoundPacket(requestId, index, stream.available() > 0, size, buffer));
                 if (progress != null) {
                     progress.accept(new UploadProgress(clientProgress, UploadState.UPLOAD), serverProgress.get());
                 }
@@ -456,26 +458,26 @@ public final class ClientSoundManager {
                 DragNSounds.LOGGER.error("Unable to get audio duration on client. " + e.getLocalizedMessage(), e);
             }
 
-            DragNSounds.net().sendToServer(new FinishUploadSoundPacket(requestId, size, data, channels, duration));
+            ModNetworkManager.FINISH_UPLOAD_SOUND.send(NetworkDirection.toServer(), new FinishUploadSoundPacket(requestId, size, data, channels, duration));
             finish.get(60, TimeUnit.SECONDS);
 
         } catch (CancelException e) {
             DragNSounds.LOGGER.warn("Upload aborted.", e);
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            ModNetworkManager.CANCEL_UPLOAD_SOUND.send(NetworkDirection.toServer(), new CancelUploadSoundPacket(requestId));
             ClientInstanceManager.closeUploadCallbacks(requestId);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(true, 1, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_OK, 1, e.getLocalizedMessage()));
                 });
             }
         } catch (Exception e) {
             DragNSounds.LOGGER.error("Unable to upload custom sound.", e);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(false, -4, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -4, e.getLocalizedMessage()));
                 });
             }
-            DragNSounds.net().sendToServer(new CancelUploadSoundPacket(requestId));
+            ModNetworkManager.CANCEL_UPLOAD_SOUND.send(NetworkDirection.toServer(), new CancelUploadSoundPacket(requestId));
             ClientInstanceManager.closeUploadCallbacks(requestId);
         } finally {
             SoundUploadCancelCallback.close(requestId);
@@ -485,13 +487,13 @@ public final class ClientSoundManager {
     @SuppressWarnings("unchecked")
     public static void getAllSoundFiles(Collection<IFilter<SoundFile>> filters, Consumer<SoundFile[]> callback) {
         final long requestId = SoundListCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundListRequestPacket(requestId, filters.toArray(new IFilter[filters.size()])));        
+        ModNetworkManager.SOUND_LIST_REQUEST.send(NetworkDirection.toServer(), new SoundListRequestPacket(requestId, filters.toArray(new IFilter[filters.size()])));
     }
 
     
     public static void getSoundFile(SoundLocation location, String id, Consumer<Optional<SoundFile>> callback) {
         final long requestId = SoundFileCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundFileRequestPacket(requestId, id, location));
+        ModNetworkManager.SOUND_FILE_REQUEST.send(NetworkDirection.toServer(), new SoundFileRequestPacket(requestId, id, location));
     }
 
     public static SoundFile getClientDummySoundFile(String location, String id) {

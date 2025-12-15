@@ -1,43 +1,38 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
-public class StopSoundRequest implements IPacketBase<StopSoundRequest> {
+public class StopSoundRequest extends NetworkPacketData {
 
+    private static final String NBT_SOUND_ID = "SoundId";
     private long soundId;
 
-    public StopSoundRequest() {}
+    public StopSoundRequest(DLStatus status) { super(status); }
 
     public StopSoundRequest(long soundId) {
+        super(DLStatus.OK);
         this.soundId = soundId;
     }
 
     @Override
-    public void encode(StopSoundRequest packet, FriendlyByteBuf buf) {
-        buf.writeLong(packet.soundId);
+    protected void write(CompoundTag tag) {
+        tag.putLong(NBT_SOUND_ID, soundId);
     }
 
     @Override
-    public StopSoundRequest decode(FriendlyByteBuf buf) {
-        return new StopSoundRequest(
-            buf.readLong()
-        );
+    protected void read(CompoundTag tag) {
+        this.soundId = tag.getLong(NBT_SOUND_ID);
     }
 
-    @Override
-    public void handle(StopSoundRequest packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.stopSound(packet.soundId);
-            });
+    public static void handle(StopSoundRequest packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            ClientSoundManager.stopSound(packet.soundId);
         });
     }
-    
 }

@@ -1,20 +1,25 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundFileResponsePacket;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacket> {
+public class SoundFileRequestPacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_ID = "Id";
+    private static final String NBT_LOCATION = "Location";
 
     private long requestId;
     private String id;
@@ -22,47 +27,45 @@ public class SoundFileRequestPacket implements IPacketBase<SoundFileRequestPacke
 
     private CompoundTag nbt;
 
-    public SoundFileRequestPacket() {}
+    public SoundFileRequestPacket(DLStatus status) {
+        super(status);
+    }
 
     public SoundFileRequestPacket(long requestId, String id, SoundLocation location) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.id = id;
         this.location = location;
     }
 
     public SoundFileRequestPacket(long requestId, String id, CompoundTag nbt) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.id = id;
         this.nbt = nbt;
     }
 
     @Override
-    public void encode(SoundFileRequestPacket packet, FriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeUtf(packet.id);
-        buf.writeNbt(packet.location.serializeNbt());
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_REQUEST_ID, requestId);
+        nbt.putString(NBT_ID, id);
+        nbt.put(NBT_LOCATION, location.serializeNbt());
     }
 
     @Override
-    public SoundFileRequestPacket decode(FriendlyByteBuf buf) {
-        return new SoundFileRequestPacket(
-            buf.readLong(), 
-            buf.readUtf(), 
-            buf.readNbt()
-        );
+    protected void read(CompoundTag nbt) {
+        this.requestId = nbt.getLong(NBT_REQUEST_ID);
+        this.id = nbt.getString(NBT_ID);
+        this.nbt = nbt.getCompound(NBT_LOCATION);
     }
 
-    @Override
-    public void handle(SoundFileRequestPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            try {
-                SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()), packet.id);                
-                DragNSounds.net().sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new SoundFileResponsePacket(packet.requestId, file));
-            } catch (IOException e) {
-                DragNSounds.LOGGER.warn("Could not find sound file.", e);
-                DragNSounds.net().sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new SoundFileResponsePacket(packet.requestId, (SoundFile)null));
-            }
-        });
+    public static void handle(SoundFileRequestPacket packet, NetworkPacketContext context) {
+        try {
+            SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, context.getPlayer().level()), packet.id);
+            ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, file));
+        } catch (IOException e) {
+            DragNSounds.LOGGER.warn("Could not find sound file.", e);
+            ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, (SoundFile) null));
+        }
     }
-
 }

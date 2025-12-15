@@ -29,7 +29,9 @@ import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.SoundUploadCommandPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import de.mrjulsen.mcdragonlib.util.TextUtils;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -378,7 +380,7 @@ public class CustomSoundCommand {
 
 
     private static int uploadSound(CommandSourceStack cmd, SoundLocation location, String displayName, ServerPlayer player, AudioSettings settings, boolean showProgressScreen, CompoundTag nbt) throws CommandSyntaxException {
-        DragNSounds.net().sendToPlayer(player, new SoundUploadCommandPacket(new SoundFile.Builder(location, displayName, Map.of()), settings, showProgressScreen));
+        ModNetworkManager.SOUND_UPLOAD_COMMAND.send(NetworkDirection.toPlayer(player), new SoundUploadCommandPacket(new SoundFile.Builder(location, displayName, Map.of()), settings, showProgressScreen));
         cmd.sendSuccess(() -> TextUtils.translate("gui." + DragNSounds.MOD_ID + ".commands.sound.upload_started"), false);
         return 1;
     }

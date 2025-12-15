@@ -34,8 +34,10 @@ import de.mrjulsen.dragnsounds.net.stc.PlaySoundPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundListChunkResponsePacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundGetDataRequestPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import de.mrjulsen.mcdragonlib.util.DLUtils;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import net.minecraft.client.Minecraft;
@@ -65,10 +67,10 @@ public class ServerSoundManager {
             while (i < BUFFER_BLOCK_SIZE && hasNext) {
                 byte[] data = new byte[buffer.maxSize(player.getUUID(), soundId, DragNSounds.DEFAULT_NET_DATA_SIZE * 2)];
                 hasNext = buffer.read(player.getUUID(), soundId, data);
-                DragNSounds.net().sendToPlayer(player, new SoundDataPacket(soundId, i, INITIAL_SIZE, hasNext, data));
+                ModNetworkManager.SOUND_DATA.send(NetworkDirection.toPlayer(player), new SoundDataPacket(soundId, i, INITIAL_SIZE, hasNext, data));
                 i++;
             }
-            DragNSounds.net().sendToPlayer(player, new PlaySoundPacket(soundId, i - 1, file, playback, clientCallbackRequestId));
+            ModNetworkManager.PLAY_SOUND.send(NetworkDirection.toPlayer(player), new PlaySoundPacket(soundId, i - 1, file, playback, clientCallbackRequestId));
         }
     }
 
@@ -79,7 +81,7 @@ public class ServerSoundManager {
         if (!hasNext) {
             ServerInstanceManager.closeSound(player, soundId);
         }
-        DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundDataPacket(soundId, index, -1, hasNext, data));
+        ModNetworkManager.SOUND_DATA.send(NetworkDirection.toPlayer((ServerPlayer)player), new SoundDataPacket(soundId, index, -1, hasNext, data));
     }
 
     public static void closeOnDisconnect(Player player) {
@@ -89,14 +91,16 @@ public class ServerSoundManager {
 
     public static void getSoundPlaybackData(long soundId, ServerPlayer[] players, ISoundPlaybackData callback) {
         SoundGetDataCallback.create(soundId, callback);
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundGetDataRequestPacket(soundId));
+        for (ServerPlayer player : players) {
+            ModNetworkManager.SOUND_GET_DATA_REQUEST.send(NetworkDirection.toPlayer(player), new SoundGetDataRequestPacket(soundId));
+        }
     }
 
     public static void stopSound(Player player, long soundId) {
         ServerInstanceManager.closeSound(player, soundId);
     }
 
-    public static StatusResult prepareUploadPacket(ServerPlayer player, StartUploadSoundPacket packet) {
+    public static DLStatus prepareUploadPacket(ServerPlayer player, StartUploadSoundPacket packet) {
         return ServerInstanceManager.createUploadBuffer(packet.getRequestId(), packet.getMaxSize(), player);
     }
 
@@ -116,7 +120,7 @@ public class ServerSoundManager {
                 files = getSoundFileList(level, filters);
             } catch (IOException e) {
                 DragNSounds.LOGGER.error("Unable to get sound file list.", e);
-                DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, false, new SoundFile[0]));
+                ModNetworkManager.SOUND_LIST_CHUNK_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)player), new SoundListChunkResponsePacket(requestId, false, new SoundFile[0]));
                 return;
             }
 
@@ -125,7 +129,7 @@ public class ServerSoundManager {
                 System.arraycopy(files, i, chunk, 0, chunk.length);
                 
                 boolean hasMore = i + filesPerPacket < files.length;
-                DragNSounds.net().sendToPlayer((ServerPlayer)player, new SoundListChunkResponsePacket(requestId, hasMore, chunk));
+                ModNetworkManager.SOUND_LIST_CHUNK_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)player), new SoundListChunkResponsePacket(requestId, hasMore, chunk));
             }
         }, "Sound List Loader").start();
     }
@@ -144,13 +148,13 @@ public class ServerSoundManager {
         }
     }
 
-    public static StatusResult deleteSound(SoundLocation loc, String id) throws IOException {
+    public static DLStatus deleteSound(SoundLocation loc, String id) throws IOException {
         try (IndexFile index = IndexFile.open(loc, false)) {
             if (!index.has(id)) {
-                return new StatusResult(false, -1, "File not found.");
+                return new DLStatus(DLStatus.FLAG_ERROR, -1, "File not found.");
             }
             boolean success = index.delete(id);            
-            return success ? new StatusResult(true, 0, "Success") : new StatusResult(false, -2, "Failed to delete sound file.");
+            return success ? new DLStatus(DLStatus.FLAG_OK, 0, "Success") : new DLStatus(DLStatus.FLAG_ERROR, -2, "Failed to delete sound file.");
         }
     }
 
@@ -294,29 +298,29 @@ public class ServerSoundManager {
     }
 
 
-    public static long createSound(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, Consumer<StatusResult> onError) {
+    public static long createSound(String filePath, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterUpload, Consumer<DLStatus> onError) {
         try {
             return createSound(IOUtils.readFile(filePath), targetSettings, settings, afterUpload, onError);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to create custom sound.", e);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                 });
             }
         }
         return 0;
     }
     
-    public static long createSound(InputStream audioData, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterConversion, Consumer<StatusResult> onError) {
+    public static long createSound(InputStream audioData, SoundFile.Builder targetSettings, AudioSettings settings, Consumer<Optional<SoundFile>> afterConversion, Consumer<DLStatus> onError) {
         final long requestId = Api.id();
         new Thread(() -> {
             try {
                 FFmpegUtils.convertToOggStream(requestId, audioData, settings, 
                     (output) -> {
                         try {
-                            StatusResult result = CommonConfig.checkFilePermissions(output.available(), null);
-                            if (!result.result()) {
+                            DLStatus result = CommonConfig.checkFilePermissions(output.available(), null);
+                            if (result.flag() != DLStatus.FLAG_OK) {
                                 throw new Exception(result.message());
                             }
                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -327,7 +331,7 @@ public class ServerSoundManager {
                             DragNSounds.LOGGER.error("Unable to create custom sound. No permission.", e);
                             if (onError != null) {
                                 Minecraft.getInstance().execute(() -> {
-                                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                                 });
                             }
                         } finally {
@@ -337,7 +341,7 @@ public class ServerSoundManager {
                                 DragNSounds.LOGGER.error("Unable to close custom sound stream.", e);
                                 if (onError != null) {
                                     Minecraft.getInstance().execute(() -> {
-                                        onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                                     });
                                 }
                             }
@@ -350,7 +354,7 @@ public class ServerSoundManager {
                 DragNSounds.LOGGER.error("Unable to create custom sound.", e);
                 if (onError != null) {
                     Minecraft.getInstance().execute(() -> {
-                        onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                     });
                 }
                 SoundUploadCancelCallback.close(requestId);
@@ -359,21 +363,21 @@ public class ServerSoundManager {
         return requestId;
     }
 
-    public static long playSoundOnce(String filePath, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] players, Runnable afterConversion, Consumer<StatusResult> onError) {
+    public static long playSoundOnce(String filePath, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] players, Runnable afterConversion, Consumer<DLStatus> onError) {
         try {
             return playSoundOnce(IOUtils.readFile(filePath), settings, playback, players, afterConversion, onError);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Unable to play custom temp sound.", e);
             if (onError != null) {
                 Minecraft.getInstance().execute(() -> {
-                    onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                    onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                 });
             }
         }
         return 0;
     }
     
-    public static long playSoundOnce(InputStream audioData, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] players, Runnable afterConversion, Consumer<StatusResult> onError) {
+    public static long playSoundOnce(InputStream audioData, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] players, Runnable afterConversion, Consumer<DLStatus> onError) {
         final long requestId = Api.id();
         new Thread(() -> {
             try {
@@ -401,7 +405,7 @@ public class ServerSoundManager {
                 DragNSounds.LOGGER.error("Unable to play custom temp sound.", e);
                 if (onError != null) {
                     Minecraft.getInstance().execute(() -> {
-                        onError.accept(new StatusResult(false, -3, e.getLocalizedMessage()));
+                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -3, e.getLocalizedMessage()));
                     });
                 }
                 SoundUploadCancelCallback.close(requestId);

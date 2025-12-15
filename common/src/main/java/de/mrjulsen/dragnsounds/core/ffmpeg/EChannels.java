@@ -2,10 +2,10 @@ package de.mrjulsen.dragnsounds.core.ffmpeg;
 
 import java.util.Arrays;
 
-import de.mrjulsen.mcdragonlib.core.ITranslatableEnum;
-import net.minecraft.util.StringRepresentable;
+import de.mrjulsen.dragnsounds.DragNSounds;
+import de.mrjulsen.mcdragonlib.data.ITranslatableEnum;
 
-public enum EChannels implements StringRepresentable, ITranslatableEnum {
+public enum EChannels implements ITranslatableEnum {
     MONO(1, "mono"),
     STEREO(2, "stereo");
 
@@ -32,20 +32,10 @@ public enum EChannels implements StringRepresentable, ITranslatableEnum {
     public static EChannels getByNameUnsafe(String name) {
         return Arrays.stream(values()).filter(x -> x.getName().equals(name)).findFirst().get();
     }
-        
+    
     @Override
-    public String getSerializedName() {
-        return getName();
-    }
-
-    @Override
-    public String getEnumName() {
-        return "audio_channels";
-    }
-
-    @Override
-    public String getEnumValueName() {
-        return getName();
+    public Data getTranslationData() {
+        return new Data(DragNSounds.MOD_ID, "audio_channels", name);
     }
     
 }

@@ -13,6 +13,8 @@ import de.mrjulsen.dragnsounds.core.callbacks.client.SoundStreamHolder;
 import de.mrjulsen.dragnsounds.net.cts.SoundDataRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.StopSoundNotificationPacket;
 import de.mrjulsen.dragnsounds.net.stc.SoundDataPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 
 public class SoundDataStream extends InputStream {
 
@@ -130,7 +132,7 @@ public class SoundDataStream extends InputStream {
                 packetIndexRequested = packetIndexNeeded;
             }
             pendingBytes += 8192 * 2;
-            DragNSounds.net().sendToServer(new SoundDataRequestPacket(this.getSoundId(), 8192 * 2, packetIndexRequested));
+            ModNetworkManager.SOUND_DATA_REQUEST.send(NetworkDirection.toServer(), new SoundDataRequestPacket(this.getSoundId(), 8192 * 2, packetIndexRequested));
             packetIndexRequested++;
         }
         return maxLen;
@@ -190,7 +192,7 @@ public class SoundDataStream extends InputStream {
         isStreaming = false;
         bufferQ.clear();
         SoundStreamHolder.close(soundId);
-        DragNSounds.net().sendToServer(new StopSoundNotificationPacket(soundId));
+        ModNetworkManager.STOP_SOUND_NOTIFICATION.send(NetworkDirection.toServer(), new StopSoundNotificationPacket(soundId));
         DragNSounds.LOGGER.info("Sound playback has been stopped. (ID " + soundId + ")");
     }
     

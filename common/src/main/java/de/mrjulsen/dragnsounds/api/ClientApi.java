@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundChannelsHolder;
@@ -28,8 +27,10 @@ import de.mrjulsen.dragnsounds.net.cts.AllMetadataRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.PlaySoundRequestPacket;
 import de.mrjulsen.dragnsounds.net.cts.SoundDeleteRequestPacket;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
 
@@ -48,7 +49,7 @@ public final class ClientApi {
      */
     public static long playSound(SoundFile file, PlaybackConfig playback, Consumer<Long> responseCallback) {
         long requestId = ClientInstanceManager.addSoundRequestCallback(responseCallback);
-        DragNSounds.net().sendToServer(new PlaySoundRequestPacket(requestId, file, playback));
+        ModNetworkManager.PLAY_SOUND_REQUEST.send(NetworkDirection.toServer(), new PlaySoundRequestPacket(requestId, file, playback));
         return requestId;
     }
 
@@ -190,7 +191,7 @@ public final class ClientApi {
      * @param error Called when an error occurs, either on the client or the server side.or if the upload was cancelled.
      * @return The id of the upload. Use it to cancel the upload.
      */
-    public static long uploadSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<StatusResult> error) {
+    public static long uploadSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, BiConsumer<UploadProgress, UploadProgress> progress, Consumer<DLStatus> error) {
         return ClientSoundManager.uploadSound(srcFilePath, builder, settings, callback, progress, error);
     }
 
@@ -256,9 +257,9 @@ public final class ClientApi {
      * @param id The id of the custom sound.
      * @param callback Called after the server has responded.
      */
-    public static void deleteSound(SoundLocation location, String id, Consumer<StatusResult> callback) {
+    public static void deleteSound(SoundLocation location, String id, Consumer<DLStatus> callback) {
         final long requestId = SoundDeleteCallback.create(callback);
-        DragNSounds.net().sendToServer(new SoundDeleteRequestPacket(requestId, location, id));
+        ModNetworkManager.SOUND_DELETE_REQUEST.send(NetworkDirection.toServer(), new SoundDeleteRequestPacket(requestId, location, id));
     }
 
     /**
@@ -266,7 +267,7 @@ public final class ClientApi {
      * @param file The sound file to delete.
      * @param callback Called after the server has responded.
      */
-    public static void deleteSound(SoundFile file, Consumer<StatusResult> callback) {
+    public static void deleteSound(SoundFile file, Consumer<DLStatus> callback) {
         deleteSound(file.getLocation(), file.getId(), callback);
     }
 
@@ -277,7 +278,7 @@ public final class ClientApi {
      */
     public static void getFileMetadata(SoundFile file, Consumer<Map<String, String>> callback) {
         final long requestId = SoundMetadataCallback.create(callback);
-        DragNSounds.net().sendToServer(new AllMetadataRequestPacket(requestId, file));
+        ModNetworkManager.REQUEST_ALL_METADATA.send(NetworkDirection.toServer(), new AllMetadataRequestPacket(requestId, file));
     }
 
     /**

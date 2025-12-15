@@ -1,31 +1,24 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
-public class PrintDebugPacket implements IPacketBase<PrintDebugPacket> {
+public class PrintDebugPacket extends NetworkPacketData {
 
-    @Override
-    public void encode(PrintDebugPacket packet, FriendlyByteBuf buf) {}
+    public PrintDebugPacket() { super(DLStatus.OK); }
+    public PrintDebugPacket(DLStatus status) { super(status); }
 
-    @Override
-    public PrintDebugPacket decode(FriendlyByteBuf buf) {
-        return new PrintDebugPacket();
-    }
+    @Override protected void write(CompoundTag tag) {}
+    @Override protected void read(CompoundTag tag) {}
 
-    @Override
-    public void handle(PrintDebugPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                contextSupplier.get().getPlayer().sendSystemMessage(ClientInstanceManager.debugComponent());
-            });
+    public static void handle(PrintDebugPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            context.getPlayer().sendSystemMessage(ClientInstanceManager.debugComponent());
         });
     }
-    
 }

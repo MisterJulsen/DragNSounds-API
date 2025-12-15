@@ -1,17 +1,21 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ServerInstanceManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPacket> {
+public class FinishUploadSoundPacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_MAX_SIZE = "MaxSize";
+    private static final String NBT_FILE = "File";
+    private static final String NBT_INITIAL_DURATION = "InitialDuration";
+    private static final String NBT_INITIAL_CHANNELS = "InitialChannels";
 
     private long requestId;
     private int maxSize;
@@ -22,9 +26,12 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
     private CompoundTag nbt;
     private Level level;
 
-    public FinishUploadSoundPacket() {}
+    public FinishUploadSoundPacket(DLStatus status) {
+        super(status);
+    }
 
     public FinishUploadSoundPacket(long requestId, int maxSize, SoundFile.Builder file, int initialChannels, long initialDuration) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.maxSize = maxSize;
         this.file = file;
@@ -32,38 +39,36 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
     }
 
     private FinishUploadSoundPacket(long requestId, int maxSize, CompoundTag nbt, int initialChannels, long initialDuration) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.maxSize = maxSize;
         this.nbt = nbt;
         this.initialChannels = initialChannels;
     }
+    
 
     @Override
-    public void encode(FinishUploadSoundPacket packet, FriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeInt(packet.maxSize);
-        buf.writeNbt(packet.file.serializeNbt());
-        buf.writeInt(packet.initialChannels);
-        buf.writeLong(packet.initialDuration);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_REQUEST_ID, requestId);
+        nbt.putInt(NBT_MAX_SIZE, maxSize);
+        nbt.put(NBT_FILE, file.serializeNbt());
+        nbt.putLong(NBT_INITIAL_DURATION, initialDuration);
+        nbt.putInt(NBT_INITIAL_CHANNELS, initialChannels);
     }
 
     @Override
-    public FinishUploadSoundPacket decode(FriendlyByteBuf buf) {
-        return new FinishUploadSoundPacket(
-            buf.readLong(),
-            buf.readInt(),
-            buf.readNbt(),
-            buf.readInt(),
-            buf.readLong()
-        );
-    }
+    protected void read(CompoundTag nbt) {
+        this.requestId = nbt.getLong(NBT_REQUEST_ID);
+        this.maxSize = nbt.getInt(NBT_MAX_SIZE);
+        this.nbt = nbt.getCompound(NBT_FILE);
+        this.initialChannels = nbt.getInt(NBT_INITIAL_CHANNELS);
+        this.initialDuration = nbt.getLong(NBT_INITIAL_DURATION);
+    }   
 
-    @Override
-    public void handle(FinishUploadSoundPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            packet.level = contextSupplier.get().getPlayer().level();
-            ServerInstanceManager.getUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)contextSupplier.get().getPlayer()).setFinalizerPacket(packet);
-        });
+    
+    public static void handle(FinishUploadSoundPacket packet, NetworkPacketContext context) {
+        packet.level = context.getPlayer().level();
+        ServerInstanceManager.getUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)context.getPlayer()).setFinalizerPacket(packet);
     }
 
     public long getRequestId() {
@@ -80,5 +85,5 @@ public class FinishUploadSoundPacket implements IPacketBase<FinishUploadSoundPac
 
     public SoundFile.Builder getFile() {
         return SoundFile.Builder.fromNbt(nbt, level);
-    }    
+    }
 }

@@ -1,52 +1,46 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundErrorCallback;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
-public class UploadFailedPacket implements IPacketBase<UploadFailedPacket> {
+public class UploadFailedPacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_RESULT = "Result";
 
     private long requestId;
-    private StatusResult error;
+    private DLStatus error;
 
-    public UploadFailedPacket() {}
+    public UploadFailedPacket(DLStatus status) { super(status); }
 
-    public UploadFailedPacket(long requestId, StatusResult error) {
+    public UploadFailedPacket(long requestId, DLStatus error) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.error = error;
     }
 
     @Override
-    public void encode(UploadFailedPacket packet, FriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeBoolean(packet.error.result());
-        buf.writeInt(packet.error.code());
-        buf.writeUtf(packet.error.message());
+    protected void write(CompoundTag tag) {
+        tag.putLong(NBT_REQUEST_ID, requestId);
+        tag.put(NBT_RESULT, error.toNbt());
     }
 
     @Override
-    public UploadFailedPacket decode(FriendlyByteBuf buf) {
-        return new UploadFailedPacket(
-            buf.readLong(),
-            new StatusResult(buf.readBoolean(), buf.readInt(), buf.readUtf())
-        );
+    protected void read(CompoundTag tag) {
+        this.requestId = tag.getLong(NBT_REQUEST_ID);
+        this.error = DLStatus.fromNbt(tag.getCompound(NBT_RESULT));
     }
 
-    @Override
-    public void handle(UploadFailedPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                SoundErrorCallback.run(packet.requestId, packet.error);
-                ClientInstanceManager.closeUploadCallbacks(packet.requestId);
-            });
+    public static void handle(UploadFailedPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            SoundErrorCallback.run(packet.requestId, packet.error);
+            ClientInstanceManager.closeUploadCallbacks(packet.requestId);
         });
     }
-    
 }

@@ -34,11 +34,13 @@ import de.mrjulsen.dragnsounds.net.stc.modify.SoundSeekPacket;
 import de.mrjulsen.dragnsounds.net.stc.modify.SoundVolumePacket;
 import de.mrjulsen.dragnsounds.registry.FilterRegistry;
 import de.mrjulsen.dragnsounds.util.SoundUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 
 /**
  * Contains useful methods to play and manipulate custom sounds on the server side. For client-side sound management see {@code ClientApi}.
@@ -73,7 +75,7 @@ public final class ServerApi {
      * @param error Called when an error occurs or if the process was cancelled.
      * @return The id of the process. Use it to cancel the process.
      */
-    public static long createSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<StatusResult> error) {
+    public static long createSound(String srcFilePath, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<DLStatus> error) {
         return ServerSoundManager.createSound(srcFilePath, builder, settings, callback, error);
     }
     
@@ -86,7 +88,7 @@ public final class ServerApi {
      * @param error Called when an error occurs or if the process was cancelled.
      * @return The id of the process. Use it to cancel the process.
      */
-    public static long createSound(InputStream audioData, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<StatusResult> error) {
+    public static long createSound(InputStream audioData, SoundFile.Builder builder, AudioSettings settings, Consumer<Optional<SoundFile>> callback, Consumer<DLStatus> error) {
         return ServerSoundManager.createSound(audioData, builder, settings, callback, error);
     }
 
@@ -103,7 +105,7 @@ public final class ServerApi {
      * @param error Called when an error occurs or if the conversion was cancelled.
      * @return The id of the process. Use it to cancel the process.
      */
-    public static long playSoundOnce(String srcFilePath, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<StatusResult> error) {
+    public static long playSoundOnce(String srcFilePath, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<DLStatus> error) {
         long id = ServerSoundManager.playSoundOnce(srcFilePath, settings, playback, player, afterConversion, error);
         SoundPlayingCallback.create(id, soundCallback);
         return id;
@@ -122,7 +124,7 @@ public final class ServerApi {
      * @param error Called when an error occurs or if the conversion was cancelled.
      * @return The id of the process. Use it to cancel the process.
      */
-    public static long playSoundOnce(InputStream audioData, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<StatusResult> error) {
+    public static long playSoundOnce(InputStream audioData, AudioSettings settings, PlaybackConfig playback, ServerPlayer[] player, ISoundCreatedCallback soundCallback, Runnable afterConversion, Consumer<DLStatus> error) {
         long id = ServerSoundManager.playSoundOnce(audioData, settings, playback, player, afterConversion, error);
         SoundPlayingCallback.create(id, soundCallback);
         return id;
@@ -136,7 +138,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setDoppler(long soundId, float dopplerValue, Vec3 velocity, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundDopplerPacket(null, soundId, dopplerValue, velocity));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_DOPPLER.send(NetworkDirection.toPlayer(p), new SoundDopplerPacket(null, soundId, dopplerValue, velocity));
+        }
     }
 
     /**
@@ -148,7 +152,9 @@ public final class ServerApi {
      * @param outerGain The gain at the outside of the cone.
      */
     public static void setCone(long soundId, Vec3 direction, float angleA, float angleB, float outerGain, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundConeDirectionPacket(null, soundId, angleA, angleB, outerGain, direction));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_CONE_DIRECTION.send(NetworkDirection.toPlayer(p), new SoundConeDirectionPacket(null, soundId, angleA, angleB, outerGain, direction));
+        }
     }  
 
     /**
@@ -160,7 +166,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setVolumeAndPitch(long soundId, float volume, float pitch, int attenuationDistance, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundVolumePacket(null, soundId, volume, pitch, attenuationDistance));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_VOLUME.send(NetworkDirection.toPlayer(p), new SoundVolumePacket(null, soundId, volume, pitch, attenuationDistance));
+        }
     }
 
     /**
@@ -170,7 +178,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setPosition(long soundId, Vec3 pos, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundPositionPacket(null, soundId, pos));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_POSITION.send(NetworkDirection.toPlayer(p), new SoundPositionPacket(null, soundId, pos));
+        }
     }
 
     /**
@@ -180,7 +190,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void seek(long soundId, int ticks, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundSeekPacket(null, soundId, ticks));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_SEEK.send(NetworkDirection.toPlayer(p), new SoundSeekPacket(null, soundId, ticks));
+        }
     }
 
     /**
@@ -190,7 +202,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setSoundPaused(long soundId, boolean pause, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundPauseResumePacket(null, soundId, pause));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_PAUSE_RESUME.send(NetworkDirection.toPlayer(p), new SoundPauseResumePacket(null, soundId, pause));
+        }
     }
 
     
@@ -202,7 +216,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setDopplerAllInstances(SoundFile file, float dopplerValue, Vec3 velocity, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundDopplerPacket(file, 0, dopplerValue, velocity));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_DOPPLER.send(NetworkDirection.toPlayer(p), new SoundDopplerPacket(file, 0, dopplerValue, velocity));
+        }
     }
 
     /**
@@ -214,7 +230,9 @@ public final class ServerApi {
      * @param outerGain The gain at the outside of the cone.
      */
     public static void setConeAllInstances(SoundFile file, Vec3 direction, float angleA, float angleB, float outerGain, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundConeDirectionPacket(file, 0, angleA, angleB, outerGain, direction));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_CONE_DIRECTION.send(NetworkDirection.toPlayer(p), new SoundConeDirectionPacket(file, 0, angleA, angleB, outerGain, direction));
+        }
     }  
 
     /**
@@ -226,7 +244,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setVolumeAndPitchAllInstances(SoundFile file, float volume, float pitch, int attenuationDistance, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundVolumePacket(file, 0, volume, pitch, attenuationDistance));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_VOLUME.send(NetworkDirection.toPlayer(p), new SoundVolumePacket(file, 0, volume, pitch, attenuationDistance));
+        }
     }
 
     /**
@@ -236,7 +256,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setPositionAllInstances(SoundFile file, Vec3 pos, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundPositionPacket(file, 0, pos));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_POSITION.send(NetworkDirection.toPlayer(p), new SoundPositionPacket(file, 0, pos));
+        }
     }
 
     /**
@@ -246,7 +268,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void seekAllInstances(SoundFile file, int ticks, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundSeekPacket(file, 0, ticks));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_SEEK.send(NetworkDirection.toPlayer(p), new SoundSeekPacket(file, 0, ticks));
+        }
     }
 
     /**
@@ -266,7 +290,9 @@ public final class ServerApi {
      * @param players The affected players.
      */
     public static void setSoundPausedAllInstances(SoundFile file, boolean pause, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new SoundPauseResumePacket(file, 0, pause));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.SOUND_PAUSE_RESUME.send(NetworkDirection.toPlayer(p), new SoundPauseResumePacket(file, 0, pause));
+        }
     }
 
     /**
@@ -275,7 +301,9 @@ public final class ServerApi {
      * @param players The players for whom the sound should be stopped.
      */
     public static void stopSound(long soundId, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new StopSoundRequest(soundId));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.STOP_SOUND_REQUEST.send(NetworkDirection.toPlayer(p), new StopSoundRequest(soundId));
+        }
     }
 
     /**
@@ -284,7 +312,9 @@ public final class ServerApi {
      * @param players The players for whom the sound should be stopped.
      */
     public static void stopAllSoundInstances(SoundFile file, ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new StopSoundInstancesRequest(file));
+        for (ServerPlayer p : players) {
+            ModNetworkManager.STOP_SOUND_INSTANCES.send(NetworkDirection.toPlayer(p), new StopSoundInstancesRequest(file));
+        }
     }
 
     /**
@@ -292,7 +322,9 @@ public final class ServerApi {
      * @param players The players for whom the sound should be stopped.
      */
     public static void stopAllCustomSounds(ServerPlayer[] players) {
-        DragNSounds.net().sendToPlayers(Arrays.stream(players).toList(), new StopAllSoundsPacket());
+        for (ServerPlayer p : players) {
+            ModNetworkManager.STOP_ALL_SOUNDS.send(NetworkDirection.toPlayer(p), new StopAllSoundsPacket());
+        }
     }
 
     /**
@@ -303,7 +335,7 @@ public final class ServerApi {
      */
     public static void isSoundPlaying(long soundId, ServerPlayer player, Consumer<Boolean> callback) {
         final long id = SoundPlayingCheckCallback.create(callback);
-        DragNSounds.net().sendToPlayer(player, new SoundPlayingCheckPacket(id, soundId));
+        ModNetworkManager.SOUND_PLAYING_CHECK.send(NetworkDirection.toPlayer(player), new SoundPlayingCheckPacket(id, soundId));
     }
 
     /**
@@ -387,13 +419,13 @@ public final class ServerApi {
      * @param id The id of the custom sound.
      * @return A status notification.
      */
-    public static StatusResult deleteSound(SoundLocation location, String id) {
+    public static DLStatus deleteSound(SoundLocation location, String id) {
         try {
             return ServerSoundManager.deleteSound(location, id);
         } catch (IOException e) {
             DragNSounds.LOGGER.error("Could not delete sound file.", e);
         }
-        return new StatusResult(false, -3, "Could not delete sound file.");
+        return new DLStatus(DLStatus.FLAG_ERROR, -3, "Could not delete sound file.");
     }
 
     /**
@@ -401,7 +433,7 @@ public final class ServerApi {
      * @param file The sound file to delete.
      * @return A status notification.
      */
-    public static StatusResult deleteSound(SoundFile file) {
+    public static DLStatus deleteSound(SoundFile file) {
         return deleteSound(file.getLocation(), file.getId());
     }
 

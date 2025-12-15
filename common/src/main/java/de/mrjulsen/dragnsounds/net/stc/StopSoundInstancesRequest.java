@@ -1,50 +1,39 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.IPacketBase;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 
-public class StopSoundInstancesRequest implements IPacketBase<StopSoundInstancesRequest> {
+public class StopSoundInstancesRequest extends NetworkPacketData {
 
-    private SoundFile file;
+    private static final String NBT_FILE = "File";
     private CompoundTag nbt;
 
-    public StopSoundInstancesRequest() {}
+    public StopSoundInstancesRequest(DLStatus status) { super(status); }
 
     public StopSoundInstancesRequest(SoundFile file) {
-        this.file = file;
-    }
-
-    private StopSoundInstancesRequest(CompoundTag nbt) {
-        this.nbt = nbt;
+        super(DLStatus.OK);
+        this.nbt = file.serializeNbt();
     }
 
     @Override
-    public void encode(StopSoundInstancesRequest packet, FriendlyByteBuf buf) {
-        buf.writeNbt(packet.file.serializeNbt());
+    protected void write(CompoundTag tag) {
+        tag.put(NBT_FILE, nbt);
     }
 
     @Override
-    public StopSoundInstancesRequest decode(FriendlyByteBuf buf) {
-        return new StopSoundInstancesRequest(
-            buf.readNbt()
-        );
+    protected void read(CompoundTag tag) {
+        this.nbt = tag.getCompound(NBT_FILE);
     }
 
-    @Override
-    public void handle(StopSoundInstancesRequest packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()));
-            });
+    public static void handle(StopSoundInstancesRequest packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
         });
     }
-    
 }
