@@ -68,7 +68,7 @@ public class UploadScreen extends DLWindow {
     public void renderMainLayer(DLGuiGraphics graphics, double mouseX, double mouseY, Rectangle renderBounds) {
         DefaultGuiTextures.DRAGONLIB_UI.getSprite(DefaultGuiTextures.SPRITE_NAME_WINDOW_ROUNDED).render(graphics, 0, 0, width(), height());
         GuiUtils.drawString(graphics, graphics.defaultFont(), width() / 2, height() / 2 - 40, title, DragonLib.VANILLA_UI_FONT_COLOR, ETextAlignment.CENTER, false);
-        GuiUtils.drawString(graphics, graphics.defaultFont(), width() / 2, height() / 2 - 20, currentState == UploadState.CONVERT ? TextUtils.translate(keyConvert) : TextUtils.translate(keyUpload, (int)progressBar.value.get().intValue()), DragonLib.VANILLA_UI_FONT_COLOR, ETextAlignment.CENTER, false);
+        GuiUtils.drawString(graphics, graphics.defaultFont(), width() / 2, height() / 2 - 20, currentState == UploadState.CONVERT ? TextUtils.translate(keyConvert) : TextUtils.translate(keyUpload, (int)(progressBar.value.get().doubleValue() * 100)), DragonLib.VANILLA_UI_FONT_COLOR, ETextAlignment.CENTER, false);
     }
     
     public void setProgress(double d) {
