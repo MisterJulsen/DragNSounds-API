@@ -1,76 +1,64 @@
 package de.mrjulsen.dragnsounds.net.stc.modify;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 
-public class SoundPositionPacket extends BaseNetworkPacket<SoundPositionPacket> {
+public class SoundPositionPacket extends NetworkPacketData {
 
-    private SoundFile file;
+    private static final String NBT_HAS_FILE = "HasFile";
+    private static final String NBT_FILE = "File";
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_X = "X";
+    private static final String NBT_Y = "Y";
+    private static final String NBT_Z = "Z";
+
+    private CompoundTag nbt;
     private long requestId;
     private Vec3 pos;
 
-    private CompoundTag nbt;
-
-    public SoundPositionPacket() {}
+    public SoundPositionPacket(DLStatus status) { super(status); }
 
     public SoundPositionPacket(SoundFile file, long requestId, Vec3 pos) {
+        super(DLStatus.OK);
+        this.nbt = file != null ? file.serializeNbt() : null;
         this.requestId = requestId;
         this.pos = pos;
-        this.file = file;
-    }
-    
-    private SoundPositionPacket(CompoundTag nbt, long requestId, Vec3 pos) {
-        this.requestId = requestId;
-        this.pos = pos;
-        this.nbt = nbt;
     }
 
-    @Override
-    public void encode(SoundPositionPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(packet.file != null);
-        if (packet.file == null) {
-            buf.writeLong(packet.requestId);
-        } else {
-            buf.writeNbt(packet.file.serializeNbt());
-        }
-        buf.writeDouble(packet.pos.x());
-        buf.writeDouble(packet.pos.y());
-        buf.writeDouble(packet.pos.z());
+    @Override protected void write(CompoundTag tag) {
+        tag.putBoolean(NBT_HAS_FILE, nbt != null);
+        if (nbt != null) tag.put(NBT_FILE, nbt);
+        else tag.putLong(NBT_REQUEST_ID, requestId);
+        tag.putDouble(NBT_X, pos.x());
+        tag.putDouble(NBT_Y, pos.y());
+        tag.putDouble(NBT_Z, pos.z());
     }
 
-    @Override
-    public SoundPositionPacket decode(RegistryFriendlyByteBuf buf) {
-        boolean hasFile = buf.readBoolean();
-        return new SoundPositionPacket(
-            hasFile ? buf.readNbt() : null,
-            !hasFile ? buf.readLong() : 0,
-            new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble())
-        );
+    @Override protected void read(CompoundTag tag) {
+        boolean hasFile = tag.getBoolean(NBT_HAS_FILE);
+        this.nbt = hasFile ? tag.getCompound(NBT_FILE) : null;
+        this.requestId = hasFile ? 0 : tag.getLong(NBT_REQUEST_ID);
+        this.pos = new Vec3(tag.getDouble(NBT_X), tag.getDouble(NBT_Y), tag.getDouble(NBT_Z));
     }
 
-    @Override
-    public void handle(SoundPositionPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
-                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPosition(x, packet.pos));
-                } else {
-                    ClientSoundManager.setPosition(packet.requestId, packet.pos);
-                }
-            });
+    public static void handle(SoundPositionPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            if (packet.nbt != null) {
+                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPosition(x, packet.pos));
+            } else {
+                ClientSoundManager.setPosition(packet.requestId, packet.pos);
+            }
         });
     }
-    
 }

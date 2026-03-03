@@ -1,20 +1,23 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
 import java.util.Map;
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundLocation;
 import de.mrjulsen.dragnsounds.net.stc.AllMetadataResponsePacket;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class AllMetadataRequestPacket extends BaseNetworkPacket<AllMetadataRequestPacket> {
+public class AllMetadataRequestPacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_LOCATION = "Location";
+    private static final String NBT_ID = "Id";
 
     private long requestId;
     private SoundLocation location;
@@ -22,43 +25,42 @@ public class AllMetadataRequestPacket extends BaseNetworkPacket<AllMetadataReque
 
     private CompoundTag nbt;
 
-    public AllMetadataRequestPacket() {}
+    public AllMetadataRequestPacket(DLStatus status) {
+        super(status);
+    }
 
     public AllMetadataRequestPacket(long requestId, SoundFile file) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.location = file.getLocation();
         this.id = file.getId();
     }
 
     private AllMetadataRequestPacket(long requestId, CompoundTag nbt, String id) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.nbt = nbt;
         this.id = id;
     }
 
     @Override
-    public void encode(AllMetadataRequestPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeNbt(packet.location.serializeNbt());
-        buf.writeUtf(packet.id);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_REQUEST_ID, requestId);
+        nbt.put(NBT_LOCATION, location.serializeNbt());
+        nbt.putString(NBT_ID, id);
     }
 
     @Override
-    public AllMetadataRequestPacket decode(RegistryFriendlyByteBuf buf) {
-        return new AllMetadataRequestPacket(
-            buf.readLong(),
-            buf.readNbt(),
-            buf.readUtf()
-        );
+    protected void read(CompoundTag nbt) {
+        this.requestId = nbt.getLong(NBT_REQUEST_ID);
+        this.id = nbt.getString(NBT_ID);
+        this.nbt = nbt.getCompound(NBT_LOCATION);
     }
-
-    @Override
-    public void handle(AllMetadataRequestPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
-            Map<String, String> metadata = ServerSoundManager.getAllSoundFileMetadata(loc, packet.id);
-            DLNetworkManager.sendToPlayer((ServerPlayer)contextSupplier.get().getPlayer(), new AllMetadataResponsePacket(packet.requestId, metadata));
-        });
+    
+    public static void handle(AllMetadataRequestPacket packet, NetworkPacketContext context) {        
+        SoundLocation loc = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
+        Map<String, String> metadata = ServerSoundManager.getAllSoundFileMetadata(loc, packet.id);
+        ModNetworkManager.RESPONSE_ALL_METADATA.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new AllMetadataResponsePacket(packet.requestId, metadata));
     }
     
 }

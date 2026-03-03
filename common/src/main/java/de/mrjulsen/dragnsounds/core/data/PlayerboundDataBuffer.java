@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import de.mrjulsen.dragnsounds.DragNSounds;
 import de.mrjulsen.dragnsounds.api.Api;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
 
 public class PlayerboundDataBuffer implements AutoCloseable {
     private byte[] buffer;
@@ -74,7 +74,7 @@ public class PlayerboundDataBuffer implements AutoCloseable {
         positions.computeIfAbsent(player, x -> new HashMap<>()).computeIfAbsent(soundId, x -> 0);
     }
 
-    public StatusResult remove(UUID player, long soundId, int returnReason) {
+    public DLStatus remove(UUID player, long soundId, int returnReason) {
         if (positions.containsKey(player)) {            
             Map<Long, Integer> positionsBySound = positions.get(player);
             positionsBySound.remove(soundId);
@@ -85,13 +85,13 @@ public class PlayerboundDataBuffer implements AutoCloseable {
 
         switch (returnReason) {
             case NO_PLAYER_WITH_UUID:
-                return new StatusResult(!positions.containsKey(player), NO_PLAYER_WITH_UUID, null);
+                return new DLStatus(positions.containsKey(player) ? DLStatus.FLAG_ERROR : DLStatus.FLAG_OK, NO_PLAYER_WITH_UUID, null);
             case NO_SOUND_WITH_ID:
-                return new StatusResult(positions.values().stream().allMatch(x -> x.keySet().stream().noneMatch(y -> y == soundId)), NO_SOUND_WITH_ID, null);
+                return new DLStatus(positions.values().stream().allMatch(x -> x.keySet().stream().noneMatch(y -> y == soundId)) ? DLStatus.FLAG_OK : DLStatus.FLAG_ERROR, NO_SOUND_WITH_ID, null);
             case NO_SOUND_AND_PLAYER:
-                return new StatusResult(!positions.containsKey(player) && positions.values().stream().allMatch(x -> x.keySet().stream().noneMatch(y -> y == soundId)), NO_SOUND_AND_PLAYER, null);
+                return new DLStatus((!positions.containsKey(player) && positions.values().stream().allMatch(x -> x.keySet().stream().noneMatch(y -> y == soundId))) ? DLStatus.FLAG_OK : DLStatus.FLAG_ERROR, NO_SOUND_AND_PLAYER, null);
             default:
-                return new StatusResult(positions.isEmpty(), NO_LISTENERS, null);            
+                return new DLStatus(positions.isEmpty() ? DLStatus.FLAG_OK : DLStatus.FLAG_ERROR, NO_LISTENERS, null);            
         }
     }
 

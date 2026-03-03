@@ -2,10 +2,10 @@ package de.mrjulsen.dragnsounds.core.data;
 
 import java.util.Arrays;
 
-import de.mrjulsen.mcdragonlib.core.ITranslatableEnum;
-import net.minecraft.util.StringRepresentable;
+import de.mrjulsen.dragnsounds.DragNSounds;
+import de.mrjulsen.mcdragonlib.data.ITranslatableEnum;
 
-public enum ESoundType implements StringRepresentable, ITranslatableEnum {
+public enum ESoundType implements ITranslatableEnum {
     UI(0, "ui"),
     WORLD(1, "world");
 
@@ -30,18 +30,8 @@ public enum ESoundType implements StringRepresentable, ITranslatableEnum {
     }
 
     @Override
-    public String getEnumName() {
-        return "sound_type";
-    }
-
-    @Override
-    public String getEnumValueName() {
-        return getName();
-    }
-
-    @Override
-    public String getSerializedName() {
-        return getName();
+    public Data getTranslationData() {
+        return new Data(DragNSounds.MOD_ID, "sound_type", name);
     }
     
 }

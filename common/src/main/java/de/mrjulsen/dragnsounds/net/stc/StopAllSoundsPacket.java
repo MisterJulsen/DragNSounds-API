@@ -1,33 +1,23 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class StopAllSoundsPacket extends BaseNetworkPacket<StopAllSoundsPacket> {
+public class StopAllSoundsPacket extends NetworkPacketData {
 
-    public StopAllSoundsPacket() {}
+    public StopAllSoundsPacket() { super(DLStatus.OK); }
+    public StopAllSoundsPacket(de.mrjulsen.mcdragonlib.data.DLStatus status) { super(status); }
 
-    @Override
-    public void encode(StopAllSoundsPacket packet, RegistryFriendlyByteBuf buf) {}
+    @Override protected void write(net.minecraft.nbt.CompoundTag tag) {}
+    @Override protected void read(net.minecraft.nbt.CompoundTag tag) {}
 
-    @Override
-    public StopAllSoundsPacket decode(RegistryFriendlyByteBuf buf) {
-        return new StopAllSoundsPacket();
-    }
-
-    @Override
-    public void handle(StopAllSoundsPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.stopAllSounds();
-            });
+    public static void handle(StopAllSoundsPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            ClientSoundManager.stopAllSounds();
         });
     }
-    
 }

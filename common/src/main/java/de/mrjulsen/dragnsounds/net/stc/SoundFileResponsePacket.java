@@ -1,62 +1,47 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundFileCallback;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundFileResponsePacket extends BaseNetworkPacket<SoundFileResponsePacket> {
+public class SoundFileResponsePacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_HAS = "Has";
+    private static final String NBT_FILE = "File";
 
     private long requestId;
-    private SoundFile file;
-
     private CompoundTag nbt;
 
-    public SoundFileResponsePacket() {}
-
+    public SoundFileResponsePacket(DLStatus status) { super(status); }
     public SoundFileResponsePacket(long requestId, SoundFile file) {
+        super(DLStatus.OK);
         this.requestId = requestId;
-        this.file = file;
+        this.nbt = file != null ? file.serializeNbt() : null;
     }
 
-    private SoundFileResponsePacket(long requestId, CompoundTag nbt) {
-        this.requestId = requestId;
-        this.nbt = nbt;
+    @Override protected void write(CompoundTag tag) {
+        tag.putLong(NBT_REQUEST_ID, requestId);
+        tag.putBoolean(NBT_HAS, nbt != null);
+        if (nbt != null) tag.put(NBT_FILE, nbt);
     }
 
-    @Override
-    public void encode(SoundFileResponsePacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        boolean b = packet.file != null;
-        buf.writeBoolean(b);
-        if (b) {
-            buf.writeNbt(packet.file.serializeNbt());
-        }
+    @Override protected void read(CompoundTag tag) {
+        this.requestId = tag.getLong(NBT_REQUEST_ID);
+        this.nbt = tag.getBoolean(NBT_HAS) ? tag.getCompound(NBT_FILE) : null;
     }
 
-    @Override
-    public SoundFileResponsePacket decode(RegistryFriendlyByteBuf buf) {
-        return new SoundFileResponsePacket(
-            buf.readLong(),
-            buf.readBoolean() ? buf.readNbt() : null
-        );
-    }
-
-    @Override
-    public void handle(SoundFileResponsePacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.ofNullable(SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()));
-                SoundFileCallback.run(packet.requestId, file);
-            });
+    public static void handle(SoundFileResponsePacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.ofNullable(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
+            SoundFileCallback.run(packet.requestId, file);
         });
     }
-
 }

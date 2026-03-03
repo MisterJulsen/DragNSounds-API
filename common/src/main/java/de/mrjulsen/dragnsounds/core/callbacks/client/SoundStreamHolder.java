@@ -2,12 +2,13 @@ package de.mrjulsen.dragnsounds.core.callbacks.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.data.SoundDataStream;
 
 public class SoundStreamHolder {
-    private static final Map<Long, SoundDataStream> holder = new HashMap<>();
+    private static final Map<Long, SoundDataStream> holder = new ConcurrentHashMap<>();
 
     public static SoundDataStream getOrCreate(long requestId, Supplier<SoundDataStream> value) {
         return holder.computeIfAbsent(requestId, x -> value.get());

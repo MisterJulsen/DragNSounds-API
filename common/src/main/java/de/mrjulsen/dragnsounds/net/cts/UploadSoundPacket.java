@@ -1,24 +1,32 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
-public class UploadSoundPacket extends BaseNetworkPacket<UploadSoundPacket> implements Comparable<UploadSoundPacket> {
+public class UploadSoundPacket extends NetworkPacketData implements Comparable<UploadSoundPacket> {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_INDEX = "Index";
+    private static final String NBT_HAS_MORE = "HasMore";
+    private static final String NBT_DATA = "Data";
+    private static final String NBT_MAX_SIZE = "MaxSize";
 
     private long requestId;
     private int index;
     private boolean hasMore;
     private byte[] data;
-    private int maxSize;    
+    private int maxSize;
 
-    public UploadSoundPacket() {}
+    public UploadSoundPacket(DLStatus status) {
+        super(status);
+    }
 
     public UploadSoundPacket(long requestId, int index, boolean hasMore, int maxSize, byte[] data) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.index = index;
         this.hasMore = hasMore;
@@ -27,30 +35,25 @@ public class UploadSoundPacket extends BaseNetworkPacket<UploadSoundPacket> impl
     }
 
     @Override
-    public void encode(UploadSoundPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeInt(packet.index);
-        buf.writeBoolean(packet.hasMore);
-        buf.writeInt(packet.maxSize);
-        buf.writeByteArray(packet.data);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_REQUEST_ID, requestId);
+        nbt.putInt(NBT_INDEX, index);
+        nbt.putBoolean(NBT_HAS_MORE, hasMore);
+        nbt.putInt(NBT_MAX_SIZE, maxSize);
+        nbt.putByteArray(NBT_DATA, data != null ? data : new byte[0]);
     }
 
     @Override
-    public UploadSoundPacket decode(RegistryFriendlyByteBuf buf) {
-        return new UploadSoundPacket(
-            buf.readLong(),
-            buf.readInt(),
-            buf.readBoolean(),
-            buf.readInt(),
-            buf.readByteArray()
-        );
+    protected void read(CompoundTag nbt) {
+        this.requestId = nbt.getLong(NBT_REQUEST_ID);
+        this.index = nbt.getInt(NBT_INDEX);
+        this.hasMore = nbt.getBoolean(NBT_HAS_MORE);
+        this.maxSize = nbt.getInt(NBT_MAX_SIZE);
+        this.data = nbt.getByteArray(NBT_DATA);
     }
 
-    @Override
-    public void handle(UploadSoundPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            ServerSoundManager.receiveUploadPacket((ServerPlayer)contextSupplier.get().getPlayer(), packet);
-        });
+    public static void handle(UploadSoundPacket packet, NetworkPacketContext context) {
+        ServerSoundManager.receiveUploadPacket((ServerPlayer) context.getPlayer(), packet);
     }
 
     public byte[] getData() {
@@ -76,5 +79,5 @@ public class UploadSoundPacket extends BaseNetworkPacket<UploadSoundPacket> impl
     @Override
     public int compareTo(UploadSoundPacket o) {
         return o == null ? 0 : index - o.index;
-    }    
+    }
 }

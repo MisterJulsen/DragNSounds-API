@@ -1,74 +1,59 @@
 package de.mrjulsen.dragnsounds.net.stc.modify;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 import de.mrjulsen.dragnsounds.core.ClientInstanceManager;
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class SoundSeekPacket extends BaseNetworkPacket<SoundSeekPacket> {
+public class SoundSeekPacket extends NetworkPacketData {
 
-    private SoundFile file;
+    private static final String NBT_HAS_FILE = "HasFile";
+    private static final String NBT_FILE = "File";
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_TICKS = "Ticks";
+
+    private CompoundTag nbt;
     private long requestId;
     private int ticks;
 
-    private CompoundTag nbt;
-
-    public SoundSeekPacket() {}
+    public SoundSeekPacket(DLStatus status) { super(status); }
 
     public SoundSeekPacket(SoundFile file, long requestId, int ticks) {
+        super(DLStatus.OK);
+        this.nbt = file != null ? file.serializeNbt() : null;
         this.requestId = requestId;
         this.ticks = ticks;
-        this.file = file;
-    }
-    
-    private SoundSeekPacket(CompoundTag nbt, long requestId, int ticks) {
-        this.requestId = requestId;
-        this.ticks = ticks;
-        this.nbt = nbt;
     }
 
-    @Override
-    public void encode(SoundSeekPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(packet.file != null);
-        if (packet.file == null) {
-            buf.writeLong(packet.requestId);
-        } else {
-            buf.writeNbt(packet.file.serializeNbt());
-        }
-        buf.writeInt(packet.ticks);
+    @Override protected void write(CompoundTag tag) {
+        tag.putBoolean(NBT_HAS_FILE, nbt != null);
+        if (nbt != null) tag.put(NBT_FILE, nbt);
+        else tag.putLong(NBT_REQUEST_ID, requestId);
+        tag.putInt(NBT_TICKS, ticks);
     }
 
-    @Override
-    public SoundSeekPacket decode(RegistryFriendlyByteBuf buf) {
-        boolean hasFile = buf.readBoolean();
-        return new SoundSeekPacket(
-            hasFile ? buf.readNbt() : null,
-            !hasFile ? buf.readLong() : 0,
-            buf.readInt()
-        );
+    @Override protected void read(CompoundTag tag) {
+        boolean hasFile = tag.getBoolean(NBT_HAS_FILE);
+        this.nbt = hasFile ? tag.getCompound(NBT_FILE) : null;
+        this.requestId = hasFile ? 0 : tag.getLong(NBT_REQUEST_ID);
+        this.ticks = tag.getInt(NBT_TICKS);
     }
 
-    @Override
-    public void handle(SoundSeekPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                if (packet.nbt != null) {
-                    SoundFile file = SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level());
-                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.seek(x, packet.ticks));
-                } else {
-                    ClientSoundManager.seek(packet.requestId, packet.ticks);
-                }
-                
-            });
+    public static void handle(SoundSeekPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            if (packet.nbt != null) {
+                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.seek(x, packet.ticks));
+            } else {
+                ClientSoundManager.seek(packet.requestId, packet.ticks);
+            }
         });
     }
-    
 }

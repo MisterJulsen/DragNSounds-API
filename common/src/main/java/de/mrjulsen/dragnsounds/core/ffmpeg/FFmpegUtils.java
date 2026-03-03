@@ -9,7 +9,7 @@ import de.mrjulsen.dragnsounds.api.ClientApi.UploadProgress;
 import de.mrjulsen.dragnsounds.api.ClientApi.UploadState;
 import de.mrjulsen.dragnsounds.core.callbacks.client.SoundUploadCancelCallback;
 import de.mrjulsen.dragnsounds.core.data.WritableInputStream;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
 import net.minecraft.client.Minecraft;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
@@ -43,7 +43,7 @@ public final class FFmpegUtils {
      * @deprecated Use {@code convertToOggStream} instead, as it doesn't use temp files.
      */
     @Deprecated
-    public static void convertToOggFile(long requestId, File source, File target, AudioSettings settings, Consumer<UploadProgress> onProgressChanged, Consumer<File> onFinished, Consumer<StatusResult> onError) {
+    public static void convertToOggFile(long requestId, File source, File target, AudioSettings settings, Consumer<UploadProgress> onProgressChanged, Consumer<File> onFinished, Consumer<DLStatus> onError) {
         ConvertProgressListener listener = new ConvertProgressListener(onProgressChanged);
         try {
             // Audio Attributes
@@ -77,7 +77,7 @@ public final class FFmpegUtils {
                     DragNSounds.LOGGER.error("Unable to convert audio file.", e);
                     if (onError != null) {
                         Minecraft.getInstance().execute(() -> {
-                            onError.accept(new StatusResult(false, -1, e.getLocalizedMessage()));
+                            onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -1, e.getLocalizedMessage()));
                         });
                     }
                     SoundUploadCancelCallback.close(requestId);
@@ -88,7 +88,7 @@ public final class FFmpegUtils {
         } catch (Exception e) {
             DragNSounds.LOGGER.error("Error converting sound.", e);
             if (onError != null) {
-                onError.accept(new StatusResult(false, -2, e.getLocalizedMessage()));
+                onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -2, e.getLocalizedMessage()));
             }
             SoundUploadCancelCallback.close(requestId);
         }
@@ -103,7 +103,7 @@ public final class FFmpegUtils {
      * @param onFinished This method will be called after converting the audio file. Pass {@code null}, if you don't want to use this.
      * @param onError This method will be called when an error occurs. Pass {@code null}, if you don't want to use this.
      */
-    public static void convertToOggStream(long requestId, InputStream audioInputData, AudioSettings settings, Consumer<InputStream> onFinished, Consumer<StatusResult> onError, WritableInputStream outStream) throws IOException {
+    public static void convertToOggStream(long requestId, InputStream audioInputData, AudioSettings settings, Consumer<InputStream> onFinished, Consumer<DLStatus> onError, WritableInputStream outStream) throws IOException {
         // Audio Attributes
         AudioAttributes audio = new AudioAttributes();
         audio.setCodec(VORBIS_CODEC);
@@ -162,7 +162,7 @@ public final class FFmpegUtils {
                 DragNSounds.LOGGER.error("Unable to convert audio file.", e);
                 if (onError != null) {
                     Minecraft.getInstance().execute(() -> {
-                        onError.accept(new StatusResult(false, -1, e.getLocalizedMessage()));
+                        onError.accept(new DLStatus(DLStatus.FLAG_ERROR, -1, e.getLocalizedMessage()));
                     });
                 }
             }
@@ -188,8 +188,8 @@ public final class FFmpegUtils {
      * @param key The key of the metadata entry.
      * @return A {@code StatusResult} object. The {@code message()} method will return the value (if available) or an empty string.
      */
-    public static StatusResult getMetadataSafe(MultimediaInfo info, String key) {
-        return info.getAudio().getMetadata().containsKey(key) ? new StatusResult(true, 0, info.getAudio().getMetadata().get(key)) : new StatusResult(false, -1, "");
+    public static DLStatus getMetadataSafe(MultimediaInfo info, String key) {
+        return info.getAudio().getMetadata().containsKey(key) ? new DLStatus(DLStatus.FLAG_OK, 0, info.getAudio().getMetadata().get(key)) : new DLStatus(DLStatus.FLAG_ERROR, -1, "");
     }
 
 

@@ -9,8 +9,9 @@ import de.mrjulsen.dragnsounds.api.ServerApi;
 import de.mrjulsen.dragnsounds.core.data.ECompareOperation;
 import de.mrjulsen.dragnsounds.core.data.filter.FileInfoFilter;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.util.TimeUtils;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.util.time.DLTime;
+import de.mrjulsen.mcdragonlib.util.time.VanillaTimeSystem;
 import dev.architectury.utils.GameInstance;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -60,9 +61,9 @@ public class CommonConfig {
         SPEC = BUILDER.build();
     }
     
-    public static StatusResult checkFilePermissions(int fileSize, ServerPlayer player) {
+    public static DLStatus checkFilePermissions(int fileSize, ServerPlayer player) {
         if ((MAX_FILE_SIZE.get() >= 0 && fileSize > MAX_FILE_SIZE.get()) || fileSize > MAX_FILE_SIZE_BYTES) {
-            return new StatusResult(false, -1, "Not allowed to upload files larger than " + MAX_FILE_SIZE.get() + " bytes!");
+            return new DLStatus(DLStatus.FLAG_ERROR, -1, "Not allowed to upload files larger than " + MAX_FILE_SIZE.get() + " bytes!");
         }
 
         if (player != null) {
@@ -76,22 +77,22 @@ public class CommonConfig {
                 }
                 
                 if (MAX_FILES_PER_USER.get() >= 0 && count >= MAX_FILES_PER_USER.get()) {
-                    return new StatusResult(false, -2, "A maximum of " + MAX_FILES_PER_USER.get() + " files may be uploaded per player!");
+                    return new DLStatus(DLStatus.FLAG_ERROR, -2, "A maximum of " + MAX_FILES_PER_USER.get() + " files may be uploaded per player!");
                 }
                 if (MAX_FILE_STORAGE_SPACE.get() >= 0 && totalSize > MAX_FILE_STORAGE_SPACE.get()) {
-                    return new StatusResult(false, -3, "The maximum storage quota of " + MAX_FILE_STORAGE_SPACE.get() + " bytes has already been exhausted!");
+                    return new DLStatus(DLStatus.FLAG_ERROR, -3, "The maximum storage quota of " + MAX_FILE_STORAGE_SPACE.get() + " bytes has already been exhausted!");
                 }
             }
         }
         
-        return new StatusResult(true, 0, "");
+        return new DLStatus(DLStatus.FLAG_OK, 0, "");
     }
 
-    public static StatusResult checkAudioPermissions(SoundFile file, UUID player) {
+    public static DLStatus checkAudioPermissions(SoundFile file, UUID player) {
         if (MAX_AUDIO_DURATION.get() >= 0 && file.getInfo().getDuration() > MAX_AUDIO_DURATION.get()) {
-            return new StatusResult(false, -1, "Not allowed to upload audio files longer than " + TimeUtils.formatDurationMs(MAX_AUDIO_DURATION.get()) + "!");
+            return new DLStatus(DLStatus.FLAG_ERROR, -1, "Not allowed to upload audio files longer than " + DLTime.fromReal(0, 0, 0, MAX_AUDIO_DURATION.get().intValue(), 0, VanillaTimeSystem.INSTANCE).toRealMillis() + "!");
         }
 
-        return new StatusResult(true, 0, "");
+        return new DLStatus(DLStatus.FLAG_OK, 0, "");
     }
 }

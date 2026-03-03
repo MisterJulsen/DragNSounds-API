@@ -1,40 +1,41 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback;
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCallback.ESoundPlaybackStatus;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 
-public class StopSoundNotificationPacket extends BaseNetworkPacket<StopSoundNotificationPacket> {
+public class StopSoundNotificationPacket extends NetworkPacketData {
+
+    private static final String NBT_SOUND_ID = "SoundId";
 
     private long soundId;
 
-    public StopSoundNotificationPacket() {}
+    public StopSoundNotificationPacket(DLStatus status) {
+        super(status);
+    }
 
     public StopSoundNotificationPacket(long soundId) {
+        super(DLStatus.OK);
         this.soundId = soundId;
     }
 
     @Override
-    public void encode(StopSoundNotificationPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.soundId);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_SOUND_ID, soundId);
     }
 
     @Override
-    public StopSoundNotificationPacket decode(RegistryFriendlyByteBuf buf) {
-        return new StopSoundNotificationPacket(buf.readLong());
+    protected void read(CompoundTag nbt) {
+        this.soundId = nbt.getLong(NBT_SOUND_ID);
     }
 
-    @Override
-    public void handle(StopSoundNotificationPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            SoundPlayingCallback.runAndClose(packet.soundId, contextSupplier.get().getPlayer(), ESoundPlaybackStatus.STOP);
-            ServerSoundManager.stopSound(contextSupplier.get().getPlayer(), packet.soundId);
-        });
+    public static void handle(StopSoundNotificationPacket packet, NetworkPacketContext context) {
+        SoundPlayingCallback.runAndClose(packet.soundId, context.getPlayer(), ESoundPlaybackStatus.STOP);
+        ServerSoundManager.stopSound((ServerPlayer) context.getPlayer(), packet.soundId);
     }
-    
 }

@@ -20,9 +20,10 @@ import de.mrjulsen.dragnsounds.config.CommonConfig;
 import de.mrjulsen.dragnsounds.core.ffmpeg.EChannels;
 import de.mrjulsen.dragnsounds.net.cts.RemoveMetadataPacket;
 import de.mrjulsen.dragnsounds.net.cts.UpdateMetadataPacket;
+import de.mrjulsen.dragnsounds.registry.ModNetworkManager;
 import de.mrjulsen.dragnsounds.util.ExtendedNBTUtils;
-import de.mrjulsen.mcdragonlib.data.StatusResult;
-import de.mrjulsen.mcdragonlib.net.DLNetworkManager;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkDirection;
 import de.mrjulsen.mcdragonlib.util.IOUtils;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
@@ -85,7 +86,7 @@ public class SoundFile {
      */
     public void updateMetadata(Map<String, String> meta) {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            DLNetworkManager.sendToServer(new UpdateMetadataPacket(id, location, meta));
+            ModNetworkManager.UPDATE_METADATA.send(NetworkDirection.toServer(), new UpdateMetadataPacket(id, location, meta));
         });
         EnvExecutor.runInEnv(Env.SERVER, () -> () -> {
             try {
@@ -105,7 +106,7 @@ public class SoundFile {
      */
     public void removeMetadata(Set<String> keys) {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            DLNetworkManager.sendToServer(new RemoveMetadataPacket(id, location, keys));
+            ModNetworkManager.REMOVE_METADATA.send(NetworkDirection.toServer(), new RemoveMetadataPacket(id, location, keys));
         });
         EnvExecutor.runInEnv(Env.SERVER, () -> () -> {
             try {
@@ -362,8 +363,8 @@ public class SoundFile {
                 );
                 soundFile.metadata.putAll(metadata);
 
-                StatusResult result = CommonConfig.checkAudioPermissions(soundFile, owner);
-                if (!result.result()) {
+                DLStatus result = CommonConfig.checkAudioPermissions(soundFile, owner);
+                if (result.flag() != DLStatus.FLAG_OK) {
                     file.delete();
                     throw new IOException(result.message());
                 }

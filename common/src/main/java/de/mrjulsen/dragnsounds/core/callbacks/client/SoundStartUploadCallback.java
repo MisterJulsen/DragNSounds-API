@@ -4,17 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import de.mrjulsen.mcdragonlib.data.StatusResult;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
 
 public class SoundStartUploadCallback {
-    private static final Map<Long, Consumer<StatusResult>> callbacks = new HashMap<>();
+    private static final Map<Long, Consumer<DLStatus>> callbacks = new HashMap<>();
 
-    public static long create(long requestId, Consumer<StatusResult> callback) {
+    public static long create(long requestId, Consumer<DLStatus> callback) {
         callbacks.put(requestId, callback);
         return requestId;
     }   
 
-    public static boolean run(long id, StatusResult value) {
+    public static boolean run(long id, DLStatus value) {
         boolean b = callbacks.containsKey(id);
         if (b) {
             callbacks.remove(id).accept(value);

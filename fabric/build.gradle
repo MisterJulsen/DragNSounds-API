@@ -33,7 +33,7 @@ dependencies {
 	modRuntimeOnly("eu.pb4:placeholder-api:${project.text_placeholder_api_version}")
     modRuntimeOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
     modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${rootProject.forge_config_api_port_version}")
-    modImplementation(include("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}"))
+    modImplementation("de.mrjulsen.mcdragonlib:dragonlib-fabric:${rootProject.minecraft_version}-${rootProject.dragonlib_version}")
      
     if (rootProject.includeDependencies.toBoolean()) {        
         modImplementation(include("ws.schild:jave-core:${rootProject.jave_version}"))

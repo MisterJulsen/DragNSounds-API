@@ -1,77 +1,59 @@
 package de.mrjulsen.dragnsounds.net.stc;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ClientSoundManager;
 import de.mrjulsen.dragnsounds.core.data.PlaybackConfig;
 import de.mrjulsen.dragnsounds.core.filesystem.SoundFile;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class PlaySoundPacket extends BaseNetworkPacket<PlaySoundPacket> {
+public class PlaySoundPacket extends NetworkPacketData {
+
+    private static final String NBT_SOUND_ID = "SoundId";
+    private static final String NBT_TRIGGER = "Trigger";
+    private static final String NBT_FILE = "File";
+    private static final String NBT_CONFIG = "Config";
+    private static final String NBT_CLIENT_REQ = "ClientReq";
 
     private long soundId;
     private int triggerIndex;
-    private SoundFile file;
+    private CompoundTag nbt;
     private PlaybackConfig playback;
     private long clientCallbackRequestId;
 
-    private CompoundTag nbt;
-
-    public PlaySoundPacket() {}
+    public PlaySoundPacket(DLStatus status) { super(status); }
 
     public PlaySoundPacket(long soundId, int triggerIndex, SoundFile file, PlaybackConfig config, long clientCallbackRequestId) {
+        super(DLStatus.OK);
         this.soundId = soundId;
         this.triggerIndex = triggerIndex;
-        this.file = file;
+        this.nbt = file.serializeNbt();
         this.playback = config;
         this.clientCallbackRequestId = clientCallbackRequestId;
     }
 
-    private PlaySoundPacket(long soundId, int triggerIndex, CompoundTag nbt, PlaybackConfig config, long clientCallbackRequestId) {
-        this.soundId = soundId;
-        this.triggerIndex = triggerIndex;
-        this.nbt = nbt;
-        this.playback = config;
-        this.clientCallbackRequestId = clientCallbackRequestId;
+    @Override protected void write(CompoundTag tag) {
+        tag.putLong(NBT_SOUND_ID, soundId);
+        tag.putInt(NBT_TRIGGER, triggerIndex);
+        tag.put(NBT_FILE, nbt);
+        tag.put(NBT_CONFIG, playback.serializeNbt());
+        tag.putLong(NBT_CLIENT_REQ, clientCallbackRequestId);
     }
 
-    @Override
-    public void encode(PlaySoundPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.soundId);
-        buf.writeInt(packet.triggerIndex);
-        buf.writeNbt(packet.file.serializeNbt());
-        buf.writeNbt(packet.playback.serializeNbt());
-        buf.writeLong(packet.clientCallbackRequestId);
+    @Override protected void read(CompoundTag tag) {
+        this.soundId = tag.getLong(NBT_SOUND_ID);
+        this.triggerIndex = tag.getInt(NBT_TRIGGER);
+        this.nbt = tag.getCompound(NBT_FILE);
+        this.playback = PlaybackConfig.deserializeNbt(tag.getCompound(NBT_CONFIG));
+        this.clientCallbackRequestId = tag.getLong(NBT_CLIENT_REQ);
     }
 
-    @Override
-    public PlaySoundPacket decode(RegistryFriendlyByteBuf buf) {
-        long soundId = buf.readLong();
-        int triggerIndex = buf.readInt();
-        CompoundTag nbt = buf.readNbt();
-        PlaybackConfig playback = PlaybackConfig.deserializeNbt(buf.readNbt());
-        long clientCallbackRequestId = buf.readLong();
-        return new PlaySoundPacket(
-            soundId,
-            triggerIndex,
-            nbt,
-            playback,
-            clientCallbackRequestId
-        );
-    }
-
-    @Override
-    public void handle(PlaySoundPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, contextSupplier.get().getPlayer().level()), packet.playback, packet.clientCallbackRequestId);
-            });
+    public static void handle(PlaySoundPacket packet, NetworkPacketContext context) {
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+            ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, context.getPlayer().level()), packet.playback, packet.clientCallbackRequestId);
         });
     }
-    
 }

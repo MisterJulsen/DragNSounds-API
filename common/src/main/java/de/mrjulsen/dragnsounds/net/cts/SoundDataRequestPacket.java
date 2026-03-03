@@ -1,47 +1,49 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.ServerSoundManager;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
+import net.minecraft.nbt.CompoundTag;
 
-public class SoundDataRequestPacket extends BaseNetworkPacket<SoundDataRequestPacket> {
+public class SoundDataRequestPacket extends NetworkPacketData {
+
+    private static final String NBT_SOUND_ID = "SoundId";
+    private static final String NBT_SIZE = "Size";
+    private static final String NBT_INDEX = "Index";
 
     private long soundId;
     private int size;
     private int index;
 
-    public SoundDataRequestPacket() {}
+    public SoundDataRequestPacket(DLStatus status) {
+        super(status);
+    }
 
     public SoundDataRequestPacket(long soundId, int size, int index) {
+        super(DLStatus.OK);
         this.soundId = soundId;
         this.size = size;
         this.index = index;
     }
 
     @Override
-    public void encode(SoundDataRequestPacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.soundId);
-        buf.writeInt(packet.size);
-        buf.writeInt(packet.index);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_SOUND_ID, soundId);
+        nbt.putInt(NBT_SIZE, size);
+        nbt.putInt(NBT_INDEX, index);
     }
 
     @Override
-    public SoundDataRequestPacket decode(RegistryFriendlyByteBuf buf) {
-        return new SoundDataRequestPacket(
-            buf.readLong(),
-            buf.readInt(),
-            buf.readInt()
-        );
+    protected void read(CompoundTag nbt) {
+        this.soundId = nbt.getLong(NBT_SOUND_ID);
+        this.size = nbt.getInt(NBT_SIZE);
+        this.index = nbt.getInt(NBT_INDEX);
     }
 
-    @Override
-    public void handle(SoundDataRequestPacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            ServerSoundManager.sendSoundData(contextSupplier.get().getPlayer(), packet.soundId, packet.size, packet.index);
-        });
+    
+    public static void handle(SoundDataRequestPacket packet, NetworkPacketContext context) {
+        ServerSoundManager.sendSoundData(context.getPlayer(), packet.soundId, packet.size, packet.index);
     }
     
 }

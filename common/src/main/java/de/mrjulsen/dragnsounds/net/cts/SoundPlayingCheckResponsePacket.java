@@ -1,43 +1,42 @@
 package de.mrjulsen.dragnsounds.net.cts;
 
-import java.util.function.Supplier;
-
 import de.mrjulsen.dragnsounds.core.callbacks.server.SoundPlayingCheckCallback;
-import de.mrjulsen.mcdragonlib.net.BaseNetworkPacket;
-import dev.architectury.networking.NetworkManager.PacketContext;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import de.mrjulsen.mcdragonlib.data.DLStatus;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketContext;
+import de.mrjulsen.mcdragonlib.network.NetworkPacketData;
+import net.minecraft.nbt.CompoundTag;
 
-public class SoundPlayingCheckResponsePacket extends BaseNetworkPacket<SoundPlayingCheckResponsePacket> {
+public class SoundPlayingCheckResponsePacket extends NetworkPacketData {
+
+    private static final String NBT_REQUEST_ID = "RequestId";
+    private static final String NBT_VALUE = "Value";
 
     private long requestId;
     private boolean value;
 
-    public SoundPlayingCheckResponsePacket() {}
+    public SoundPlayingCheckResponsePacket(DLStatus status) {
+        super(status);
+    }
 
     public SoundPlayingCheckResponsePacket(long requestId, boolean value) {
+        super(DLStatus.OK);
         this.requestId = requestId;
         this.value = value;
     }
 
     @Override
-    public void encode(SoundPlayingCheckResponsePacket packet, RegistryFriendlyByteBuf buf) {
-        buf.writeLong(packet.requestId);
-        buf.writeBoolean(packet.value);
+    protected void write(CompoundTag nbt) {
+        nbt.putLong(NBT_REQUEST_ID, requestId);
+        nbt.putBoolean(NBT_VALUE, value);
     }
 
     @Override
-    public SoundPlayingCheckResponsePacket decode(RegistryFriendlyByteBuf buf) {
-        return new SoundPlayingCheckResponsePacket(
-            buf.readLong(), 
-            buf.readBoolean()
-        );
+    protected void read(CompoundTag nbt) {
+        this.requestId = nbt.getLong(NBT_REQUEST_ID);
+        this.value = nbt.getBoolean(NBT_VALUE);
     }
 
-    @Override
-    public void handle(SoundPlayingCheckResponsePacket packet, Supplier<PacketContext> contextSupplier) {
-        contextSupplier.get().queue(() -> {
-            SoundPlayingCheckCallback.run(packet.requestId, packet.value);
-        });
+    public static void handle(SoundPlayingCheckResponsePacket packet, NetworkPacketContext context) {
+        SoundPlayingCheckCallback.run(packet.requestId, packet.value);
     }
-
 }
