@@ -1,0 +1,20 @@
+{
+    "generated_at": "2026-03-03T16:05:17Z",
+    "mod_id": "dragnsounds",
+    "display_name": "DragNSounds API",
+    "mod_version": "0.2.1",
+    "minecraft_version": "1.21.1",
+    "release_channel_raw": "beta",
+    "full_version": "1.21.1-beta-0.2.1+2",
+    "release_channel": "beta",
+    "artifacts": {
+        "fabric": {
+            "filename": "dragnsounds-fabric-1.21.1-beta-0.2.1+2",
+            "platform": "fabric"
+        },
+        "neoforge": {
+            "filename": "dragnsounds-neoforge-1.21.1-beta-0.2.1+2",
+            "platform": "neoforge"
+        }
+    }
+}
