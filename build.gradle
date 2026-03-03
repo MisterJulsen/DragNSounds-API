@@ -11,7 +11,7 @@ architectury {
 
 allprojects {
     group = rootProject.maven_group
-    version = "$rootProject.minecraft_version${rootProject.release_channel != "release" ? "-$rootProject.release_channel" : ""}-$rootProject.mod_version"
+    version = "$rootProject.minecraft_version${rootProject.release_channel != "release" ? "-$rootProject.release_channel" : ""}-$rootProject.mod_version${rootProject.build_number != "0" ? "+$rootProject.build_number" : ""}"
 }
 
 subprojects {
