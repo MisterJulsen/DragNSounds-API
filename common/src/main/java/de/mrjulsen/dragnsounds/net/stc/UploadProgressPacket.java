@@ -38,8 +38,10 @@ public class UploadProgressPacket extends NetworkPacketData {
     }
 
     public static void handle(UploadProgressPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundUploadProgressCallback.run(packet.requestId, packet.progress);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                SoundUploadProgressCallback.run(packet.requestId, packet.progress);
+            });
         });
     }
 }

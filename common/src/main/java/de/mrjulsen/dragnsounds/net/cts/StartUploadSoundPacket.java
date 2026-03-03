@@ -41,8 +41,10 @@ public class StartUploadSoundPacket extends NetworkPacketData {
     }
 
     public static void handle(StartUploadSoundPacket packet, NetworkPacketContext context) {
-        DLStatus result = ServerSoundManager.prepareUploadPacket((ServerPlayer) context.getPlayer(), packet);
-        ModNetworkManager.START_UPLOAD_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new StartUploadResponsePacket(packet.requestId, result));
+        context.queue(() -> {
+            DLStatus result = ServerSoundManager.prepareUploadPacket((ServerPlayer) context.getPlayer(), packet);
+            ModNetworkManager.START_UPLOAD_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new StartUploadResponsePacket(packet.requestId, result));
+        });
     }
 
     public long getRequestId() {

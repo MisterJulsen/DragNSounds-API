@@ -53,9 +53,11 @@ public class SoundListChunkResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundListChunkResponsePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            for (CompoundTag t : packet.nbt) SoundListCallback.get(packet.requestId).add(SoundFile.fromNbt(t, context.getPlayer().level()));
-            if (!packet.hasMore) SoundListCallback.runIfPresent(packet.requestId);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                for (CompoundTag t : packet.nbt) SoundListCallback.get(packet.requestId).add(SoundFile.fromNbt(t, context.getPlayer().level()));
+                if (!packet.hasMore) SoundListCallback.runIfPresent(packet.requestId);
+            });
         });
     }
 }

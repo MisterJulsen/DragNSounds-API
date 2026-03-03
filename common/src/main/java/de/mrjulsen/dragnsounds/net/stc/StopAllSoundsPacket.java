@@ -16,8 +16,10 @@ public class StopAllSoundsPacket extends NetworkPacketData {
     @Override protected void read(net.minecraft.nbt.CompoundTag tag) {}
 
     public static void handle(StopAllSoundsPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            ClientSoundManager.stopAllSounds();
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                ClientSoundManager.stopAllSounds();
+            });
         });
     }
 }

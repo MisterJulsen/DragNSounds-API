@@ -66,11 +66,13 @@ public class UpdateMetadataPacket extends NetworkPacketData {
     }
 
     public static void handle(UpdateMetadataPacket packet, NetworkPacketContext context) {
-        SoundLocation location = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
-        try {
-            SoundFile.updateMetadataInternal(location, packet.id, packet.metadata);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        context.queue(() -> {
+            SoundLocation location = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
+            try {
+                SoundFile.updateMetadataInternal(location, packet.id, packet.metadata);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

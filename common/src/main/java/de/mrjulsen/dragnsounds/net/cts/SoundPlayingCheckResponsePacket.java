@@ -37,6 +37,8 @@ public class SoundPlayingCheckResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundPlayingCheckResponsePacket packet, NetworkPacketContext context) {
-        SoundPlayingCheckCallback.run(packet.requestId, packet.value);
+        context.queue(() -> {
+            SoundPlayingCheckCallback.run(packet.requestId, packet.value);
+        });
     }
 }

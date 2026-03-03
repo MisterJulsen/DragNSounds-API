@@ -49,8 +49,10 @@ public class SoundDataPacket extends NetworkPacketData implements Comparable<Sou
     }
 
     public static void handle(SoundDataPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(dev.architectury.utils.Env.CLIENT, () -> () -> {
-            ClientInstanceManager.receiveSoundData(packet);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(dev.architectury.utils.Env.CLIENT, () -> () -> {
+                ClientInstanceManager.receiveSoundData(packet);
+            });
         });
     }
 

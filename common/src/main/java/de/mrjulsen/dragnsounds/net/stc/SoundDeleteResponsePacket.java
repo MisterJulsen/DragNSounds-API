@@ -37,8 +37,10 @@ public class SoundDeleteResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundDeleteResponsePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundDeleteCallback.run(packet.requestId, packet.result);
-        });
+       context.queue(() -> {
+           EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+               SoundDeleteCallback.run(packet.requestId, packet.result);
+           });
+       });
     }
 }

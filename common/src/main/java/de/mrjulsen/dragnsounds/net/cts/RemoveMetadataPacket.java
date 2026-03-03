@@ -65,12 +65,14 @@ public class RemoveMetadataPacket extends NetworkPacketData {
 
     
     public static void handle(RemoveMetadataPacket packet, NetworkPacketContext context) {
-        SoundLocation location = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
-        try {
-            SoundFile.removeMetadataInternal(location, packet.id, packet.metadata);
-        } catch (IOException e) {
-            DragNSounds.LOGGER.error("Unable to remove metadata.", e);
-        }
+        context.queue(() -> {
+            SoundLocation location = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
+            try {
+                SoundFile.removeMetadataInternal(location, packet.id, packet.metadata);
+            } catch (IOException e) {
+                DragNSounds.LOGGER.error("Unable to remove metadata.", e);
+            }
+        });
     }
     
 }

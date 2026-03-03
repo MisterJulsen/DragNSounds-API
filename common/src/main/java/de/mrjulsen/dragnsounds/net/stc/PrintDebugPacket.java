@@ -17,8 +17,10 @@ public class PrintDebugPacket extends NetworkPacketData {
     @Override protected void read(CompoundTag tag) {}
 
     public static void handle(PrintDebugPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            context.getPlayer().sendSystemMessage(ClientInstanceManager.debugComponent());
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                context.getPlayer().sendSystemMessage(ClientInstanceManager.debugComponent());
+            });
         });
     }
 }

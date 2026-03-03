@@ -52,13 +52,15 @@ public class SoundPositionPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundPositionPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPosition(x, packet.pos));
-            } else {
-                ClientSoundManager.setPosition(packet.requestId, packet.pos);
-            }
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                if (packet.nbt != null) {
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPosition(x, packet.pos));
+                } else {
+                    ClientSoundManager.setPosition(packet.requestId, packet.pos);
+                }
+            });
         });
     }
 }

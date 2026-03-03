@@ -58,9 +58,11 @@ public class AllMetadataRequestPacket extends NetworkPacketData {
     }
     
     public static void handle(AllMetadataRequestPacket packet, NetworkPacketContext context) {        
-        SoundLocation loc = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
-        Map<String, String> metadata = ServerSoundManager.getAllSoundFileMetadata(loc, packet.id);
-        ModNetworkManager.RESPONSE_ALL_METADATA.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new AllMetadataResponsePacket(packet.requestId, metadata));
+        context.queue(() -> {
+            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
+            Map<String, String> metadata = ServerSoundManager.getAllSoundFileMetadata(loc, packet.id);
+            ModNetworkManager.RESPONSE_ALL_METADATA.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new AllMetadataResponsePacket(packet.requestId, metadata));
+        });
     }
     
 }

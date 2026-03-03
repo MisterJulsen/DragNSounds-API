@@ -53,7 +53,9 @@ public class UploadSoundPacket extends NetworkPacketData implements Comparable<U
     }
 
     public static void handle(UploadSoundPacket packet, NetworkPacketContext context) {
-        ServerSoundManager.receiveUploadPacket((ServerPlayer) context.getPlayer(), packet);
+        context.queue(() -> {
+            ServerSoundManager.receiveUploadPacket((ServerPlayer) context.getPlayer(), packet);
+        });
     }
 
     public byte[] getData() {

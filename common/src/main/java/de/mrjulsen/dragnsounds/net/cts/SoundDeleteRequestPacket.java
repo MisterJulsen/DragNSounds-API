@@ -59,15 +59,17 @@ public class SoundDeleteRequestPacket extends NetworkPacketData {
 
     
     public static void handle(SoundDeleteRequestPacket packet, NetworkPacketContext context) {        
-        SoundLocation loc = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
-        DLStatus result;
-        try {
-            result = ServerSoundManager.deleteSound(loc, packet.id);
-        } catch (IOException e) {
-            DragNSounds.LOGGER.error("Unable to delete sound file: " + packet.id, e);
-            result = new DLStatus(DLStatus.FLAG_ERROR, Integer.MIN_VALUE, e.getLocalizedMessage());
-        }
-        ModNetworkManager.SOUND_DELETE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundDeleteResponsePacket(packet.requestId, result));
+        context.queue(() -> {
+            SoundLocation loc = SoundLocation.fromNbt(packet.nbt, context.getPlayer().level());
+            DLStatus result;
+            try {
+                result = ServerSoundManager.deleteSound(loc, packet.id);
+            } catch (IOException e) {
+                DragNSounds.LOGGER.error("Unable to delete sound file: " + packet.id, e);
+                result = new DLStatus(DLStatus.FLAG_ERROR, Integer.MIN_VALUE, e.getLocalizedMessage());
+            }
+            ModNetworkManager.SOUND_DELETE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundDeleteResponsePacket(packet.requestId, result));
+        });
     }
     
 }

@@ -35,7 +35,9 @@ public class StopSoundNotificationPacket extends NetworkPacketData {
     }
 
     public static void handle(StopSoundNotificationPacket packet, NetworkPacketContext context) {
-        SoundPlayingCallback.runAndClose(packet.soundId, context.getPlayer(), ESoundPlaybackStatus.STOP);
-        ServerSoundManager.stopSound((ServerPlayer) context.getPlayer(), packet.soundId);
+        context.queue(() -> {
+            SoundPlayingCallback.runAndClose(packet.soundId, context.getPlayer(), ESoundPlaybackStatus.STOP);
+            ServerSoundManager.stopSound((ServerPlayer) context.getPlayer(), packet.soundId);
+        });
     }
 }

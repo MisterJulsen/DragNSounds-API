@@ -57,13 +57,15 @@ public class SoundDopplerPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundDopplerPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setDoppler(x, packet.doppler, packet.velocity));
-            } else {
-                ClientSoundManager.setDoppler(packet.requestId, packet.doppler, packet.velocity);
-            }
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                if (packet.nbt != null) {
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setDoppler(x, packet.doppler, packet.velocity));
+                } else {
+                    ClientSoundManager.setDoppler(packet.requestId, packet.doppler, packet.velocity);
+                }
+            });
         });
     }
 }

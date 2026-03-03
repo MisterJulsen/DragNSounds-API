@@ -55,6 +55,8 @@ public class PlaySoundRequestPacket extends NetworkPacketData {
 
     
     public static void handle(PlaySoundRequestPacket packet, NetworkPacketContext context) {
-        ServerSoundManager.playSound(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()), packet.playback, new ServerPlayer[] { (ServerPlayer)context.getPlayer() }, packet.requestId);
+        context.queue(() -> {
+            ServerSoundManager.playSound(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()), packet.playback, new ServerPlayer[] { (ServerPlayer)context.getPlayer() }, packet.requestId);
+        });
     }
 }

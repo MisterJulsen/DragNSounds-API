@@ -41,8 +41,10 @@ public class AllMetadataResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(AllMetadataResponsePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundMetadataCallback.run(packet.requestId, packet.metadata);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                SoundMetadataCallback.run(packet.requestId, packet.metadata);
+            });
         });
     }
 }

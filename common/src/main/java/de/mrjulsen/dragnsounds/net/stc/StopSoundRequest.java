@@ -31,8 +31,10 @@ public class StopSoundRequest extends NetworkPacketData {
     }
 
     public static void handle(StopSoundRequest packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            ClientSoundManager.stopSound(packet.soundId);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                ClientSoundManager.stopSound(packet.soundId);
+            });
         });
     }
 }

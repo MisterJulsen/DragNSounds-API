@@ -34,8 +34,10 @@ public class CancelUploadSoundPacket extends NetworkPacketData {
 
     
     public static void handle(CancelUploadSoundPacket packet, NetworkPacketContext context) {
-        DragNSounds.LOGGER.info("Cancel sound file upload...");
-        ServerSoundManager.closeUpload(packet.requestId);
+        context.queue(() -> {
+            DragNSounds.LOGGER.info("Cancel sound file upload...");
+            ServerSoundManager.closeUpload(packet.requestId);
+        });
     }
     
 }

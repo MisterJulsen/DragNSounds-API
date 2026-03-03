@@ -26,9 +26,11 @@ public class SoundPlayingCheckPacket extends NetworkPacketData {
     @Override protected void read(CompoundTag tag) { this.requestId = tag.getLong(NBT_REQUEST_ID); this.soundId = tag.getLong(NBT_SOUND_ID); }
 
     public static void handle(SoundPlayingCheckPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            boolean isPlaying = SoundChannelsHolder.has(packet.soundId);
-            ModNetworkManager.SOUND_PLAYING_CHECK_RESPONSE.send(NetworkDirection.toServer(), new SoundPlayingCheckResponsePacket(packet.requestId, isPlaying));
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                boolean isPlaying = SoundChannelsHolder.has(packet.soundId);
+                ModNetworkManager.SOUND_PLAYING_CHECK_RESPONSE.send(NetworkDirection.toServer(), new SoundPlayingCheckResponsePacket(packet.requestId, isPlaying));
+            });
         });
     }
 }

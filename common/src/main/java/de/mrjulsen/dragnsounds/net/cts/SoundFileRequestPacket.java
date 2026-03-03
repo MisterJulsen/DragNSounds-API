@@ -60,12 +60,14 @@ public class SoundFileRequestPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundFileRequestPacket packet, NetworkPacketContext context) {
-        try {
-            SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, context.getPlayer().level()), packet.id);
-            ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, file));
-        } catch (IOException e) {
-            DragNSounds.LOGGER.warn("Could not find sound file.", e);
-            ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, (SoundFile) null));
-        }
+        context.queue(() -> {
+            try {
+                SoundFile file = ServerSoundManager.getSoundFile(SoundLocation.fromNbt(packet.nbt, context.getPlayer().level()), packet.id);
+                ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, file));
+            } catch (IOException e) {
+                DragNSounds.LOGGER.warn("Could not find sound file.", e);
+                ModNetworkManager.SOUND_FILE_RESPONSE.send(NetworkDirection.toPlayer((ServerPlayer)context.getPlayer()), new SoundFileResponsePacket(packet.requestId, (SoundFile) null));
+            }
+        });
     }
 }

@@ -40,7 +40,9 @@ public class SoundCreatedResponsePacket extends NetworkPacketData {
 
     
     public static void handle(SoundCreatedResponsePacket packet, NetworkPacketContext context) {
-        SoundPlayingCallback.run(packet.soundId, context.getPlayer(), packet.status);
+        context.queue(() -> {
+            SoundPlayingCallback.run(packet.soundId, context.getPlayer(), packet.status);
+        });
     }
     
 }

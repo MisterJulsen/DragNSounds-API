@@ -81,6 +81,8 @@ public class SoundListRequestPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundListRequestPacket packet, NetworkPacketContext context) {
-        ServerSoundManager.sendFileListToPlayer(context.getPlayer(), packet.requestId, context.getPlayer().level(), packet.filter);
+        context.queue(() -> {
+            ServerSoundManager.sendFileListToPlayer(context.getPlayer(), packet.requestId, context.getPlayer().level(), packet.filter);
+        });
     }
 }

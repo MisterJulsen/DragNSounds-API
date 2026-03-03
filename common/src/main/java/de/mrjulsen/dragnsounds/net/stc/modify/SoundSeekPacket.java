@@ -47,13 +47,15 @@ public class SoundSeekPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundSeekPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.seek(x, packet.ticks));
-            } else {
-                ClientSoundManager.seek(packet.requestId, packet.ticks);
-            }
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                if (packet.nbt != null) {
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.seek(x, packet.ticks));
+                } else {
+                    ClientSoundManager.seek(packet.requestId, packet.ticks);
+                }
+            });
         });
     }
 }

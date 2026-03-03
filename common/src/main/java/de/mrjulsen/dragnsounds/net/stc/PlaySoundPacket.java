@@ -52,8 +52,10 @@ public class PlaySoundPacket extends NetworkPacketData {
     }
 
     public static void handle(PlaySoundPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, context.getPlayer().level()), packet.playback, packet.clientCallbackRequestId);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                ClientSoundManager.playSoundQueue(packet.soundId, packet.triggerIndex, SoundFile.fromNbt(packet.nbt, context.getPlayer().level()), packet.playback, packet.clientCallbackRequestId);
+            });
         });
     }
 }

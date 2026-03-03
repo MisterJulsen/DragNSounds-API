@@ -67,8 +67,10 @@ public class FinishUploadSoundPacket extends NetworkPacketData {
 
     
     public static void handle(FinishUploadSoundPacket packet, NetworkPacketContext context) {
-        packet.level = context.getPlayer().level();
-        ServerInstanceManager.getUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)context.getPlayer()).setFinalizerPacket(packet);
+        context.queue(() -> {
+            packet.level = context.getPlayer().level();
+            ServerInstanceManager.getUploadBuffer(packet.requestId, packet.maxSize, (ServerPlayer)context.getPlayer()).setFinalizerPacket(packet);
+        });
     }
 
     public long getRequestId() {

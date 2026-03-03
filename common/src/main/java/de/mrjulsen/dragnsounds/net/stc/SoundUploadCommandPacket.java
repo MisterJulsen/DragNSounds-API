@@ -52,44 +52,46 @@ public class SoundUploadCommandPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundUploadCommandPacket packet, NetworkPacketContext context) {
-        System.out.println(context.getPlayer());
-        System.out.println(context.getPlayer().getServer());
         context.queue(() -> {
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                SoundUtils.showUploadDialog(false, (files) -> {
-                    if (!files.isPresent()) return;
-                    try {
-                        AtomicReference<UploadScreen> screen = new AtomicReference<>(null);
-                        long uploadId = ClientSoundManager.uploadSound(
-                                files.get()[0].toString(),
-                                SoundFile.Builder.fromNbt(packet.builderNbt, context.getPlayer().level()),
-                                packet.settings != null ? packet.settings : AudioSettings.getByFile(files.get()[0].toString()),
-                                (file) -> {
-                                    if (Minecraft.getInstance().screen instanceof DLScreen sc) {
-                                        sc.getWindowManager().close();
+            System.out.println(context.getPlayer());
+            System.out.println(context.getPlayer().getServer());
+            context.queue(() -> {
+                EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                    SoundUtils.showUploadDialog(false, (files) -> {
+                        if (!files.isPresent()) return;
+                        try {
+                            AtomicReference<UploadScreen> screen = new AtomicReference<>(null);
+                            long uploadId = ClientSoundManager.uploadSound(
+                                    files.get()[0].toString(),
+                                    SoundFile.Builder.fromNbt(packet.builderNbt, context.getPlayer().level()),
+                                    packet.settings != null ? packet.settings : AudioSettings.getByFile(files.get()[0].toString()),
+                                    (file) -> {
+                                        if (Minecraft.getInstance().screen instanceof DLScreen sc) {
+                                            sc.getWindowManager().close();
+                                        }
+                                    }, (client, server) -> {
+                                        if (screen.get() != null) {
+                                            screen.get().setCurrentState(server.state());
+                                            screen.get().setProgress(server.progress());
+                                        }
+                                    }, (e) -> {
+                                        context.getPlayer().sendSystemMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED));
+                                        if (Minecraft.getInstance().screen instanceof DLScreen sc) {
+                                            sc.getWindowManager().close();
+                                        }
                                     }
-                                }, (client, server) -> {
-                                    if (screen.get() != null) {
-                                        screen.get().setCurrentState(server.state());
-                                        screen.get().setProgress(server.progress());
-                                    }
-                                }, (e) -> {
-                                    context.getPlayer().sendSystemMessage(TextUtils.translate("gui." + DragNSounds.MOD_ID + ".upload.failed").withStyle(ChatFormatting.RED));
-                                    if (Minecraft.getInstance().screen instanceof DLScreen sc) {
-                                        sc.getWindowManager().close();
-                                    }
-                                }
-                        );
-                        if (packet.showProgress) {
-                            DLWindow.openWindow(mgr -> {
-                                UploadScreen uploadScreen = new UploadScreen(mgr, uploadId);
-                                screen.set(uploadScreen);
-                                return uploadScreen;
-                            });
+                            );
+                            if (packet.showProgress) {
+                                DLWindow.openWindow(mgr -> {
+                                    UploadScreen uploadScreen = new UploadScreen(mgr, uploadId);
+                                    screen.set(uploadScreen);
+                                    return uploadScreen;
+                                });
+                            }
+                        } catch (EncoderException e) {
+                            DragNSounds.LOGGER.error("Unable to upload sound.", e);
                         }
-                    } catch (EncoderException e) {
-                        DragNSounds.LOGGER.error("Unable to upload sound.", e);
-                    }
+                    });
                 });
             });
         });

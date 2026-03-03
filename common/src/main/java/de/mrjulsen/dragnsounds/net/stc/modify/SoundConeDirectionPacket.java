@@ -71,13 +71,15 @@ public class SoundConeDirectionPacket extends NetworkPacketData {
     }
 
     public static void handle(SoundConeDirectionPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setCone(x, packet.direction, packet.angleA, packet.angleB, packet.outerGain));
-            } else {
-                ClientSoundManager.setCone(packet.requestId, packet.direction, packet.angleA, packet.angleB, packet.outerGain);
-            }
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                if (packet.nbt != null) {
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setCone(x, packet.direction, packet.angleA, packet.angleB, packet.outerGain));
+                } else {
+                    ClientSoundManager.setCone(packet.requestId, packet.direction, packet.angleA, packet.angleB, packet.outerGain);
+                }
+            });
         });
     }
 }

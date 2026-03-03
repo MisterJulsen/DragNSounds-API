@@ -41,9 +41,11 @@ public class UploadSuccessPacket extends NetworkPacketData {
     }
 
     public static void handle(UploadSuccessPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundUploadCallback.run(packet.requestId, Optional.ofNullable(packet.nbt == null ? null : SoundFile.fromNbt(packet.nbt, context.getPlayer().level())));
-            ClientInstanceManager.closeUploadCallbacks(packet.requestId);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                SoundUploadCallback.run(packet.requestId, Optional.ofNullable(packet.nbt == null ? null : SoundFile.fromNbt(packet.nbt, context.getPlayer().level())));
+                ClientInstanceManager.closeUploadCallbacks(packet.requestId);
+            });
         });
     }
 }

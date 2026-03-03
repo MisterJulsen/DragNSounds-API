@@ -39,9 +39,11 @@ public class SoundFileResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundFileResponsePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.ofNullable(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
-            SoundFileCallback.run(packet.requestId, file);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                Optional<SoundFile> file = packet.nbt == null ? Optional.empty() : Optional.ofNullable(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
+                SoundFileCallback.run(packet.requestId, file);
+            });
         });
     }
 }

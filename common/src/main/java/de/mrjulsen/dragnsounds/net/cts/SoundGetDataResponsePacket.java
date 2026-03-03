@@ -42,6 +42,8 @@ public class SoundGetDataResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundGetDataResponsePacket packet, NetworkPacketContext context) {
-        SoundGetDataCallback.run(packet.soundId, context.getPlayer(), packet.data);
+        context.queue(() -> {
+            SoundGetDataCallback.run(packet.soundId, context.getPlayer(), packet.data);
+        });
     }
 }

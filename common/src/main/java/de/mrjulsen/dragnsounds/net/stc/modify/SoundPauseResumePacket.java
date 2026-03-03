@@ -47,13 +47,15 @@ public class SoundPauseResumePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundPauseResumePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPaused(x, packet.pause));
-            } else {
-                ClientSoundManager.setPaused(packet.requestId, packet.pause);
-            }
-        });
+        context.queue(() -> {
+           EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+               if (packet.nbt != null) {
+                   SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                   Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> ClientSoundManager.setPaused(x, packet.pause));
+               } else {
+                   ClientSoundManager.setPaused(packet.requestId, packet.pause);
+               }
+           });
+       });
     }
 }

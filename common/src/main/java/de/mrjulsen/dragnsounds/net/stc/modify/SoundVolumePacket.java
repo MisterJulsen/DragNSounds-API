@@ -57,13 +57,15 @@ public class SoundVolumePacket extends NetworkPacketData {
     }
 
     public static void handle(SoundVolumePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            if (packet.nbt != null) {
-                SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
-                Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> apply(x, packet.volume, packet.pitch, packet.attenuationDistance));
-            } else {
-                apply(packet.requestId, packet.volume, packet.pitch, packet.attenuationDistance);
-            }
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                if (packet.nbt != null) {
+                    SoundFile file = SoundFile.fromNbt(packet.nbt, context.getPlayer().level());
+                    Arrays.stream(ClientInstanceManager.getInstancesOfSound(file)).forEach(x -> apply(x, packet.volume, packet.pitch, packet.attenuationDistance));
+                } else {
+                    apply(packet.requestId, packet.volume, packet.pitch, packet.attenuationDistance);
+                }
+            });
         });
     }
 

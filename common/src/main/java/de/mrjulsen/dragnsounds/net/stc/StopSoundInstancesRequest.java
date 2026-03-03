@@ -32,8 +32,10 @@ public class StopSoundInstancesRequest extends NetworkPacketData {
     }
 
     public static void handle(StopSoundInstancesRequest packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                ClientSoundManager.stopAllSoundInstances(SoundFile.fromNbt(packet.nbt, context.getPlayer().level()));
+            });
         });
     }
 }

@@ -39,8 +39,10 @@ public class StartUploadResponsePacket extends NetworkPacketData {
     }
 
     public static void handle(StartUploadResponsePacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundStartUploadCallback.run(packet.requestId, packet.status);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                SoundStartUploadCallback.run(packet.requestId, packet.status);
+            });
         });
     }
 }

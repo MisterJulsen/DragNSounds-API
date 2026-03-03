@@ -38,9 +38,11 @@ public class UploadFailedPacket extends NetworkPacketData {
     }
 
     public static void handle(UploadFailedPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            SoundErrorCallback.run(packet.requestId, packet.error);
-            ClientInstanceManager.closeUploadCallbacks(packet.requestId);
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                SoundErrorCallback.run(packet.requestId, packet.error);
+                ClientInstanceManager.closeUploadCallbacks(packet.requestId);
+            });
         });
     }
 }

@@ -23,8 +23,10 @@ public class SoundGetDataRequestPacket extends NetworkPacketData {
     @Override protected void read(CompoundTag tag) { this.soundId = tag.getLong(NBT_SOUND_ID); }
 
     public static void handle(SoundGetDataRequestPacket packet, NetworkPacketContext context) {
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            ModNetworkManager.SOUND_GET_DATA_RESPONSE.send(NetworkDirection.toServer(), new SoundGetDataResponsePacket(packet.soundId, ClientSoundManager.getData(packet.soundId)));
+        context.queue(() -> {
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
+                ModNetworkManager.SOUND_GET_DATA_RESPONSE.send(NetworkDirection.toServer(), new SoundGetDataResponsePacket(packet.soundId, ClientSoundManager.getData(packet.soundId)));
+            });
         });
     }
 }
